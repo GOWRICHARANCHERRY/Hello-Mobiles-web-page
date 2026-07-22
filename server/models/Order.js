@@ -1,0 +1,57 @@
+import mongoose from 'mongoose';
+
+const orderItemSchema = new mongoose.Schema({
+  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  name: String,
+  price: Number,
+  quantity: { type: Number, required: true, min: 1 },
+  image: String,
+});
+
+const orderSchema = new mongoose.Schema({
+  orderNumber: { type: String, unique: true },
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  items: [orderItemSchema],
+  shippingAddress: {
+    name: String,
+    phone: String,
+    street: String,
+    city: String,
+    state: String,
+    pincode: String,
+  },
+  paymentMethod: { type: String, enum: ['online', 'cod', 'store_pickup'], required: true },
+  paymentStatus: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
+  orderStatus: {
+    type: String,
+    enum: ['confirmed', 'processing', 'packed', 'shipped', 'delivered', 'cancelled'],
+    default: 'confirmed',
+  },
+  subtotal: Number,
+  deliveryCharge: { type: Number, default: 0 },
+  discount: { type: Number, default: 0 },
+  total: Number,
+  emiDetails: {
+    tenure: Number,
+    monthlyEmi: Number,
+    downPayment: { type: Number, default: 0 },
+  },
+  exchangeDetails: {
+    oldPhoneModel: String,
+    exchangeValue: { type: Number, default: 0 },
+  },
+  trackingId: String,
+  deliveredAt: Date,
+  invoiceUrl: String,
+  notes: String,
+}, { timestamps: true });
+
+orderSchema.pre('save', async function (next) {
+  if (!this.orderNumber) {
+    const count = await mongoose.model('Order').countDocuments();
+    this.orderNumber = `HM${1001 + count}`;
+  }
+  next();
+});
+
+export default mongoose.model('Order', orderSchema);
