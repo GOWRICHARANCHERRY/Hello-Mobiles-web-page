@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { Home, Search, ShoppingCart, User, Heart, Menu, X, LogOut, Calculator, RotateCcw, LogIn } from 'lucide-react';
+import { Home, Search, ShoppingCart, User, Heart, Menu, X, LogOut, Calculator, RotateCcw, LogIn, Mail, Instagram } from 'lucide-react';
 import { useState } from 'react';
 import LoginPopup from '../../components/LoginPopup';
 
@@ -164,8 +164,20 @@ export default function CustomerLayout() {
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-800 text-center py-4 text-sm text-gray-500">
-          &copy; 2024 Hello Mobiles & Electronics. All rights reserved.
+        <div className="border-t border-gray-800 py-4">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-sm text-gray-500">&copy; 2024 Hello Mobiles & Electronics. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="https://www.instagram.com/hellomobilesandelectronics?igsh=MW1wY3JhOTh3ZW81MA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-gray-400 hover:text-pink-500 transition text-sm">
+                <Instagram size={16} /> Instagram
+              </a>
+              <a href="mailto:svlnmobiles12@gmail.com"
+                className="flex items-center gap-1.5 text-gray-400 hover:text-gold-400 transition text-sm">
+                <Mail size={16} /> svlnmobiles12@gmail.com
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
 
