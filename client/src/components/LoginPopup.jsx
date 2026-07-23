@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { X, Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,21 +27,12 @@ export default function LoginPopup({ onClose }) {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const { loginWithGoogle } = await import('../../context/AuthContext');
-    } catch {}
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential: credentialResponse.credential }),
-      });
-      const data = await res.json();
-      if (data.token) {
-        localStorage.setItem('token', data.token);
+      const res = await api.post('/auth/google', { credential: credentialResponse.credential });
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
         window.location.reload();
-        onClose();
       } else {
-        toast.error(data.message || 'Google login failed');
+        toast.error(res.data.message || 'Google login failed');
       }
     } catch {
       toast.error('Google login failed');
