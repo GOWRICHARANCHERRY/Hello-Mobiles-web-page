@@ -40,11 +40,11 @@ export default function LoginPopup({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative animate-scale-in">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative animate-scale-in" onClick={e => e.stopPropagation()}>
         {/* Close Button */}
         <button onClick={onClose}
-          className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-800 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110">
+          className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm text-gray-500 hover:text-gray-800 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer">
           <X size={18} />
         </button>
 
