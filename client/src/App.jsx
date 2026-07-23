@@ -35,8 +35,14 @@ import AdminBanners from './pages/admin/AdminBanners';
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>;
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/" />;
   if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
+  return children;
+}
+
+function OptionalAuthRoute({ children }) {
+  const { loading } = useAuth();
+  if (loading) return <div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>;
   return children;
 }
 
@@ -44,7 +50,7 @@ function AppRoutes() {
   const { user } = useAuth();
 
   const getHomeRoute = () => {
-    if (!user) return '/login';
+    if (!user) return '/';
     if (user.role === 'admin') return '/admin';
     if (user.role === 'employee') return '/employee';
     return '/';
@@ -55,10 +61,13 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to={getHomeRoute()} /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to={getHomeRoute()} /> : <Signup />} />
 
-      <Route path="/" element={<ProtectedRoute roles={['customer']}><CustomerLayout /></ProtectedRoute>}>
+      <Route path="/" element={<OptionalAuthRoute><CustomerLayout /></OptionalAuthRoute>}>
         <Route index element={<Home />} />
         <Route path="products" element={<ProductList />} />
         <Route path="products/:id" element={<ProductDetail />} />
+      </Route>
+
+      <Route path="/" element={<ProtectedRoute roles={['customer']}><CustomerLayout /></ProtectedRoute>}>
         <Route path="cart" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
         <Route path="orders" element={<Orders />} />

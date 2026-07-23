@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import LoginPopup from '../../components/LoginPopup';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -16,6 +17,7 @@ export default function ProductDetail() {
   const [inWishlist, setInWishlist] = useState(false);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   useEffect(() => {
     api.get(`/products/${id}`).then(r => {
@@ -25,17 +27,19 @@ export default function ProductDetail() {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!user) return setShowLoginPopup(true);
     addToCart(product, quantity);
     toast.success('Added to cart!');
   };
 
   const handleBuyNow = () => {
+    if (!user) return setShowLoginPopup(true);
     addToCart(product, quantity);
     navigate('/checkout');
   };
 
   const handleWishlist = async () => {
-    if (!user) return navigate('/login');
+    if (!user) return setShowLoginPopup(true);
     try {
       await api.post(`/auth/wishlist/${product._id}`);
       setInWishlist(!inWishlist);
@@ -194,6 +198,8 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
+
+      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 import HeroCarousel from '../../components/HeroCarousel';
-import { Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon, Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw } from 'lucide-react';
+import { Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon, Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
   { name: 'Mobiles', icon: Smartphone, color: 'from-gold-400 to-gold-600' },
@@ -15,10 +16,14 @@ const categories = [
 
 const brands = ['Apple', 'Samsung', 'Vivo', 'Oppo', 'Realme', 'Redmi', 'Sony', 'LG'];
 
+import LoginPopup from '../../components/LoginPopup';
+
 export default function Home() {
+  const { user } = useAuth();
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [offerProducts, setOfferProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   useEffect(() => {
     api.get('/products?featured=true').then(r => setFeaturedProducts(r.data)).catch(() => {});
@@ -176,6 +181,19 @@ export default function Home() {
           </a>
         </div>
       </div>
+
+      {/* Login CTA for guests */}
+      {!user && (
+        <div className="gold-gradient rounded-2xl p-6 text-center text-white">
+          <p className="text-lg font-semibold mb-2">Login to unlock exclusive deals, track orders & manage your cart!</p>
+          <button onClick={() => setShowLoginPopup(true)}
+            className="bg-white text-gold-700 px-6 py-2 rounded-lg font-semibold text-sm hover:shadow-lg transition inline-flex items-center gap-2">
+            <LogIn size={16} /> Login Now
+          </button>
+        </div>
+      )}
+
+      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
     </div>
   );
 }

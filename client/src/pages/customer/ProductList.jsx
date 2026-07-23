@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import LoginPopup from '../../components/LoginPopup';
 import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -26,6 +28,8 @@ export default function ProductList() {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
@@ -69,6 +73,7 @@ export default function ProductList() {
   const handleAddToCart = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) return setShowLoginPopup(true);
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
   };
@@ -265,6 +270,8 @@ export default function ProductList() {
           )}
         </div>
       </div>
+
+      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
     </div>
   );
 }
