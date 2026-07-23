@@ -25,10 +25,10 @@ export default function CustomerLayout() {
   const navLinks = [
     { to: '/', label: 'Home', icon: Home },
     { to: '/products', label: 'Products', icon: Search },
-    { to: '/wishlist', label: 'Wishlist', icon: Heart },
-    { to: '/cart', label: 'Cart', icon: ShoppingCart, badge: cartCount },
-    { to: '/emi-calculator', label: 'EMI Calc', icon: Calculator },
-    { to: '/exchange-calculator', label: 'Exchange', icon: RotateCcw },
+    { to: '/wishlist', label: 'Wishlist', icon: Heart, requiresAuth: true },
+    { to: '/cart', label: 'Cart', icon: ShoppingCart, badge: cartCount, requiresAuth: true },
+    { to: '/emi-calculator', label: 'EMI Calc', icon: Calculator, requiresAuth: true },
+    { to: '/exchange-calculator', label: 'Exchange', icon: RotateCcw, requiresAuth: true },
   ];
 
   return (
@@ -53,15 +53,22 @@ export default function CustomerLayout() {
           </form>
 
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map(link => (
-              <Link key={link.to} to={link.to} className={`relative flex flex-col items-center text-xs transition-all duration-300 ${location.pathname === link.to ? 'text-gold-600 scale-110' : 'text-gray-600 hover:text-gold-600'}`}>
-                <div className="relative">
-                  <link.icon size={20} />
-                  {link.badge > 0 && <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold animate-bounce">{link.badge}</span>}
-                </div>
-                <span className="mt-1 font-medium">{link.label}</span>
-              </Link>
-            ))}
+            {navLinks.map(link => {
+              const needsAuth = link.requiresAuth && !user;
+              const Tag = needsAuth ? 'button' : Link;
+              const props = needsAuth
+                ? { onClick: () => setShowLoginPopup(true), className: `relative flex flex-col items-center text-xs transition-all duration-300 text-gray-600 hover:text-gold-600 cursor-pointer` }
+                : { to: link.to, className: `relative flex flex-col items-center text-xs transition-all duration-300 ${location.pathname === link.to ? 'text-gold-600 scale-110' : 'text-gray-600 hover:text-gold-600'}` };
+              return (
+                <Tag key={link.to} {...props}>
+                  <div className="relative">
+                    <link.icon size={20} />
+                    {link.badge > 0 && <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold animate-bounce">{link.badge}</span>}
+                  </div>
+                  <span className="mt-1 font-medium">{link.label}</span>
+                </Tag>
+              );
+            })}
           </div>
 
           <div className="hidden md:flex items-center gap-3 ml-4">
@@ -98,13 +105,24 @@ export default function CustomerLayout() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down">
-          {navLinks.map(link => (
-            <Link key={link.to} to={link.to} onClick={() => setMenuOpen(false)}
-              className={`flex items-center gap-3 px-6 py-3 border-b transition ${location.pathname === link.to ? 'bg-gold-50 text-gold-600 font-semibold' : 'text-gray-700 hover:bg-gold-50'}`}>
-              <link.icon size={18} /> {link.label}
-              {link.badge > 0 && <span className="ml-auto bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">{link.badge}</span>}
-            </Link>
-          ))}
+          {navLinks.map(link => {
+            const needsAuth = link.requiresAuth && !user;
+            if (needsAuth) {
+              return (
+                <button key={link.to} onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }}
+                  className={`flex items-center gap-3 px-6 py-3 border-b transition w-full text-left text-gray-700 hover:bg-gold-50`}>
+                  <link.icon size={18} /> {link.label}
+                </button>
+              );
+            }
+            return (
+              <Link key={link.to} to={link.to} onClick={() => setMenuOpen(false)}
+                className={`flex items-center gap-3 px-6 py-3 border-b transition ${location.pathname === link.to ? 'bg-gold-50 text-gold-600 font-semibold' : 'text-gray-700 hover:bg-gold-50'}`}>
+                <link.icon size={18} /> {link.label}
+                {link.badge > 0 && <span className="ml-auto bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">{link.badge}</span>}
+              </Link>
+            );
+          })}
           {user ? (
             <>
               <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><User size={18} /> Profile</Link>
