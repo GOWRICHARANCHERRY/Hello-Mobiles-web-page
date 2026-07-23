@@ -16,13 +16,13 @@ export default function Orders() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'delivered': return <CheckCircle size={20} className="text-green-500" />;
-      case 'shipped': return <Truck size={20} className="text-blue-500" />;
+      case 'shipped': return <Truck size={20} className="text-gold-500" />;
       case 'cancelled': return <XCircle size={20} className="text-red-500" />;
       default: return <Clock size={20} className="text-yellow-500" />;
     }
   };
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   if (orders.length === 0) {
     return (
@@ -30,7 +30,7 @@ export default function Orders() {
         <Package size={64} className="mx-auto text-gray-300 mb-4" />
         <h2 className="text-xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
         <p className="text-gray-500 mb-6">Start shopping to see your orders here</p>
-        <Link to="/products" className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition inline-block">Shop Now</Link>
+        <Link to="/products" className="bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-700 transition inline-block">Shop Now</Link>
       </div>
     );
   }
@@ -73,7 +73,7 @@ export default function Orders() {
               <div className="flex flex-col md:flex-row md:items-center justify-between">
                 <div className="flex gap-2 overflow-x-auto">
                   {order.items.slice(0, 3).map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
+                    <div key={i} className="flex items-center gap-2 bg-gold-50 rounded-lg p-2">
                       {item.image && <img src={item.image} alt="" className="w-10 h-10 object-contain" />}
                       <div>
                         <p className="text-xs font-medium text-gray-800 truncate max-w-[120px]">{item.name}</p>

@@ -31,14 +31,14 @@ export default function AdminEmployees() {
     } catch (error) { toast.error('Failed'); }
   };
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Employees ({employees.length})</h1>
         <button onClick={() => setShowForm(!showForm)}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-primary-700">
+          className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gold-700">
           <Plus size={16} /> Add Employee
         </button>
       </div>
@@ -48,15 +48,15 @@ export default function AdminEmployees() {
           <h2 className="font-bold mb-4">Add New Employee</h2>
           <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input placeholder="Full Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input placeholder="Phone Number" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} required
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required
-              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+              className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <div className="md:col-span-2 flex gap-2">
-              <button type="submit" className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700">Add Employee</button>
+              <button type="submit" className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-700">Add Employee</button>
               <button type="button" onClick={() => setShowForm(false)} className="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
             </div>
           </form>
@@ -79,7 +79,7 @@ export default function AdminEmployees() {
               <tr key={emp._id} className="border-b last:border-0 hover:bg-gray-50">
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center"><UserCheck size={14} className="text-primary-600" /></div>
+                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center"><UserCheck size={14} className="text-gold-600" /></div>
                     <span className="font-medium">{emp.name}</span>
                   </div>
                 </td>

@@ -24,7 +24,7 @@ export default function Wishlist() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   if (wishlist.length === 0) {
     return (
@@ -32,7 +32,7 @@ export default function Wishlist() {
         <Heart size={64} className="mx-auto text-gray-300 mb-4" />
         <h2 className="text-xl font-bold text-gray-800 mb-2">Your Wishlist is Empty</h2>
         <p className="text-gray-500 mb-6">Save items you love for later</p>
-        <Link to="/products" className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition inline-block">Explore Products</Link>
+        <Link to="/products" className="bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-700 transition inline-block">Explore Products</Link>
       </div>
     );
   }
@@ -52,7 +52,7 @@ export default function Wishlist() {
               <p className="text-lg font-bold text-gray-900 mt-2">₹{product.price?.toLocaleString()}</p>
               <div className="flex gap-2 mt-3">
                 <button onClick={() => { addToCart(product); toast.success('Added to cart!'); }}
-                  className="flex-1 bg-primary-600 text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 hover:bg-primary-700">
+                  className="flex-1 bg-gold-600 text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 hover:bg-gold-700">
                   <ShoppingCart size={14} /> Add to Cart
                 </button>
                 <button onClick={() => handleRemove(product._id)} className="text-red-500 hover:text-red-600 px-3 py-2 border rounded-lg">

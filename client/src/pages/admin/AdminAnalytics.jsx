@@ -18,7 +18,7 @@ export default function AdminAnalytics() {
     }).catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -28,7 +28,7 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm p-5 text-center">
           <p className="text-sm text-gray-500">Total Orders (All Time)</p>
-          <p className="text-3xl font-bold text-primary-600">{data?.reports?.summary?.count || 0}</p>
+          <p className="text-3xl font-bold text-gold-600">{data?.reports?.summary?.count || 0}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-5 text-center">
           <p className="text-sm text-gray-500">Total Revenue (All Time)</p>

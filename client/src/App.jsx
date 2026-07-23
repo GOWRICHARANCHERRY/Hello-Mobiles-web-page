@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
@@ -29,6 +30,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminEmployees from './pages/admin/AdminEmployees';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminBanners from './pages/admin/AdminBanners';
 
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
@@ -75,6 +77,7 @@ function AppRoutes() {
       <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AdminLayout /></ProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
+        <Route path="banners" element={<AdminBanners />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="employees" element={<AdminEmployees />} />
         <Route path="customers" element={<AdminCustomers />} />
@@ -88,13 +91,15 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Toaster position="top-right" />
-          <AppRoutes />
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <Toaster position="top-right" />
+            <AppRoutes />
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }

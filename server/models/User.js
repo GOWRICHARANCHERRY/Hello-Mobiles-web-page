@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   loyaltyPoints: { type: Number, default: 0 },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  phoneVerified: { type: Boolean, default: false },
+  otp: String,
+  otpExpiry: Date,
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

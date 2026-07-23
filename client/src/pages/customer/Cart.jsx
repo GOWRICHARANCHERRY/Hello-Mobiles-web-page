@@ -14,7 +14,7 @@ export default function Cart() {
         <ShoppingBag size={64} className="mx-auto text-gray-300 mb-4" />
         <h2 className="text-xl font-bold text-gray-800 mb-2">Your Cart is Empty</h2>
         <p className="text-gray-500 mb-6">Add products to your cart to get started</p>
-        <Link to="/products" className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition inline-block">
+        <Link to="/products" className="bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-700 transition inline-block">
           Continue Shopping
         </Link>
       </div>
@@ -56,7 +56,7 @@ export default function Cart() {
             </div>
           ))}
           <div className="flex gap-3">
-            <Link to="/products" className="border border-primary-600 text-primary-600 px-6 py-2 rounded-xl font-medium hover:bg-primary-50 transition text-sm">
+            <Link to="/products" className="border border-gold-600 text-gold-600 px-6 py-2 rounded-xl font-medium hover:bg-gold-50 transition text-sm">
               Continue Shopping
             </Link>
             <button onClick={() => { clearCart(); toast.success('Cart cleared'); }}

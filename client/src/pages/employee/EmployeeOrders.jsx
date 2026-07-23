@@ -33,7 +33,7 @@ export default function EmployeeOrders() {
 
   const nextStatus = { confirmed: 'processing', processing: 'packed', packed: 'shipped', shipped: 'delivered' };
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -85,7 +85,7 @@ export default function EmployeeOrders() {
                 {order.orderStatus !== 'delivered' && order.orderStatus !== 'cancelled' && (
                   <div className="mt-4 flex gap-2">
                     <button onClick={(e) => { e.stopPropagation(); updateStatus(order._id, nextStatus[order.orderStatus]); }}
-                      className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition">
+                      className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-700 transition">
                       Mark as {nextStatus[order.orderStatus]?.charAt(0).toUpperCase() + nextStatus[order.orderStatus]?.slice(1)}
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); updateStatus(order._id, 'cancelled'); }}

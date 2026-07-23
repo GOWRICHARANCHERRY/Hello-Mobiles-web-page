@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import { Smartphone, Tv, Watch, Headphones, Laptop, Home, Zap, Shield, Truck, Percent, ChevronRight, Star } from 'lucide-react';
+import HeroCarousel from '../../components/HeroCarousel';
+import { Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon, Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw } from 'lucide-react';
 
 const categories = [
-  { name: 'Mobiles', icon: Smartphone, color: 'bg-blue-500' },
-  { name: 'TVs', icon: Tv, color: 'bg-purple-500' },
-  { name: 'Smart Watches', icon: Watch, color: 'bg-green-500' },
-  { name: 'Earbuds', icon: Headphones, color: 'bg-pink-500' },
-  { name: 'Laptops', icon: Laptop, color: 'bg-orange-500' },
-  { name: 'Home Appliances', icon: Home, color: 'bg-teal-500' },
+  { name: 'Mobiles', icon: Smartphone, color: 'from-gold-400 to-gold-600' },
+  { name: 'TVs', icon: Tv, color: 'from-amber-400 to-amber-600' },
+  { name: 'Smart Watches', icon: Watch, color: 'from-yellow-400 to-yellow-600' },
+  { name: 'Earbuds', icon: Headphones, color: 'from-gold-500 to-amber-500' },
+  { name: 'Laptops', icon: Laptop, color: 'from-orange-400 to-orange-600' },
+  { name: 'Home Appliances', icon: HomeIcon, color: 'from-gold-600 to-gold-800' },
 ];
 
 const brands = ['Apple', 'Samsung', 'Vivo', 'Oppo', 'Realme', 'Redmi', 'Sony', 'LG'];
@@ -26,31 +27,22 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Hero Banner */}
-      <div className="gradient-bg rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-        <div className="relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Welcome to Hello Mobiles</h2>
-          <p className="text-blue-100 text-lg mb-6 max-w-xl">Best deals on mobiles, TVs, and electronics. EMI available, exchange offers, and free delivery!</p>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/products" className="bg-white text-primary-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">Shop Now</Link>
-            <Link to="/exchange-calculator" className="border border-white/50 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition">Exchange Old Phone</Link>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-10 animate-fade-in">
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Feature Badges */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { icon: Zap, label: 'No Cost EMI', desc: '0% interest' },
-          { icon: Percent, label: 'Cashback Offers', desc: 'Up to 10% off' },
-          { icon: Truck, label: 'Free Delivery', desc: 'Orders above ₹5K' },
+          { icon: Zap, label: 'No Cost EMI', desc: '0% interest available' },
+          { icon: Percent, label: 'Festival Offers', desc: 'Up to 40% off' },
+          { icon: Truck, label: 'Free Delivery', desc: 'On orders above ₹5K' },
           { icon: Shield, label: 'Genuine Products', desc: '100% authentic' },
         ].map((item, i) => (
-          <div key={i} className="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm card-hover">
-            <div className="bg-primary-100 text-primary-600 w-12 h-12 rounded-lg flex items-center justify-center"><item.icon size={22} /></div>
+          <div key={i} className="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm card-hover animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
+            <div className="bg-gradient-to-br from-gold-400 to-gold-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md">
+              <item.icon size={22} />
+            </div>
             <div>
               <p className="font-semibold text-sm text-gray-800">{item.label}</p>
               <p className="text-xs text-gray-500">{item.desc}</p>
@@ -61,17 +53,18 @@ export default function Home() {
 
       {/* Categories */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Shop by Category</h2>
-          <Link to="/products" className="text-primary-600 text-sm flex items-center gap-1 hover:underline">View All <ChevronRight size={16} /></Link>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="section-title">Shop by Category</h2>
+          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-          {categories.map(cat => (
-            <Link key={cat.name} to={`/products?category=${cat.name}`} className="bg-white rounded-xl p-4 text-center shadow-sm card-hover">
-              <div className={`${cat.color} text-white w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-2`}>
-                <cat.icon size={26} />
+          {categories.map((cat, i) => (
+            <Link key={cat.name} to={`/products?category=${cat.name}`}
+              className="bg-white rounded-xl p-5 text-center shadow-sm card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className={`bg-gradient-to-br ${cat.color} text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                <cat.icon size={28} />
               </div>
-              <p className="text-sm font-medium text-gray-700">{cat.name}</p>
+              <p className="text-sm font-semibold text-gray-700">{cat.name}</p>
             </Link>
           ))}
         </div>
@@ -79,11 +72,11 @@ export default function Home() {
 
       {/* Brands */}
       <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Featured Brands</h2>
+        <h2 className="section-title">Featured Brands</h2>
         <div className="flex flex-wrap gap-3">
-          {brands.map(brand => (
+          {brands.map((brand, i) => (
             <Link key={brand} to={`/products?brand=${brand}`}
-              className="bg-white border-2 border-gray-200 rounded-xl px-6 py-3 font-semibold text-gray-700 hover:border-primary-500 hover:text-primary-600 transition">
+              className="bg-white border-2 border-gold-200 rounded-xl px-6 py-3 font-semibold text-gray-700 hover:border-gold-500 hover:text-gold-700 hover:bg-gold-50 transition-all duration-300 card-hover animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
               {brand}
             </Link>
           ))}
@@ -93,13 +86,15 @@ export default function Home() {
       {/* Today's Offers */}
       {offerProducts.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Today's Offers</h2>
-            <Link to="/products?onOffer=true" className="text-primary-600 text-sm flex items-center gap-1 hover:underline">View All <ChevronRight size={16} /></Link>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title flex items-center gap-2">
+              <Gift className="text-gold-500" size={28} /> Today's Offers
+            </h2>
+            <Link to="/products?onOffer=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {offerProducts.slice(0, 4).map(product => (
-              <ProductCard key={product._id} product={product} />
+            {offerProducts.slice(0, 4).map((product, i) => (
+              <ProductCard key={product._id} product={product} delay={i} />
             ))}
           </div>
         </div>
@@ -108,13 +103,13 @@ export default function Home() {
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Featured Products</h2>
-            <Link to="/products?featured=true" className="text-primary-600 text-sm flex items-center gap-1 hover:underline">View All <ChevronRight size={16} /></Link>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title">Featured Products</h2>
+            <Link to="/products?featured=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {featuredProducts.slice(0, 4).map(product => (
-              <ProductCard key={product._id} product={product} />
+            {featuredProducts.slice(0, 4).map((product, i) => (
+              <ProductCard key={product._id} product={product} delay={i} />
             ))}
           </div>
         </div>
@@ -123,76 +118,93 @@ export default function Home() {
       {/* New Arrivals */}
       {newArrivals.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">New Arrivals</h2>
-            <Link to="/products?newArrival=true" className="text-primary-600 text-sm flex items-center gap-1 hover:underline">View All <ChevronRight size={16} /></Link>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title">New Arrivals</h2>
+            <Link to="/products?newArrival=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {newArrivals.slice(0, 4).map(product => (
-              <ProductCard key={product._id} product={product} />
+            {newArrivals.slice(0, 4).map((product, i) => (
+              <ProductCard key={product._id} product={product} delay={i} />
             ))}
           </div>
         </div>
       )}
 
-      {/* EMI & Exchange Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white">
-          <h3 className="text-xl font-bold mb-2">No Cost EMI Available</h3>
-          <p className="text-blue-100 text-sm mb-4">Buy now and pay in easy installments. 0% interest on all major banks.</p>
-          <Link to="/emi-calculator" className="bg-white text-blue-700 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 transition inline-block">Calculate EMI</Link>
-        </div>
-        <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white">
-          <h3 className="text-xl font-bold mb-2">Exchange Your Old Phone</h3>
-          <p className="text-orange-100 text-sm mb-4">Get instant exchange value for your old phone. Best prices guaranteed.</p>
-          <Link to="/exchange-calculator" className="bg-white text-orange-600 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-orange-50 transition inline-block">Check Value</Link>
-        </div>
+      {/* EMI & Exchange */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Link to="/emi-calculator" className="bg-gradient-to-br from-gold-600 via-gold-500 to-amber-500 rounded-2xl p-8 text-white card-hover group block">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform"><CreditCard size={28} /></div>
+            <h3 className="text-xl font-bold">No Cost EMI Available</h3>
+          </div>
+          <p className="text-gold-100 text-sm mb-4">Buy now and pay in easy installments. 0% interest on all major banks.</p>
+          <span className="bg-white text-gold-700 px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">Calculate EMI →</span>
+        </Link>
+        <Link to="/exchange-calculator" className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl p-8 text-white card-hover group block">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform"><RotateCcw size={28} /></div>
+            <h3 className="text-xl font-bold">Exchange Your Old Phone</h3>
+          </div>
+          <p className="text-gray-300 text-sm mb-4">Get instant exchange value for your old phone. Best prices guaranteed.</p>
+          <span className="bg-gold-500 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">Check Value →</span>
+        </Link>
       </div>
 
       {/* Store Info */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Visit Our Store</h2>
+      <div className="bg-white rounded-2xl p-8 shadow-sm gold-border">
+        <h2 className="section-title">Visit Our Stores</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">Hello Mobiles</h3>
-            <p className="text-gray-600">123 Main Street, Near City Center</p>
-            <p className="text-gray-600">City - 500001</p>
-            <p className="text-gray-600">Phone: +91 99999 99999</p>
-            <p className="text-gray-600">Timing: 10:00 AM - 9:00 PM (All days)</p>
-          </div>
-          <div className="bg-gray-200 rounded-xl h-48 flex items-center justify-center text-gray-500">
-            <p>Google Map Embed</p>
-          </div>
+          <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
+            className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
+            <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Allur</h3>
+            <p className="text-gray-600 text-sm">📍 Allur, Andhra Pradesh</p>
+            <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
+            <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
+            <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+              View on Google Maps →
+            </span>
+          </a>
+          <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer"
+            className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
+            <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Buchi</h3>
+            <p className="text-gray-600 text-sm">📍 Buchi, Andhra Pradesh</p>
+            <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
+            <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
+            <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+              View on Google Maps →
+            </span>
+          </a>
         </div>
       </div>
     </div>
   );
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, delay = 0 }) {
   const discount = product.mrp ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
   return (
-    <Link to={`/products/${product._id}`} className="bg-white rounded-xl shadow-sm overflow-hidden card-hover block">
-      <div className="bg-gray-100 p-4 h-48 flex items-center justify-center relative">
+    <Link to={`/products/${product._id}`}
+      className="bg-white rounded-xl shadow-sm overflow-hidden card-hover block animate-fade-in-up" style={{ animationDelay: `${delay * 0.1}s` }}>
+      <div className="bg-gradient-to-br from-gold-50 to-amber-50 p-4 h-48 flex items-center justify-center relative">
         {product.images?.[0] ? (
-          <img src={product.images[0]} alt={product.name} className="h-full object-contain" />
+          <img src={product.images[0]} alt={product.name} className="h-full object-contain hover:scale-110 transition-transform duration-500" />
         ) : (
           <div className="text-gray-400 text-sm">No Image</div>
         )}
-        {discount > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">{discount}% OFF</span>}
-        {product.isNewArrival && <span className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">NEW</span>}
+        {discount > 0 && <span className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">{discount}% OFF</span>}
+        {product.isNewArrival && <span className="absolute top-2 right-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">NEW</span>}
       </div>
       <div className="p-4">
-        <p className="text-xs text-gray-500">{product.brand}</p>
+        <p className="text-xs text-gold-600 font-semibold">{product.brand}</p>
         <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
         <div className="flex items-center gap-2 mt-2">
           <span className="text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
           {product.mrp > product.price && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
         </div>
-        {product.emiAvailable && <p className="text-xs text-green-600 mt-1">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
+        {product.emiAvailable && <p className="text-xs text-gold-600 mt-1 font-medium">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
         {product.ratings > 0 && (
           <div className="flex items-center gap-1 mt-2">
-            <Star size={12} className="fill-yellow-400 text-yellow-400" />
+            <Star size={12} className="fill-gold-400 text-gold-400" />
             <span className="text-xs text-gray-600">{product.ratings} ({product.reviewCount})</span>
           </div>
         )}

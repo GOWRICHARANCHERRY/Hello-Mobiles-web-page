@@ -47,17 +47,17 @@ export default function ProductDetail() {
 
   const handleWhatsApp = () => {
     const msg = `Hi, I'm interested in ${product?.name} (₹${product?.price?.toLocaleString()}). Please share more details.`;
-    window.open(`https://wa.me/919999999999?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/918886888128?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div></div>;
   if (!product) return <div className="text-center py-16"><p className="text-gray-500 text-lg">Product not found</p></div>;
 
   const discount = product.mrp ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
 
   return (
     <div className="animate-fade-in">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-600 hover:text-primary-600 mb-4 text-sm">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-600 hover:text-gold-600 mb-4 text-sm">
         <ChevronLeft size={18} /> Back
       </button>
 
@@ -76,7 +76,7 @@ export default function ProductDetail() {
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                 {product.images.map((img, i) => (
                   <button key={i} onClick={() => setSelectedImage(i)}
-                    className={`w-16 h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden ${selectedImage === i ? 'border-primary-500' : 'border-gray-200'}`}>
+                    className={`w-16 h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden ${selectedImage === i ? 'border-gold-500' : 'border-gray-200'}`}>
                     <img src={img} alt="" className="w-full h-full object-contain" />
                   </button>
                 ))}
@@ -98,7 +98,7 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+            <div className="mt-4 p-4 bg-gold-50 rounded-xl">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
                 {product.mrp > product.price && (
@@ -141,20 +141,20 @@ export default function ProductDetail() {
                 Buy Now
               </button>
               <button onClick={handleAddToCart} disabled={product.stock <= 0}
-                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2">
+                className="flex-1 bg-gold-600 hover:bg-gold-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2">
                 <ShoppingCart size={18} /> Add to Cart
               </button>
             </div>
 
             <div className="mt-3 flex gap-3">
-              <button onClick={handleWishlist} className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm transition ${inWishlist ? 'bg-red-50 border-red-300 text-red-600' : 'hover:bg-gray-50'}`}>
+              <button onClick={handleWishlist} className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm transition ${inWishlist ? 'bg-red-50 border-red-300 text-red-600' : 'hover:bg-gold-50'}`}>
                 <Heart size={16} className={inWishlist ? 'fill-red-500' : ''} /> {inWishlist ? 'Wishlisted' : 'Wishlist'}
               </button>
               <button onClick={handleWhatsApp} className="flex items-center gap-2 px-4 py-2 border border-green-300 bg-green-50 text-green-700 rounded-xl text-sm hover:bg-green-100 transition">
                 <MessageCircle size={16} /> Ask on WhatsApp
               </button>
               <button onClick={() => { navigator.share?.({ title: product.name, url: window.location.href }); }}
-                className="flex items-center gap-2 px-4 py-2 border rounded-xl text-sm hover:bg-gray-50 transition">
+                className="flex items-center gap-2 px-4 py-2 border rounded-xl text-sm hover:bg-gold-50 transition">
                 <Share2 size={16} /> Share
               </button>
             </div>
@@ -166,8 +166,8 @@ export default function ProductDetail() {
                 { icon: Shield, label: 'Genuine Product' },
                 { icon: RotateCcw, label: 'Easy Returns' },
               ].map((f, i) => (
-                <div key={i} className="text-center p-3 bg-gray-50 rounded-xl">
-                  <f.icon size={20} className="mx-auto text-primary-600 mb-1" />
+                <div key={i} className="text-center p-3 bg-gold-50 rounded-xl">
+                  <f.icon size={20} className="mx-auto text-gold-600 mb-1" />
                   <p className="text-xs font-medium text-gray-700">{f.label}</p>
                 </div>
               ))}

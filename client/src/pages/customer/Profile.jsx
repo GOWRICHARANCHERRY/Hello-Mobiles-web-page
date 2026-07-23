@@ -39,8 +39,8 @@ export default function Profile() {
         {/* Profile Card */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="text-center">
-            <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <User size={32} className="text-primary-600" />
+            <div className="w-20 h-20 bg-gold-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <User size={32} className="text-gold-600" />
             </div>
             <h2 className="font-bold text-lg">{user?.name}</h2>
             <p className="text-sm text-gray-500">{user?.phone}</p>
@@ -57,7 +57,7 @@ export default function Profile() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg">Personal Details</h3>
             <button onClick={() => editing ? handleSave() : setEditing(true)}
-              className="text-primary-600 flex items-center gap-1 text-sm font-medium">
+              className="text-gold-600 flex items-center gap-1 text-sm font-medium">
               {editing ? <><Save size={16} /> Save</> : <><Edit2 size={16} /> Edit</>}
             </button>
           </div>
@@ -65,32 +65,32 @@ export default function Profile() {
             <div>
               <label className="block text-sm text-gray-600 mb-1">Name</label>
               <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">Email</label>
               <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-600 mb-1">Address</label>
               <input value={form.street} onChange={e => setForm({...form, street: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">City</label>
               <input value={form.city} onChange={e => setForm({...form, city: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">State</label>
               <input value={form.state} onChange={e => setForm({...form, state: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">Pincode</label>
               <input value={form.pincode} onChange={e => setForm({...form, pincode: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-primary-500 outline-none' : 'bg-gray-50'}`} />
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
             </div>
           </div>
         </div>

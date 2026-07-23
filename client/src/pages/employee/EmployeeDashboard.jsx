@@ -10,7 +10,7 @@ export default function EmployeeDashboard() {
     api.get('/employee/dashboard').then(r => { setData(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">

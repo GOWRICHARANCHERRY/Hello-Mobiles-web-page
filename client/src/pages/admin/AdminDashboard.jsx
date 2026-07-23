@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     api.get('/admin/dashboard').then(r => { setData(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Products', value: data?.totalProducts || 0, color: 'text-primary-600' },
+          { label: 'Total Products', value: data?.totalProducts || 0, color: 'text-gold-600' },
           { label: 'Total Customers', value: data?.totalCustomers || 0, color: 'text-accent-600' },
           { label: 'Employees', value: data?.totalEmployees || 0, color: 'text-purple-600' },
           { label: 'Low Stock Alerts', value: data?.lowStockProducts || 0, color: 'text-red-500' },

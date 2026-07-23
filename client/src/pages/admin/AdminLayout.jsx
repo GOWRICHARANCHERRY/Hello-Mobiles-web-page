@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout() {
@@ -11,6 +11,7 @@ export default function AdminLayout() {
   const links = [
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/admin/products', label: 'Products', icon: Package },
+    { to: '/admin/banners', label: 'Banners', icon: Image },
     { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { to: '/admin/employees', label: 'Employees', icon: UserCheck },
     { to: '/admin/customers', label: 'Customers', icon: Users },
@@ -28,7 +29,7 @@ export default function AdminLayout() {
         <nav className="px-4 py-4 space-y-1">
           {links.map(link => (
             <Link key={link.to} to={link.to} onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${location.pathname === link.to ? 'bg-primary-600' : 'hover:bg-white/10'}`}>
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${location.pathname === link.to ? 'bg-gold-600' : 'hover:bg-white/10'}`}>
               <link.icon size={18} /> {link.label}
             </Link>
           ))}

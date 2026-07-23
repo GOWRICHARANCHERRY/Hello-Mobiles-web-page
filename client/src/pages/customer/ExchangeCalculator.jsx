@@ -105,8 +105,8 @@ export default function ExchangeCalculator() {
           )}
 
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-blue-700 font-medium text-sm">How Exchange Works:</p>
-            <ol className="text-blue-600 text-xs mt-2 space-y-1 list-decimal list-inside">
+            <p className="text-gold-700 font-medium text-sm">How Exchange Works:</p>
+            <ol className="text-gold-600 text-xs mt-2 space-y-1 list-decimal list-inside">
               <li>Get an estimated value using this calculator</li>
               <li>Visit our store with your old phone</li>
               <li>Our team will inspect and verify the condition</li>

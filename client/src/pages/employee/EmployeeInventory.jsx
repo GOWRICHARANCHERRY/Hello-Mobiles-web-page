@@ -24,7 +24,7 @@ export default function EmployeeInventory() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -70,7 +70,7 @@ export default function EmployeeInventory() {
                     {editingId === product._id ? (
                       <button onClick={() => handleUpdateStock(product._id)} className="text-green-600 hover:text-green-700"><Save size={16} /></button>
                     ) : (
-                      <button onClick={() => { setEditingId(product._id); setNewStock(product.stock); }} className="text-primary-600 hover:text-primary-700"><Edit2 size={16} /></button>
+                      <button onClick={() => { setEditingId(product._id); setNewStock(product.stock); }} className="text-gold-600 hover:text-gold-700"><Edit2 size={16} /></button>
                     )}
                   </td>
                 </tr>

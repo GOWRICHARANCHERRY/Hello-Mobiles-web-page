@@ -2,14 +2,29 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
-import { Star, ShoppingCart, Eye, Filter, X } from 'lucide-react';
+import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+function FilterSection({ title, defaultOpen = true, children }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-gold-100 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
+      <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full text-left mb-2">
+        <span className="font-medium text-sm text-gray-700">{title}</span>
+        {open ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+      </button>
+      {open && children}
+    </div>
+  );
+}
 
 export default function ProductList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
 
   const [filters, setFilters] = useState({
@@ -19,9 +34,16 @@ export default function ProductList() {
     maxPrice: searchParams.get('maxPrice') || '',
     ram: searchParams.get('ram') || '',
     storage: searchParams.get('storage') || '',
+    screenSize: searchParams.get('screenSize') || '',
+    color: searchParams.get('color') || '',
     sortBy: searchParams.get('sortBy') || '',
     search: searchParams.get('search') || '',
   });
+
+  useEffect(() => {
+    api.get('/products/brands').then(r => setBrands(r.data)).catch(() => {});
+    api.get('/products/categories').then(r => setCategories(r.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -39,8 +61,10 @@ export default function ProductList() {
   };
 
   const clearFilters = () => {
-    setFilters({ category: '', brand: '', minPrice: '', maxPrice: '', ram: '', storage: '', sortBy: '', search: '' });
+    setFilters({ category: '', brand: '', minPrice: '', maxPrice: '', ram: '', storage: '', screenSize: '', color: '', sortBy: '', search: '' });
   };
+
+  const activeCount = Object.values(filters).filter(v => v && v !== '').length;
 
   const handleAddToCart = (product, e) => {
     e.preventDefault();
@@ -49,89 +73,133 @@ export default function ProductList() {
     toast.success(`${product.name} added to cart!`);
   };
 
+  const screenSizes = ['5.5 inch', '6.1 inch', '6.5 inch', '6.7 inch', '6.8 inch', '15.6 inch', '32 inch', '43 inch', '50 inch', '55 inch', '65 inch'];
+  const colors = ['Black', 'White', 'Blue', 'Silver', 'Gold', 'Purple', 'Green', 'Red', 'Gray', 'Titanium', 'Natural Titanium', 'Natural Silver'];
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {filters.search ? `Results for "${filters.search}"` : filters.category || 'All Products'}
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {filters.search ? `Results for "${filters.search}"` : filters.category || 'All Products'}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">{products.length} product{products.length !== 1 ? 's' : ''} found</p>
+        </div>
         <div className="flex items-center gap-3">
           <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+            className="border-2 border-gold-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50">
             <option value="">Sort By</option>
             <option value="price_low">Price: Low to High</option>
             <option value="price_high">Price: High to Low</option>
             <option value="name">Name A-Z</option>
             <option value="rating">Rating</option>
           </select>
-          <button onClick={() => setShowFilters(!showFilters)} className="md:hidden bg-primary-600 text-white px-3 py-2 rounded-lg flex items-center gap-1">
-            <Filter size={16} /> Filter
+          <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl flex items-center gap-1 text-sm font-medium shadow-lg">
+            <Filter size={16} /> Filter {activeCount > 0 && <span className="bg-white text-gold-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">{activeCount}</span>}
           </button>
         </div>
       </div>
 
       <div className="flex gap-6">
         {/* Filters Sidebar */}
-        <div className={`${showFilters ? 'fixed inset-0 z-50 bg-black/50 md:relative md:bg-transparent' : 'hidden'} md:block`}>
-          <div className={`${showFilters ? 'absolute right-0 top-0 h-full w-72 bg-white p-4 overflow-y-auto' : 'w-64 flex-shrink-0'} md:relative md:w-64 bg-white rounded-xl shadow-sm p-4`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">Filters</h3>
-              <div className="flex gap-2">
-                <button onClick={clearFilters} className="text-sm text-primary-600 hover:underline">Clear All</button>
-                {showFilters && <button onClick={() => setShowFilters(false)}><X size={20} /></button>}
+        <div className={`${showFilters ? 'fixed inset-0 z-50 bg-black/50 lg:relative lg:bg-transparent' : 'hidden'} lg:block`}>
+          <div className={`${showFilters ? 'absolute right-0 top-0 h-full w-80 bg-white p-5 overflow-y-auto shadow-2xl' : 'w-72 flex-shrink-0'} lg:relative lg:w-72 bg-white rounded-2xl shadow-sm p-5 gold-border`}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-lg gold-text flex items-center gap-2"><Filter size={18} /> Filters</h3>
+              <div className="flex gap-2 items-center">
+                {activeCount > 0 && (
+                  <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">{activeCount} active</span>
+                )}
+                <button onClick={clearFilters} className="text-sm text-gold-600 hover:underline font-medium">Clear All</button>
+                {showFilters && <button onClick={() => setShowFilters(false)} className="lg:hidden p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>}
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="font-medium text-sm text-gray-700 mb-2 block">Category</label>
-                {['Mobiles', 'TVs', 'Smart Watches', 'Earbuds', 'Laptops', 'Home Appliances'].map(cat => (
-                  <label key={cat} className="flex items-center gap-2 py-1 cursor-pointer">
-                    <input type="radio" name="category" checked={filters.category === cat} onChange={() => handleFilterChange('category', filters.category === cat ? '' : cat)} className="text-primary-600" />
-                    <span className="text-sm">{cat}</span>
-                  </label>
-                ))}
-              </div>
-
-              <div>
-                <label className="font-medium text-sm text-gray-700 mb-2 block">Brand</label>
-                {['Apple', 'Samsung', 'Vivo', 'Oppo', 'Realme', 'Redmi', 'Sony', 'LG'].map(brand => (
-                  <label key={brand} className="flex items-center gap-2 py-1 cursor-pointer">
-                    <input type="radio" name="brand" checked={filters.brand === brand} onChange={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)} className="text-primary-600" />
-                    <span className="text-sm">{brand}</span>
-                  </label>
-                ))}
-              </div>
-
-              <div>
-                <label className="font-medium text-sm text-gray-700 mb-2 block">Price Range</label>
-                <div className="flex gap-2">
-                  <input type="number" placeholder="Min" value={filters.minPrice} onChange={e => handleFilterChange('minPrice', e.target.value)}
-                    className="w-1/2 border rounded-lg px-2 py-1.5 text-sm" />
-                  <input type="number" placeholder="Max" value={filters.maxPrice} onChange={e => handleFilterChange('maxPrice', e.target.value)}
-                    className="w-1/2 border rounded-lg px-2 py-1.5 text-sm" />
+            <div>
+              <FilterSection title="Category">
+                <div className="space-y-1">
+                  {categories.map(cat => (
+                    <label key={cat} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                      <input type="radio" name="category" checked={filters.category === cat}
+                        onChange={() => handleFilterChange('category', filters.category === cat ? '' : cat)}
+                        className="text-gold-600 w-4 h-4" />
+                      <span className="text-sm">{cat}</span>
+                    </label>
+                  ))}
                 </div>
-              </div>
+              </FilterSection>
 
-              <div>
-                <label className="font-medium text-sm text-gray-700 mb-2 block">RAM</label>
-                {['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'].map(ram => (
-                  <label key={ram} className="flex items-center gap-2 py-1 cursor-pointer">
-                    <input type="radio" name="ram" checked={filters.ram === ram} onChange={() => handleFilterChange('ram', filters.ram === ram ? '' : ram)} className="text-primary-600" />
-                    <span className="text-sm">{ram}</span>
-                  </label>
-                ))}
-              </div>
+              <FilterSection title="Brand">
+                <div className="space-y-1">
+                  {brands.map(brand => (
+                    <label key={brand} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                      <input type="radio" name="brand" checked={filters.brand === brand}
+                        onChange={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)}
+                        className="text-gold-600 w-4 h-4" />
+                      <span className="text-sm">{brand}</span>
+                    </label>
+                  ))}
+                </div>
+              </FilterSection>
 
-              <div>
-                <label className="font-medium text-sm text-gray-700 mb-2 block">Storage</label>
-                {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(storage => (
-                  <label key={storage} className="flex items-center gap-2 py-1 cursor-pointer">
-                    <input type="radio" name="storage" checked={filters.storage === storage} onChange={() => handleFilterChange('storage', filters.storage === storage ? '' : storage)} className="text-primary-600" />
-                    <span className="text-sm">{storage}</span>
-                  </label>
-                ))}
-              </div>
+              <FilterSection title="Price Range">
+                <div className="flex gap-2 px-1">
+                  <input type="number" placeholder="Min ₹" value={filters.minPrice} onChange={e => handleFilterChange('minPrice', e.target.value)}
+                    className="w-1/2 border-2 border-gold-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
+                  <input type="number" placeholder="Max ₹" value={filters.maxPrice} onChange={e => handleFilterChange('maxPrice', e.target.value)}
+                    className="w-1/2 border-2 border-gold-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
+                </div>
+              </FilterSection>
+
+              <FilterSection title="RAM">
+                <div className="space-y-1">
+                  {['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'].map(ram => (
+                    <label key={ram} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                      <input type="radio" name="ram" checked={filters.ram === ram}
+                        onChange={() => handleFilterChange('ram', filters.ram === ram ? '' : ram)}
+                        className="text-gold-600 w-4 h-4" />
+                      <span className="text-sm">{ram}</span>
+                    </label>
+                  ))}
+                </div>
+              </FilterSection>
+
+              <FilterSection title="Storage">
+                <div className="space-y-1">
+                  {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(storage => (
+                    <label key={storage} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                      <input type="radio" name="storage" checked={filters.storage === storage}
+                        onChange={() => handleFilterChange('storage', filters.storage === storage ? '' : storage)}
+                        className="text-gold-600 w-4 h-4" />
+                      <span className="text-sm">{storage}</span>
+                    </label>
+                  ))}
+                </div>
+              </FilterSection>
+
+              <FilterSection title="Screen Size">
+                <div className="space-y-1">
+                  {screenSizes.map(size => (
+                    <label key={size} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                      <input type="radio" name="screenSize" checked={filters.screenSize === size}
+                        onChange={() => handleFilterChange('screenSize', filters.screenSize === size ? '' : size)}
+                        className="text-gold-600 w-4 h-4" />
+                      <span className="text-sm">{size}</span>
+                    </label>
+                  ))}
+                </div>
+              </FilterSection>
+
+              <FilterSection title="Color" defaultOpen={false}>
+                <div className="flex flex-wrap gap-2 px-1">
+                  {colors.map(color => (
+                    <button key={color} onClick={() => handleFilterChange('color', filters.color === color ? '' : color)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition ${filters.color === color ? 'border-gold-500 bg-gold-100 text-gold-700' : 'border-gray-200 text-gray-600 hover:border-gold-300'}`}>
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </FilterSection>
             </div>
           </div>
         </div>
@@ -141,40 +209,41 @@ export default function ProductList() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1,2,3,4,5,6].map(i => (
-                <div key={i} className="bg-white rounded-xl shadow-sm p-4 animate-pulse">
-                  <div className="bg-gray-200 h-48 rounded-lg mb-3"></div>
-                  <div className="bg-gray-200 h-4 rounded w-1/3 mb-2"></div>
-                  <div className="bg-gray-200 h-4 rounded w-2/3"></div>
+                <div key={i} className="bg-white rounded-2xl shadow-sm p-4 animate-pulse gold-border">
+                  <div className="bg-gold-100 h-48 rounded-xl mb-3"></div>
+                  <div className="bg-gold-100 h-4 rounded w-1/3 mb-2"></div>
+                  <div className="bg-gold-100 h-4 rounded w-2/3"></div>
                 </div>
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl">
-              <p className="text-gray-500 text-lg">No products found</p>
-              <button onClick={clearFilters} className="text-primary-600 mt-2 hover:underline">Clear filters</button>
+            <div className="text-center py-16 bg-white rounded-2xl gold-border">
+              <p className="text-gray-500 text-lg font-medium">No products found</p>
+              <p className="text-gray-400 text-sm mt-1">Try adjusting your filters</p>
+              <button onClick={clearFilters} className="btn-gold rounded-xl mt-4">Clear All Filters</button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map(product => (
-                <Link key={product._id} to={`/products/${product._id}`} className="bg-white rounded-xl shadow-sm overflow-hidden card-hover block">
+                <Link key={product._id} to={`/products/${product._id}`} className="bg-white rounded-2xl shadow-sm overflow-hidden card-hover block gold-border">
                   <div className="bg-gray-100 p-4 h-48 flex items-center justify-center relative">
                     {product.images?.[0] ? (
                       <img src={product.images[0]} alt={product.name} className="h-full object-contain" />
                     ) : (
-                      <div className="text-gray-400">No Image</div>
+                      <div className="text-gray-400 text-sm">No Image</div>
                     )}
                     {product.mrp > product.price && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
                       </span>
                     )}
-                    {product.stock <= 0 && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">Out of Stock</span>}
+                    {product.stock <= 0 && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">Out of Stock</span>}
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-gray-500">{product.brand}</p>
+                    <p className="text-xs text-gold-600 font-medium">{product.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
+                      <span className="text-lg font-bold gold-text">₹{product.price.toLocaleString()}</span>
                       {product.mrp > product.price && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
                     </div>
                     {product.ratings > 0 && (
@@ -185,7 +254,7 @@ export default function ProductList() {
                     )}
                     <div className="flex gap-2 mt-3">
                       <button onClick={(e) => handleAddToCart(product, e)} disabled={product.stock <= 0}
-                        className="flex-1 bg-primary-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition disabled:opacity-50 flex items-center justify-center gap-1">
+                        className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1">
                         <ShoppingCart size={14} /> Add to Cart
                       </button>
                     </div>

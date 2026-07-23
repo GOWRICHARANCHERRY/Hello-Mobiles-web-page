@@ -35,7 +35,7 @@ export default function AdminOrders() {
 
   const filtered = filter === 'all' ? orders : orders.filter(o => o.orderStatus === filter);
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -44,7 +44,7 @@ export default function AdminOrders() {
       <div className="flex gap-2 mb-4 flex-wrap">
         {['all', 'confirmed', 'processing', 'packed', 'shipped', 'delivered', 'cancelled'].map(s => (
           <button key={s} onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition ${filter === s ? 'bg-primary-600 text-white' : 'bg-white border text-gray-600 hover:bg-gray-50'}`}>
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition ${filter === s ? 'bg-gold-600 text-white' : 'bg-white border text-gray-600 hover:bg-gray-50'}`}>
             {s} {s !== 'all' && <span className="ml-1">({orders.filter(o => o.orderStatus === s).length})</span>}
           </button>
         ))}

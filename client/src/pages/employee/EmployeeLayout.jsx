@@ -17,7 +17,7 @@ export default function EmployeeLayout() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-primary-700 text-white transition-transform`}>
+      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform`}>
         <div className="p-6">
           <h1 className="text-xl font-bold">HELLO MOBILES</h1>
           <p className="text-blue-200 text-xs mt-1">Employee Portal</p>

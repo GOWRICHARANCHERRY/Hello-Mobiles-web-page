@@ -15,7 +15,7 @@ export default function AdminCustomers() {
     c.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>;
+  if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
   return (
     <div className="animate-fade-in">
@@ -23,7 +23,7 @@ export default function AdminCustomers() {
 
       <div className="mb-4">
         <input type="text" placeholder="Search by name, phone, or email..." value={search} onChange={e => setSearch(e.target.value)}
-          className="w-full md:w-96 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+          className="w-full md:w-96 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
