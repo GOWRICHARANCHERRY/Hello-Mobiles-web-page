@@ -2,17 +2,21 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { Home, Search, ShoppingCart, User, Heart, Menu, X, LogOut, Calculator, RotateCcw, LogIn, Mail, Instagram } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginPopup from '../../components/LoginPopup';
 
 export default function CustomerLayout() {
   const { user, logout } = useAuth();
-  const { cartCount } = useCart();
+  const { cartCount, clearGuestCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (!user) clearGuestCart();
+  }, [user]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -26,7 +30,7 @@ export default function CustomerLayout() {
     { to: '/', label: 'Home', icon: Home },
     { to: '/products', label: 'Products', icon: Search },
     { to: '/wishlist', label: 'Wishlist', icon: Heart, requiresAuth: true },
-    { to: '/cart', label: 'Cart', icon: ShoppingCart, badge: cartCount, requiresAuth: true },
+    { to: '/cart', label: 'Cart', icon: ShoppingCart, badge: user ? cartCount : 0, requiresAuth: true },
     { to: '/emi-calculator', label: 'EMI Calc', icon: Calculator, requiresAuth: true },
     { to: '/exchange-calculator', label: 'Exchange', icon: RotateCcw, requiresAuth: true },
   ];
