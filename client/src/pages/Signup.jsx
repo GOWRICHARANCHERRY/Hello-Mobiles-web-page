@@ -79,6 +79,9 @@ export default function Signup() {
         <div className="gold-gradient p-6 text-center text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
+            <div className="flex justify-center mb-3">
+              <img src="/logo.png" alt="Hello Mobiles" className="w-14 h-14 rounded-xl shadow-lg object-contain bg-white/20 p-1" />
+            </div>
             <h1 className="text-2xl font-bold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
             <p className="text-gold-100 text-sm mt-1">Create Your Account</p>
           </div>

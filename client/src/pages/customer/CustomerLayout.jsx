@@ -35,7 +35,7 @@ export default function CustomerLayout() {
       <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-gold-100">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="gold-gradient text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-110 transition-transform">HM</div>
+            <img src="/logo.png" alt="Hello Mobiles" className="w-10 h-10 rounded-xl shadow-md group-hover:scale-110 transition-transform object-contain" />
             <div>
               <h1 className="text-lg font-bold gold-text leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
               <p className="text-[10px] text-gray-500">Mobiles | TVs | Electronics</p>
@@ -108,7 +108,10 @@ export default function CustomerLayout() {
         <div className="gold-gradient h-1"></div>
         <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-3 gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain" />
+              <h3 className="font-bold text-lg gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h3>
+            </div>
             <p className="text-gray-400 text-sm">Your trusted destination for mobiles, TVs, and electronics. Best prices, EMI options, and exchange offers.</p>
           </div>
           <div>

@@ -23,8 +23,13 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform`}>
         <div className="p-6 border-b border-gray-800">
-          <h1 className="text-xl font-bold">HELLO MOBILES</h1>
-          <p className="text-gray-400 text-xs mt-1">Admin Panel</p>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5" />
+            <div>
+              <h1 className="text-lg font-bold">HELLO MOBILES</h1>
+              <p className="text-gray-400 text-xs">Admin Panel</p>
+            </div>
+          </div>
         </div>
         <nav className="px-4 py-4 space-y-1">
           {links.map(link => (
