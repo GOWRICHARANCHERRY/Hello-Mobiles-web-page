@@ -40,11 +40,42 @@ router.post('/', auth, async (req, res) => {
     for (const item of items) {
       const product = await Product.findById(item.product);
       if (!product) return res.status(404).json({ message: `Product not found: ${item.product}` });
-      if (product.stock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
-      product.stock -= item.quantity;
+
+      let itemPrice = product.price;
+      let itemImage = product.images?.[0] || '';
+
+      if (item.variantId && product.variants?.length > 0) {
+        const variant = product.variants.id(item.variantId);
+        if (!variant) return res.status(404).json({ message: `Variant not found for ${product.name}` });
+        if (item.variant?.color) {
+          const colorEntry = variant.colors?.find(c => c.name === item.variant.color);
+          if (!colorEntry) return res.status(404).json({ message: `Color "${item.variant.color}" not found for ${product.name}` });
+          if (colorEntry.stock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name} (${item.variant.color} ${variant.ram}/${variant.storage})` });
+          colorEntry.stock -= item.quantity;
+          if (colorEntry.image) itemImage = colorEntry.image;
+        } else {
+          const totalStock = variant.colors?.reduce((s, c) => s + (c.stock || 0), 0) || 0;
+          if (totalStock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name} (${variant.ram}/${variant.storage})` });
+          for (const c of variant.colors) { c.stock = Math.max(0, c.stock - item.quantity); }
+        }
+        itemPrice = variant.price;
+      } else if (product.variants?.length > 0) {
+        return res.status(400).json({ message: `Please select a variant for ${product.name}` });
+      } else {
+        if (product.stock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
+        product.stock -= item.quantity;
+      }
+
       await product.save();
-      subtotal += product.price * item.quantity;
-      orderItems.push({ product: product._id, name: product.name, price: product.price, quantity: item.quantity, image: product.images[0] });
+      subtotal += itemPrice * item.quantity;
+      orderItems.push({
+        product: product._id,
+        name: product.name,
+        price: itemPrice,
+        quantity: item.quantity,
+        image: itemImage,
+        variant: item.variant || undefined,
+      });
     }
 
     const deliveryCharge = paymentMethod === 'store_pickup' ? 0 : (subtotal > 5000 ? 0 : 99);

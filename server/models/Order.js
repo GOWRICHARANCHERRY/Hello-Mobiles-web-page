@@ -6,6 +6,13 @@ const orderItemSchema = new mongoose.Schema({
   price: Number,
   quantity: { type: Number, required: true, min: 1 },
   image: String,
+  variant: {
+    variantId: String,
+    color: String,
+    ram: String,
+    storage: String,
+    sku: String,
+  },
 });
 
 const orderSchema = new mongoose.Schema({

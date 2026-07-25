@@ -72,7 +72,18 @@ export default function Checkout() {
     setLoading(true);
     try {
       const orderData = {
-        items: cart.map(item => ({ product: item._id, quantity: item.quantity })),
+        items: cart.map(item => ({
+          product: item._id,
+          quantity: item.quantity,
+          variantId: item.variant?._id || undefined,
+          variant: item.variant ? {
+            variantId: item.variant._id,
+            color: item.selectedColor || '',
+            ram: item.variant.ram || '',
+            storage: item.variant.storage || '',
+            sku: item.variant.sku || '',
+          } : undefined,
+        })),
         shippingAddress: { name: form.name, phone: form.phone, street: form.street, city: form.city, state: form.state, pincode: form.pincode },
         paymentMethod,
       };
@@ -206,8 +217,11 @@ export default function Checkout() {
                 <div>
                   <h3 className="font-medium text-gray-700 mb-2">Items:</h3>
                   {cart.map(item => (
-                    <div key={item._id} className="flex justify-between text-sm py-1">
-                      <span>{item.name} x {item.quantity}</span>
+                    <div key={item.cartKey} className="flex justify-between text-sm py-1">
+                      <div>
+                        <span>{item.name} x {item.quantity}</span>
+                        {item.variantLabel && <span className="text-xs text-gold-600 block">{item.variantLabel}</span>}
+                      </div>
                       <span className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</span>
                     </div>
                   ))}
@@ -228,8 +242,11 @@ export default function Checkout() {
         <div className="bg-white rounded-xl shadow-sm p-6 h-fit sticky top-20 gold-border">
           <h2 className="text-lg font-bold mb-4 gold-text">Order Summary</h2>
           {cart.map(item => (
-            <div key={item._id} className="flex justify-between text-sm py-2 border-b border-gold-100">
-              <span className="text-gray-600 truncate flex-1 mr-2">{item.name} x{item.quantity}</span>
+            <div key={item.cartKey} className="flex justify-between text-sm py-2 border-b border-gold-100">
+              <div className="flex-1 mr-2">
+                <span className="text-gray-600 truncate block">{item.name} x{item.quantity}</span>
+                {item.variantLabel && <span className="text-xs text-gold-600">{item.variantLabel}</span>}
+              </div>
               <span className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</span>
             </div>
           ))}

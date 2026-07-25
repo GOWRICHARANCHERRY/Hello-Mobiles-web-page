@@ -33,7 +33,7 @@ router.get('/dashboard', auth, roleAuth('employee'), async (req, res) => {
 
 router.get('/inventory', auth, roleAuth('employee'), async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true }).select('name brand stock lowStockThreshold category price images').sort({ stock: 1 });
+    const products = await Product.find({ isActive: true }).select('name brand stock lowStockThreshold category price images variants').sort({ stock: 1 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -42,7 +42,10 @@ router.get('/inventory', auth, roleAuth('employee'), async (req, res) => {
 
 router.put('/inventory/:id', auth, roleAuth('employee'), async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, { stock: req.body.stock }, { new: true });
+    const update = {};
+    if (req.body.stock !== undefined) update.stock = req.body.stock;
+    if (req.body.variants) update.variants = req.body.variants;
+    const product = await Product.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {

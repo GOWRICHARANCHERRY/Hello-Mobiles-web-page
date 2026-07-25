@@ -8,7 +8,16 @@ router.get('/', async (req, res) => {
   try {
     const { search, category, brand, minPrice, maxPrice, ram, storage, screenSize, color, sortBy, featured, newArrival, onOffer } = req.query;
     let query = { isActive: true };
-    if (search) query.$text = { $search: search };
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      query.$or = [
+        { name: regex },
+        { brand: regex },
+        { category: regex },
+        { description: regex },
+        { tags: regex },
+      ];
+    }
     if (category) query.category = category;
     if (brand) query.brand = { $in: brand.split(',') };
     if (minPrice || maxPrice) {
@@ -33,7 +42,24 @@ router.get('/', async (req, res) => {
     else if (sortBy === 'rating') sort = { ratings: -1 };
 
     const products = await Product.find(query).sort(sort);
-    res.json(products);
+
+    // Attach lowest variant price for products with variants
+    const enriched = products.map(p => {
+      const obj = p.toObject();
+      if (obj.variants && obj.variants.length > 0) {
+        const lowestPrice = Math.min(...obj.variants.map(v => v.price));
+        const lowestMrp = Math.min(...obj.variants.map(v => v.mrp));
+        const totalVariantStock = obj.variants.reduce((sum, v) => {
+          return sum + (v.colors?.reduce((cs, c) => cs + (c.stock || 0), 0) || 0);
+        }, 0);
+        obj.lowestVariantPrice = lowestPrice;
+        obj.lowestVariantMrp = lowestMrp;
+        obj.totalVariantStock = totalVariantStock;
+      }
+      return obj;
+    });
+
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -77,6 +103,34 @@ router.get('/autocomplete', async (req, res) => {
     else if (field === 'category') results = await Product.distinct('category', { category: regex, isActive: true });
     else return res.json([]);
     res.json(results.slice(0, 10));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/search/suggestions', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 1) return res.json({ products: [], brands: [], categories: [] });
+    const regex = new RegExp(q, 'i');
+
+    const products = await Product.find({ isActive: true, $or: [{ name: regex }, { brand: regex }] })
+      .select('name brand category price mrp images variants')
+      .limit(8)
+      .lean();
+
+    const enriched = products.map(p => {
+      const obj = { ...p };
+      if (obj.variants && obj.variants.length > 0) {
+        obj.lowestVariantPrice = Math.min(...obj.variants.map(v => v.price));
+      }
+      return obj;
+    });
+
+    const brands = await Product.distinct('brand', { isActive: true, brand: regex });
+    const categories = await Product.distinct('category', { isActive: true, category: regex });
+
+    res.json({ products: enriched, brands: brands.slice(0, 5), categories: categories.slice(0, 5) });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

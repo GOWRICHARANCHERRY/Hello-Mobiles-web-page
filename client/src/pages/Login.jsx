@@ -57,7 +57,7 @@ export default function Login() {
               <img src="/logo.png" alt="Hello Mobiles" className="w-14 h-14 rounded-xl shadow-lg object-contain bg-white/20 p-1" />
             </div>
             <h1 className="text-2xl font-bold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
-            <p className="text-gold-100 text-sm mt-1">Mobiles | TVs | Electronics</p>
+            <p className="text-gold-100 text-sm mt-1">Mobiles | Electronics | Furniture | Home Appliances</p>
           </div>
         </div>
 

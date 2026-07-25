@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import LoginPopup from '../../components/LoginPopup';
+import SearchBar from '../../components/SearchBar';
 import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -50,12 +51,30 @@ export default function ProductList() {
   }, []);
 
   useEffect(() => {
+    const fromParams = {
+      category: searchParams.get('category') || '',
+      brand: searchParams.get('brand') || '',
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      ram: searchParams.get('ram') || '',
+      storage: searchParams.get('storage') || '',
+      screenSize: searchParams.get('screenSize') || '',
+      color: searchParams.get('color') || '',
+      sortBy: searchParams.get('sortBy') || '',
+      search: searchParams.get('search') || '',
+    };
+    setFilters(fromParams);
+  }, [searchParams]);
+
+  useEffect(() => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, val]) => { if (val) params.set(key, val); });
-    setSearchParams(params);
+    const newUrl = params.toString();
+    const currentUrl = searchParams.toString();
+    if (newUrl !== currentUrl) setSearchParams(params, { replace: true });
 
     setLoading(true);
-    api.get(`/products?${params.toString()}`)
+    api.get(`/products?${newUrl}`)
       .then(r => { setProducts(r.data); setLoading(false); })
       .catch(() => { setLoading(false); });
   }, [filters]);
@@ -74,6 +93,10 @@ export default function ProductList() {
     e.preventDefault();
     e.stopPropagation();
     if (!user) return setShowLoginPopup(true);
+    if (product.variants?.length > 0) {
+      window.location.href = `/products/${product._id}`;
+      return;
+    }
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
   };
@@ -211,6 +234,15 @@ export default function ProductList() {
 
         {/* Products Grid */}
         <div className="flex-1">
+          {/* Search Bar */}
+          <div className="mb-4 hidden lg:block">
+            <SearchBar
+              placeholder="Search products, brands, categories..."
+              initialValue={filters.search}
+              onSearch={(q) => handleFilterChange('search', q)}
+            />
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1,2,3,4,5,6].map(i => (
@@ -237,20 +269,33 @@ export default function ProductList() {
                     ) : (
                       <div className="text-gray-400 text-sm">No Image</div>
                     )}
-                    {product.mrp > product.price && (
+                    {product.mrp > product.price && !product.variants?.length && (
                       <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
                       </span>
                     )}
-                    {product.stock <= 0 && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">Out of Stock</span>}
+                    {product.stock <= 0 && !product.variants?.length && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">Out of Stock</span>}
                   </div>
                   <div className="p-4">
                     <p className="text-xs text-gold-600 font-medium">{product.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-lg font-bold gold-text">₹{product.price.toLocaleString()}</span>
-                      {product.mrp > product.price && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+                      <span className="text-lg font-bold gold-text">
+                        {product.variants?.length > 0 ? (
+                          <>₹{Math.min(...product.variants.map(v => v.price)).toLocaleString()}</>
+                        ) : (
+                          <>₹{product.price.toLocaleString()}</>
+                        )}
+                      </span>
+                      {product.variants?.length > 0 ? (
+                        <span className="text-xs text-gray-400">Starting price</span>
+                      ) : product.mrp > product.price ? (
+                        <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>
+                      ) : null}
                     </div>
+                    {product.variants?.length > 1 && (
+                      <p className="text-xs text-gray-500 mt-1">{product.variants.length} variants available</p>
+                    )}
                     {product.ratings > 0 && (
                       <div className="flex items-center gap-1 mt-1">
                         <Star size={12} className="fill-yellow-400 text-yellow-400" />
@@ -258,10 +303,16 @@ export default function ProductList() {
                       </div>
                     )}
                     <div className="flex gap-2 mt-3">
-                      <button onClick={(e) => handleAddToCart(product, e)} disabled={product.stock <= 0}
-                        className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1">
-                        <ShoppingCart size={14} /> Add to Cart
-                      </button>
+                      {product.variants?.length > 0 ? (
+                        <Link to={`/products/${product._id}`} className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1 text-center">
+                          View Options
+                        </Link>
+                      ) : (
+                        <button onClick={(e) => handleAddToCart(product, e)} disabled={product.stock <= 0}
+                          className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1">
+                          <ShoppingCart size={14} /> Add to Cart
+                        </button>
+                      )}
                     </div>
                   </div>
                 </Link>

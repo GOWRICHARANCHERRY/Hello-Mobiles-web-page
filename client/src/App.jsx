@@ -17,6 +17,8 @@ import Profile from './pages/customer/Profile';
 import Wishlist from './pages/customer/Wishlist';
 import EMICalculator from './pages/customer/EMICalculator';
 import ExchangeCalculator from './pages/customer/ExchangeCalculator';
+import TermsAndConditions from './pages/customer/TermsAndConditions';
+import AboutUs from './pages/customer/AboutUs';
 
 import EmployeeLayout from './pages/employee/EmployeeLayout';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -65,6 +67,8 @@ function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="products" element={<ProductList />} />
         <Route path="products/:id" element={<ProductDetail />} />
+        <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="about" element={<AboutUs />} />
       </Route>
 
       <Route path="/" element={<ProtectedRoute roles={['customer']}><CustomerLayout /></ProtectedRoute>}>

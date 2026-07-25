@@ -3,18 +3,82 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import HeroCarousel from '../../components/HeroCarousel';
-import { Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon, Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
+import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
-  { name: 'Mobiles', icon: Smartphone, color: 'from-gold-400 to-gold-600' },
-  { name: 'TVs', icon: Tv, color: 'from-amber-400 to-amber-600' },
-  { name: 'Smart Watches', icon: Watch, color: 'from-yellow-400 to-yellow-600' },
-  { name: 'Earbuds', icon: Headphones, color: 'from-gold-500 to-amber-500' },
-  { name: 'Laptops', icon: Laptop, color: 'from-orange-400 to-orange-600' },
-  { name: 'Home Appliances', icon: HomeIcon, color: 'from-gold-600 to-gold-800' },
+  { name: 'Mobiles', color: 'from-gold-400 to-gold-600', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="16" y="4" width="32" height="56" rx="6" stroke="white" strokeWidth="2.5" fill="none"/>
+      <rect x="20" y="10" width="24" height="36" rx="2" fill="white" fillOpacity="0.3"/>
+      <circle cx="32" cy="52" r="2.5" fill="white"/>
+      <rect x="27" y="6" width="10" height="1.5" rx="1" fill="white" fillOpacity="0.5"/>
+    </svg>
+  )},
+  { name: 'TVs', color: 'from-amber-400 to-amber-600', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="4" y="8" width="56" height="36" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
+      <rect x="8" y="12" width="48" height="28" rx="2" fill="white" fillOpacity="0.3"/>
+      <rect x="24" y="48" width="16" height="2" rx="1" fill="white"/>
+      <rect x="20" y="50" width="24" height="3" rx="1.5" fill="white" fillOpacity="0.6"/>
+    </svg>
+  )},
+  { name: 'Smart Watches', color: 'from-yellow-400 to-yellow-600', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="18" y="2" width="28" height="8" rx="3" fill="white" fillOpacity="0.5"/>
+      <rect x="18" y="54" width="28" height="8" rx="3" fill="white" fillOpacity="0.5"/>
+      <rect x="14" y="10" width="36" height="44" rx="10" stroke="white" strokeWidth="2.5" fill="none"/>
+      <circle cx="32" cy="32" r="12" stroke="white" strokeWidth="1.5" fill="white" fillOpacity="0.2"/>
+      <line x1="32" y1="24" x2="32" y2="32" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="32" y1="32" x2="38" y2="32" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )},
+  { name: 'Earbuds', color: 'from-gold-500 to-amber-500', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <ellipse cx="20" cy="24" rx="8" ry="10" stroke="white" strokeWidth="2.5" fill="white" fillOpacity="0.2"/>
+      <path d="M20 34 L20 50" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+      <ellipse cx="44" cy="24" rx="8" ry="10" stroke="white" strokeWidth="2.5" fill="white" fillOpacity="0.2"/>
+      <path d="M44 34 L44 50" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+      <circle cx="20" cy="22" r="3" fill="white" fillOpacity="0.5"/>
+      <circle cx="44" cy="22" r="3" fill="white" fillOpacity="0.5"/>
+    </svg>
+  )},
+  { name: 'Laptops', color: 'from-orange-400 to-orange-600', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="8" y="8" width="48" height="32" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
+      <rect x="12" y="12" width="40" height="24" rx="2" fill="white" fillOpacity="0.3"/>
+      <path d="M4 44 L12 40 L52 40 L60 44 L60 48 Q60 50 58 50 L6 50 Q4 50 4 48 Z" stroke="white" strokeWidth="2" fill="white" fillOpacity="0.15"/>
+    </svg>
+  )},
+  { name: 'Home Appliances', color: 'from-gold-600 to-gold-800', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="10" y="6" width="44" height="52" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
+      <circle cx="32" cy="30" r="14" stroke="white" strokeWidth="2" fill="white" fillOpacity="0.15"/>
+      <circle cx="32" cy="30" r="8" stroke="white" strokeWidth="1.5" fill="white" fillOpacity="0.2"/>
+      <rect x="14" y="50" width="8" height="2" rx="1" fill="white" fillOpacity="0.6"/>
+      <rect x="26" y="50" width="12" height="2" rx="1" fill="white" fillOpacity="0.6"/>
+      <rect x="42" y="50" width="8" height="2" rx="1" fill="white" fillOpacity="0.6"/>
+    </svg>
+  )},
+  { name: 'Furniture', color: 'from-amber-600 to-amber-800', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <path d="M8 40 Q8 30 16 28 L16 20 Q16 16 20 16 L44 16 Q48 16 48 20 L48 28 Q56 30 56 40" stroke="white" strokeWidth="2.5" fill="none"/>
+      <rect x="6" y="38" width="52" height="10" rx="4" stroke="white" strokeWidth="2.5" fill="white" fillOpacity="0.25"/>
+      <line x1="12" y1="48" x2="12" y2="56" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="52" y1="48" x2="52" y2="56" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  )},
 ];
 
-const brands = ['Apple', 'Samsung', 'Vivo', 'Oppo', 'Realme', 'Redmi', 'Sony', 'LG'];
+const brands = [
+  { name: 'Apple', slug: 'apple', color: '555555' },
+  { name: 'Samsung', slug: 'samsung', color: '1428A0' },
+  { name: 'Vivo', slug: 'vivo', color: '415FFF' },
+  { name: 'Oppo', slug: 'oppo', color: '1BA784' },
+  { name: 'Realme', slug: null, img: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Realme_logo_SVG.svg' },
+  { name: 'Redmi', slug: 'xiaomi', color: 'FF6900' },
+  { name: 'Sony', slug: 'sony', color: '000000' },
+  { name: 'LG', slug: 'lg', color: 'A50034' },
+];
 
 import LoginPopup from '../../components/LoginPopup';
 
@@ -62,14 +126,14 @@ export default function Home() {
           <h2 className="section-title">Shop by Category</h2>
           <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-4 md:grid-cols-7 gap-4">
           {categories.map((cat, i) => (
             <Link key={cat.name} to={`/products?category=${cat.name}`}
-              className="bg-white rounded-xl p-5 text-center shadow-sm card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
-              <div className={`bg-gradient-to-br ${cat.color} text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                <cat.icon size={28} />
+              className="bg-white rounded-xl p-4 text-center shadow-sm card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className={`bg-gradient-to-br ${cat.color} w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                {cat.svg}
               </div>
-              <p className="text-sm font-semibold text-gray-700">{cat.name}</p>
+              <p className="text-xs md:text-sm font-semibold text-gray-700 leading-tight">{cat.name}</p>
             </Link>
           ))}
         </div>
@@ -77,12 +141,22 @@ export default function Home() {
 
       {/* Brands */}
       <div>
-        <h2 className="section-title">Featured Brands</h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="section-title">Featured Brands</h2>
+          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
+        </div>
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
           {brands.map((brand, i) => (
-            <Link key={brand} to={`/products?brand=${brand}`}
-              className="bg-white border-2 border-gold-200 rounded-xl px-6 py-3 font-semibold text-gray-700 hover:border-gold-500 hover:text-gold-700 hover:bg-gold-50 transition-all duration-300 card-hover animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
-              {brand}
+            <Link key={brand.name} to={`/products?brand=${brand.name}`}
+              className="bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm border border-gray-100 hover:border-gold-300 hover:shadow-md card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
+              {brand.slug ? (
+                <img src={`https://cdn.simpleicons.org/${brand.slug}/${brand.color}`} alt={brand.name}
+                  className="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform duration-300" />
+              ) : (
+                <img src={brand.img} alt={brand.name}
+                  className="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform duration-300" />
+              )}
+              <span className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-gold-600 transition">{brand.name}</span>
             </Link>
           ))}
         </div>
@@ -153,6 +227,43 @@ export default function Home() {
           <p className="text-gray-300 text-sm mb-4">Get instant exchange value for your old phone. Best prices guaranteed.</p>
           <span className="bg-gold-500 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">Check Value →</span>
         </Link>
+      </div>
+
+      {/* Financing Partners */}
+      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm gold-border">
+        <div className="text-center mb-6">
+          <h2 className="section-title inline-block">Finance Partners</h2>
+          <p className="text-gray-500 text-sm mt-2">Easy EMI options available with leading finance partners</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <a href="https://www.bajajfinserv.in/qr-code-rural-web-page?xc=wZJcF8vPcfuCf8IpnelpO2wo91ynp9JJsM12UNYH40AFzOXsNG4aQX+fjLXg47b9TPaQyWA9RzzmbFi7op12aw==&utm_source=RURAL_ARU&utm_medium=OFFERMART_QR_GEN" target="_blank" rel="noopener noreferrer"
+            className="bg-gradient-to-br from-blue-50 to-blue-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-blue-200 hover:border-blue-400 transition group block">
+            <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center group-hover:shadow-md transition">
+              <img src="/bajaj-finserv.png" alt="Bajaj Finserv" className="h-12 object-contain" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg">Bajaj Finserv</h3>
+            <p className="text-gray-500 text-xs mt-1">No Cost EMI · 0% Interest · 3-24 months</p>
+            <span className="mt-3 bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full group-hover:bg-blue-700 transition">Check Limit →</span>
+          </a>
+
+          <div className="bg-gradient-to-br from-red-50 to-orange-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-red-200 hover:border-red-400 transition">
+            <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center">
+              <img src="/tvs-credit.svg" alt="TVS Credit" className="h-12 object-contain" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg">TVS Credit</h3>
+            <p className="text-gray-500 text-xs mt-1">Easy EMI · Quick Approval · 6-18 months</p>
+            <span className="mt-3 bg-red-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full">Available ✓</span>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-50 to-yellow-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-orange-200 hover:border-orange-400 transition">
+            <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center">
+              <img src="/chola-finance.svg" alt="Chola Finance" className="h-12 object-contain" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg">Chola Finance</h3>
+            <p className="text-gray-500 text-xs mt-1">Low EMI · Flexible Tenure · 6-24 months</p>
+            <span className="mt-3 bg-orange-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full">Available ✓</span>
+          </div>
+        </div>
       </div>
 
       {/* Store Info */}

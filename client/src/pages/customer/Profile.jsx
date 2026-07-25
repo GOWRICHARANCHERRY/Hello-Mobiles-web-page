@@ -1,11 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
-import { User, MapPin, CreditCard, Clock, Edit2, Save } from 'lucide-react';
+import { User, MapPin, Ticket, HelpCircle, Globe, Edit2, Save, Package, ChevronRight, Phone, Mail, MessageCircle, Clock, Plus, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const tabs = [
+  { id: 'personal', label: 'Personal Details', icon: User },
+  { id: 'orders', label: 'My Orders', icon: Package },
+  { id: 'address', label: 'Saved Address', icon: MapPin },
+  { id: 'coupons', label: 'My Coupons', icon: Ticket },
+  { id: 'help', label: 'Help & Support', icon: HelpCircle },
+  { id: 'language', label: 'Preferred Language', icon: Globe },
+];
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'personal');
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '', email: user?.email || '',
@@ -13,10 +25,88 @@ export default function Profile() {
     state: user?.address?.state || '', pincode: user?.address?.pincode || '',
   });
   const [orders, setOrders] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [addrForm, setAddrForm] = useState({ label: 'Home', street: '', city: '', state: '', pincode: '', phone: '' });
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tabs.find(t => t.id === tab)) setActiveTab(tab);
+  }, [searchParams]);
 
   useEffect(() => {
     api.get('/orders').then(r => setOrders(r.data)).catch(() => {});
+    loadAddresses();
   }, []);
+
+  const loadAddresses = () => {
+    const saved = JSON.parse(localStorage.getItem('hm_addresses') || '[]');
+    if (saved.length === 0) {
+      saved.push({
+        id: 'default',
+        label: 'Home',
+        street: user?.address?.street || '45 MG Road',
+        city: user?.address?.city || 'Hyderabad',
+        state: user?.address?.state || 'Telangana',
+        pincode: user?.address?.pincode || '500001',
+        phone: user?.phone || '',
+        isDefault: true,
+      });
+      localStorage.setItem('hm_addresses', JSON.stringify(saved));
+    }
+    setAddresses(saved);
+  };
+
+  const saveAddresses = (list) => {
+    localStorage.setItem('hm_addresses', JSON.stringify(list));
+    setAddresses(list);
+  };
+
+  const handleAddAddress = () => {
+    if (!addrForm.street || !addrForm.city || !addrForm.pincode) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+    let updated;
+    if (editingAddress) {
+      updated = addresses.map(a => a.id === editingAddress.id ? { ...a, ...addrForm } : a);
+      toast.success('Address updated!');
+    } else {
+      const newAddr = { ...addrForm, id: Date.now().toString(), isDefault: addresses.length === 0 };
+      updated = [...addresses, newAddr];
+      toast.success('Address added!');
+    }
+    saveAddresses(updated);
+    setShowAddressModal(false);
+    setEditingAddress(null);
+    setAddrForm({ label: 'Home', street: '', city: '', state: '', pincode: '', phone: '' });
+  };
+
+  const handleDeleteAddress = (id) => {
+    const updated = addresses.filter(a => a.id !== id);
+    if (addresses.find(a => a.id === id)?.isDefault && updated.length > 0) {
+      updated[0].isDefault = true;
+    }
+    saveAddresses(updated);
+    toast.success('Address deleted!');
+  };
+
+  const handleSetDefault = (id) => {
+    const updated = addresses.map(a => ({ ...a, isDefault: a.id === id }));
+    saveAddresses(updated);
+  };
+
+  const openEditAddress = (addr) => {
+    setEditingAddress(addr);
+    setAddrForm({ label: addr.label, street: addr.street, city: addr.city, state: addr.state, pincode: addr.pincode, phone: addr.phone || '' });
+    setShowAddressModal(true);
+  };
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId });
+  };
 
   const handleSave = async () => {
     try {
@@ -33,91 +123,327 @@ export default function Profile() {
   };
 
   return (
-    <div className="animate-fade-in max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">My Profile</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gold-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <User size={32} className="text-gold-600" />
+    <div className="animate-fade-in max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Sidebar */}
+        <div className="md:col-span-1">
+          {/* User Card */}
+          <div className="bg-white rounded-xl shadow-sm p-5 mb-4 text-center">
+            <div className="w-16 h-16 rounded-full gold-gradient flex items-center justify-center mx-auto mb-3 text-white text-xl font-bold">
+              {user?.name?.[0]?.toUpperCase() || 'U'}
             </div>
-            <h2 className="font-bold text-lg">{user?.name}</h2>
-            <p className="text-sm text-gray-500">{user?.phone}</p>
-            {user?.email && <p className="text-sm text-gray-500">{user.email}</p>}
-            <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-              <p className="text-xs text-gray-500">Loyalty Points</p>
-              <p className="text-2xl font-bold text-yellow-600">{user?.loyaltyPoints || 0}</p>
+            <h2 className="font-bold text-gray-800">{user?.name}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{user?.phone}</p>
+            {user?.email && <p className="text-xs text-gray-500">{user.email}</p>}
+            <div className="mt-3 p-2 bg-yellow-50 rounded-lg">
+              <p className="text-[10px] text-gray-500 uppercase tracking-wide">Loyalty Points</p>
+              <p className="text-xl font-bold text-yellow-600">{user?.loyaltyPoints || 0}</p>
             </div>
           </div>
-        </div>
 
-        {/* Edit Profile */}
-        <div className="md:col-span-2 bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-lg">Personal Details</h3>
-            <button onClick={() => editing ? handleSave() : setEditing(true)}
-              className="text-gold-600 flex items-center gap-1 text-sm font-medium">
-              {editing ? <><Save size={16} /> Save</> : <><Edit2 size={16} /> Edit</>}
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">Name</label>
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">Email</label>
-              <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm text-gray-600 mb-1">Address</label>
-              <input value={form.street} onChange={e => setForm({...form, street: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">City</label>
-              <input value={form.city} onChange={e => setForm({...form, city: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">State</label>
-              <input value={form.state} onChange={e => setForm({...form, state: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">Pincode</label>
-              <input value={form.pincode} onChange={e => setForm({...form, pincode: e.target.value})} disabled={!editing}
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none' : 'bg-gold-50'}`} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Order History */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-        <h3 className="font-bold text-lg mb-4">Recent Orders</h3>
-        {orders.length === 0 ? (
-          <p className="text-gray-500 text-sm">No orders yet</p>
-        ) : (
-          <div className="space-y-3">
-            {orders.slice(0, 5).map(order => (
-              <div key={order._id} className="flex items-center justify-between py-3 border-b last:border-0">
-                <div>
-                  <p className="font-medium text-sm">#{order.orderNumber}</p>
-                  <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-sm">₹{order.total.toLocaleString()}</p>
-                  <p className={`text-xs capitalize ${order.orderStatus === 'delivered' ? 'text-green-600' : 'text-gray-500'}`}>{order.orderStatus}</p>
-                </div>
-              </div>
+          {/* Tabs */}
+          <div className="bg-white rounded-xl shadow-sm p-2">
+            {tabs.map(tab => (
+              <button key={tab.id} onClick={() => handleTabChange(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition ${
+                  activeTab === tab.id
+                    ? 'gold-gradient text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gold-50'
+                }`}>
+                <tab.icon size={16} />
+                <span className="text-left">{tab.label}</span>
+              </button>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Content */}
+        <div className="md:col-span-3">
+          {activeTab === 'personal' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-bold text-lg text-gray-800">Personal Details</h3>
+                <button onClick={() => editing ? handleSave() : setEditing(true)}
+                  className="gold-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:opacity-90 transition shadow-md">
+                  {editing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Name</label>
+                  <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={!editing}
+                    className={`w-full border rounded-lg px-4 py-2.5 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none border-gold-300' : 'bg-gray-50 border-gray-200'}`} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
+                  <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} disabled={!editing}
+                    className={`w-full border rounded-lg px-4 py-2.5 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none border-gold-300' : 'bg-gray-50 border-gray-200'}`} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone Number</label>
+                  <input value={user?.phone || ''} disabled
+                    className="w-full border rounded-lg px-4 py-2.5 text-sm bg-gray-50 border-gray-200 text-gray-500" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'orders' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-bold text-lg text-gray-800 mb-5">My Orders</h3>
+              {orders.length === 0 ? (
+                <div className="text-center py-12">
+                  <Package size={48} className="text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No orders yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {orders.map(order => (
+                    <div key={order._id} className="flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:border-gold-200 transition">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-gold-50 flex items-center justify-center">
+                          <Package size={18} className="text-gold-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">#{order.orderNumber}</p>
+                          <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        </div>
+                      </div>
+                      <div className="text-right flex items-center gap-3">
+                        <div>
+                          <p className="font-bold text-sm">₹{order.total.toLocaleString()}</p>
+                          <p className={`text-xs capitalize font-medium ${order.orderStatus === 'delivered' ? 'text-green-600' : order.orderStatus === 'cancelled' ? 'text-red-500' : 'text-gold-600'}`}>{order.orderStatus}</p>
+                        </div>
+                        <ChevronRight size={16} className="text-gray-400" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'address' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-bold text-lg text-gray-800">Saved Address</h3>
+                <button onClick={() => { setEditingAddress(null); setAddrForm({ label: 'Home', street: '', city: '', state: '', pincode: '', phone: '' }); setShowAddressModal(true); }}
+                  className="gold-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:opacity-90 transition shadow-md">
+                  <Plus size={14} /> Add Address
+                </button>
+              </div>
+
+              {addresses.length === 0 ? (
+                <div className="text-center py-12">
+                  <MapPin size={48} className="text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No saved addresses</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {addresses.map(addr => (
+                    <div key={addr.id} className={`border rounded-xl p-5 transition ${addr.isDefault ? 'border-gold-300 bg-gold-50/50' : 'border-gray-200 hover:border-gold-200'}`}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${addr.isDefault ? 'bg-gold-100' : 'bg-gray-100'}`}>
+                            <MapPin size={18} className={addr.isDefault ? 'text-gold-600' : 'text-gray-500'} />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-sm text-gray-800">{addr.label}</p>
+                              {addr.isDefault && <span className="text-[10px] bg-gold-500 text-white px-2 py-0.5 rounded-full font-semibold">Default</span>}
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{addr.street}</p>
+                            <p className="text-sm text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
+                            {addr.phone && <p className="text-xs text-gray-500 mt-1">📞 {addr.phone}</p>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!addr.isDefault && (
+                            <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-600 hover:underline font-medium">Set Default</button>
+                          )}
+                          <button onClick={() => openEditAddress(addr)} className="p-1.5 hover:bg-gold-100 rounded-lg transition">
+                            <Edit2 size={14} className="text-gold-600" />
+                          </button>
+                          {!addr.isDefault && (
+                            <button onClick={() => handleDeleteAddress(addr.id)} className="p-1.5 hover:bg-red-100 rounded-lg transition">
+                              <Trash2 size={14} className="text-red-500" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'coupons' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-bold text-lg text-gray-800 mb-5">My Coupons</h3>
+              <div className="text-center py-12">
+                <div className="w-20 h-20 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4">
+                  <Ticket size={32} className="text-orange-400" />
+                </div>
+                <p className="text-gray-600 font-medium">No coupons available yet</p>
+                <p className="text-sm text-gray-400 mt-1">Stay tuned for exciting offers and discounts!</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'help' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-bold text-lg text-gray-800 mb-5">Help & Support</h3>
+              <div className="space-y-4">
+                <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-green-300 hover:bg-green-50 transition">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle size={22} className="text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-gray-800">WhatsApp Support</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Chat with us on WhatsApp</p>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-400" />
+                </a>
+                <a href="tel:+918886888128"
+                  className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition">
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Phone size={22} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-gray-800">Call Us</p>
+                    <p className="text-xs text-gray-500 mt-0.5">+91 88868 88128</p>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-400" />
+                </a>
+                <a href="mailto:svlnmobiles12@gmail.com"
+                  className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-gold-300 hover:bg-gold-50 transition">
+                  <div className="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center flex-shrink-0">
+                    <Mail size={22} className="text-gold-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-gray-800">Email Us</p>
+                    <p className="text-xs text-gray-500 mt-0.5">svlnmobiles12@gmail.com</p>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-400" />
+                </a>
+                <div className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl">
+                  <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <Clock size={22} className="text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-gray-800">Store Hours</p>
+                    <p className="text-xs text-gray-500 mt-0.5">10:00 AM – 9:00 PM (All days)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'language' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-bold text-lg text-gray-800 mb-5">Preferred Language</h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-4 p-4 border-2 border-gold-300 rounded-xl bg-gold-50 cursor-pointer">
+                  <input type="radio" name="language" defaultChecked className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🇮🇳</span>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-800">English</p>
+                      <p className="text-xs text-gray-500">Default language</p>
+                    </div>
+                  </div>
+                </label>
+                <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gold-300 cursor-pointer transition">
+                  <input type="radio" name="language" className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🇮🇳</span>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-800">हिन्दी</p>
+                      <p className="text-xs text-gray-500">Hindi</p>
+                    </div>
+                  </div>
+                </label>
+                <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gold-300 cursor-pointer transition">
+                  <input type="radio" name="language" className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🇮🇳</span>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-800">తెలుగు</p>
+                      <p className="text-xs text-gray-500">Telugu</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Add/Edit Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in-down">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="font-bold text-lg text-gray-800">{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
+              <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }} className="p-1 hover:bg-gray-100 rounded-lg transition">
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Label</label>
+                <select value={addrForm.label} onChange={e => setAddrForm({...addrForm, label: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none">
+                  <option>Home</option>
+                  <option>Work</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Street Address *</label>
+                <input value={addrForm.street} onChange={e => setAddrForm({...addrForm, street: e.target.value})} placeholder="House no., Street, Landmark"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">City *</label>
+                  <input value={addrForm.city} onChange={e => setAddrForm({...addrForm, city: e.target.value})} placeholder="City"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">State *</label>
+                  <input value={addrForm.state} onChange={e => setAddrForm({...addrForm, state: e.target.value})} placeholder="State"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Pincode *</label>
+                  <input value={addrForm.pincode} onChange={e => setAddrForm({...addrForm, pincode: e.target.value})} placeholder="Pincode" maxLength={6}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone</label>
+                  <input value={addrForm.phone} onChange={e => setAddrForm({...addrForm, phone: e.target.value})} placeholder="Phone number" maxLength={10}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-5 border-t border-gray-100">
+              <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
+                Cancel
+              </button>
+              <button onClick={handleAddAddress}
+                className="flex-1 gold-gradient text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition shadow-md">
+                {editingAddress ? 'Update Address' : 'Save Address'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../utils/api';
-import { Plus, Edit2, Trash2, X, Save, Package, Upload, Search, ChevronDown, GripVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Save, Package, Upload, Search, ChevronDown, GripVertical, Filter, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const defaultCategories = ['Mobiles', 'TVs', 'Smart Watches', 'Earbuds', 'Laptops', 'Home Appliances', 'Accessories'];
+const defaultCategories = ['Mobiles', 'TVs', 'Smart Watches', 'Earbuds', 'Laptops', 'Home Appliances', 'Furniture', 'Accessories'];
 
 const emptySpecs = [
   { key: 'RAM', value: '' },
@@ -332,16 +332,176 @@ function DynamicSpecs({ specs, onChange }) {
   );
 }
 
+const defaultVariant = { ram: '', storage: '', price: '', mrp: '', sku: '', colors: [{ name: '', stock: 0, image: '' }] };
+
+const colorPreset = ['Black', 'White', 'Blue', 'Green', 'Red', 'Gold', 'Silver', 'Purple', 'Gray', 'Pink', 'Orange', 'Navy', 'Beige', 'Bronze', 'Cream', 'Coral', 'Teal'];
+
+function VariantManager({ variants, onChange, basePrice, baseMrp, baseStock }) {
+  const addVariant = () => onChange([...variants, { ...defaultVariant, price: basePrice || '', mrp: baseMrp || '' }]);
+  const removeVariant = (index) => onChange(variants.filter((_, i) => i !== index));
+  const duplicateVariant = (index) => {
+    const copy = { ...variants[index], sku: '', colors: variants[index].colors.map(c => ({ ...c, stock: 0 })) };
+    const newVariants = [...variants];
+    newVariants.splice(index + 1, 0, copy);
+    onChange(newVariants);
+  };
+
+  const updateVariant = (index, field, val) => {
+    onChange(variants.map((v, i) => i === index ? { ...v, [field]: val } : v));
+  };
+
+  const addColorToVariant = (variantIndex) => {
+    const v = variants[variantIndex];
+    const newColors = [...(v.colors || []), { name: '', stock: 0, image: '' }];
+    updateVariant(variantIndex, 'colors', newColors);
+  };
+
+  const removeColorFromVariant = (variantIndex, colorIndex) => {
+    const v = variants[variantIndex];
+    const newColors = v.colors.filter((_, i) => i !== colorIndex);
+    updateVariant(variantIndex, 'colors', newColors.length > 0 ? newColors : [{ name: '', stock: 0, image: '' }]);
+  };
+
+  const updateColor = (variantIndex, colorIndex, field, val) => {
+    const v = variants[variantIndex];
+    const newColors = v.colors.map((c, i) => i === colorIndex ? { ...c, [field]: val } : c);
+    updateVariant(variantIndex, 'colors', newColors);
+  };
+
+  const addAllColorsToVariant = (variantIndex) => {
+    const v = variants[variantIndex];
+    const existingNames = (v.colors || []).map(c => c.name.toLowerCase());
+    const newColors = colorPreset.filter(c => !existingNames.includes(c.toLowerCase())).map(c => ({ name: c, stock: 0, image: '' }));
+    updateVariant(variantIndex, 'colors', [...(v.colors || []), ...newColors]);
+  };
+
+  const totalVariantStock = (v) => (v.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <label className="text-sm font-medium text-gray-700">
+          Variants {variants.length > 0 && <span className="text-gray-400 font-normal">({variants.length})</span>}
+        </label>
+        <button type="button" onClick={addVariant} className="text-gold-600 text-xs flex items-center gap-1 hover:underline">
+          <Plus size={12} /> Add Variant
+        </button>
+      </div>
+      <p className="text-xs text-gray-400 mb-3">Each variant = one RAM/Storage combo with its own price. Add colors within each variant for stock tracking.</p>
+
+      {variants.length === 0 && (
+        <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+          <Package size={24} className="mx-auto text-gray-300 mb-2" />
+          <p className="text-sm text-gray-400">No variants added yet</p>
+          <p className="text-xs text-gray-400 mt-1">If this product comes in different RAM/storage options, add variants</p>
+          <button type="button" onClick={addVariant} className="mt-3 text-gold-600 text-sm font-medium hover:underline">+ Add First Variant</button>
+        </div>
+      )}
+
+      {variants.length > 0 && (
+        <div className="space-y-4">
+          {variants.map((variant, i) => (
+            <div key={i} className="border-2 border-gold-200 rounded-xl bg-gold-50/30 overflow-hidden">
+              {/* Variant Header */}
+              <div className="flex items-center justify-between p-3 bg-gold-100/50 border-b border-gold-200">
+                <span className="text-xs font-bold text-gold-700">
+                  Variant {i + 1}{variant.ram ? ` — ${variant.ram}` : ''}{variant.storage ? ` / ${variant.storage}` : ''} {variant.price ? `₹${Number(variant.price).toLocaleString()}` : ''} {variant.colors?.length > 0 ? `| ${totalVariantStock(variant)} total stock` : ''}
+                </span>
+                <div className="flex gap-1">
+                  <button type="button" onClick={() => duplicateVariant(i)} className="text-blue-500 hover:text-blue-600 p-1" title="Duplicate"><Copy size={14} /></button>
+                  <button type="button" onClick={() => removeVariant(i)} className="text-red-400 hover:text-red-600 p-1" title="Remove"><Trash2 size={14} /></button>
+                </div>
+              </div>
+
+              <div className="p-3">
+                {/* RAM + Storage + Price + MRP + SKU */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
+                  <select value={variant.ram} onChange={e => updateVariant(i, 'ram', e.target.value)}
+                    className="border-2 border-gold-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-gold-400 outline-none bg-white">
+                    <option value="">RAM</option>
+                    {['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'].map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                  <select value={variant.storage} onChange={e => updateVariant(i, 'storage', e.target.value)}
+                    className="border-2 border-gold-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-gold-400 outline-none bg-white">
+                    <option value="">Storage</option>
+                    {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <input type="number" value={variant.price} onChange={e => updateVariant(i, 'price', e.target.value)} placeholder="Price ₹"
+                    className="border-2 border-gold-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-gold-400 outline-none bg-white" />
+                  <input type="number" value={variant.mrp} onChange={e => updateVariant(i, 'mrp', e.target.value)} placeholder="MRP ₹"
+                    className="border-2 border-gold-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-gold-400 outline-none bg-white" />
+                  <input value={variant.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} placeholder="SKU (optional)"
+                    className="border-2 border-gold-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-gold-400 outline-none bg-white" />
+                </div>
+
+                {/* Colors Section */}
+                <div className="bg-white rounded-lg border border-gold-200 p-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-600">Colors & Stock</span>
+                    <div className="flex gap-1">
+                      <button type="button" onClick={() => addAllColorsToVariant(i)} className="text-[10px] text-blue-600 hover:text-blue-700 border border-blue-200 rounded px-1.5 py-0.5 hover:bg-blue-50">
+                        + All Preset Colors
+                      </button>
+                      <button type="button" onClick={() => addColorToVariant(i)} className="text-[10px] text-gold-600 hover:text-gold-700 border border-gold-200 rounded px-1.5 py-0.5 hover:bg-gold-50">
+                        + Custom Color
+                      </button>
+                    </div>
+                  </div>
+                  {(variant.colors || []).length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-2">No colors added. Add colors to track stock per color.</p>
+                  )}
+                  <div className="space-y-1.5">
+                    {(variant.colors || []).map((color, ci) => (
+                      <div key={ci} className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            list={`color-list-${i}-${ci}`}
+                            value={color.name}
+                            onChange={e => updateColor(i, ci, 'name', e.target.value)}
+                            placeholder="Color name"
+                            className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none"
+                          />
+                          <datalist id={`color-list-${i}-${ci}`}>
+                            {colorPreset.map(c => <option key={c} value={c} />)}
+                          </datalist>
+                        </div>
+                        <input type="number" value={color.stock} onChange={e => updateColor(i, ci, 'stock', Number(e.target.value))}
+                          placeholder="Stock" min="0"
+                          className="w-20 border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none" />
+                        <input value={color.image} onChange={e => updateColor(i, ci, 'image', e.target.value)}
+                          placeholder="Image URL (optional)"
+                          className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none" />
+                        <button type="button" onClick={() => removeColorFromVariant(i, ci)} className="text-red-400 hover:text-red-600 p-0.5 flex-shrink-0">
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [search, setSearch] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterBrand, setFilterBrand] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStock, setFilterStock] = useState('');
   const [form, setForm] = useState({
     name: '', brand: '', category: 'Mobiles', price: '', mrp: '', description: '',
     specifications: emptySpecs.map(s => ({ ...s })),
     stock: 0, emiAvailable: true, exchangeAvailable: true,
-    isFeatured: false, isNewArrival: false, isOnOffer: false, images: [],
+    isFeatured: false, isNewArrival: false, isOnOffer: false, images: [], variants: [],
   });
 
   useEffect(() => { loadProducts(); }, []);
@@ -375,6 +535,18 @@ export default function AdminProducts() {
         mrp: Number(form.mrp || form.price),
         stock: Number(form.stock),
         specifications: specsToMap(form.specifications),
+        variants: (form.variants || []).map(v => ({
+          ram: v.ram || '',
+          storage: v.storage || '',
+          price: Number(v.price || 0),
+          mrp: Number(v.mrp || 0),
+          sku: v.sku || '',
+          colors: (v.colors || []).map(c => ({
+            name: c.name || '',
+            stock: Number(c.stock || 0),
+            image: c.image || '',
+          })),
+        })),
       };
       if (editingId) {
         await api.put(`/products/${editingId}`, payload);
@@ -389,7 +561,7 @@ export default function AdminProducts() {
         name: '', brand: '', category: 'Mobiles', price: '', mrp: '', description: '',
         specifications: emptySpecs.map(s => ({ ...s })),
         stock: 0, emiAvailable: true, exchangeAvailable: true,
-        isFeatured: false, isNewArrival: false, isOnOffer: false, images: [],
+        isFeatured: false, isNewArrival: false, isOnOffer: false, images: [], variants: [],
       });
       loadProducts();
     } catch (error) {
@@ -405,6 +577,20 @@ export default function AdminProducts() {
       stock: product.stock || 0,
       specifications: mapToSpecs(product.specifications),
       images: product.images || [],
+      variants: (product.variants || []).map(v => ({
+        _id: v._id,
+        ram: v.ram || '',
+        storage: v.storage || '',
+        price: v.price || '',
+        mrp: v.mrp || '',
+        sku: v.sku || '',
+        colors: (v.colors || []).map(c => ({
+          _id: c._id,
+          name: c.name || '',
+          stock: c.stock || 0,
+          image: c.image || '',
+        })),
+      })),
     });
     setEditingId(product._id);
     setShowModal(true);
@@ -423,16 +609,35 @@ export default function AdminProducts() {
 
   if (loading) return <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gold-500"></div></div>;
 
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+  const brands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
+
+  const filtered = products.filter(p => {
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.brand.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterCategory && p.category !== filterCategory) return false;
+    if (filterBrand && p.brand !== filterBrand) return false;
+    if (filterStatus === 'featured' && !p.isFeatured) return false;
+    if (filterStatus === 'new' && !p.isNewArrival) return false;
+    if (filterStatus === 'offer' && !p.isOnOffer) return false;
+    const totalStock = p.variants?.length > 0 ? p.variants.reduce((s, v) => s + (v.colors?.reduce((cs, c) => cs + (c.stock || 0), 0) || 0), 0) : p.stock;
+    if (filterStock === 'low' && totalStock > 5) return false;
+    if (filterStock === 'out' && totalStock > 0) return false;
+    if (filterStock === 'in' && totalStock <= 0) return false;
+    return true;
+  });
+
+  const hasFilters = search || filterCategory || filterBrand || filterStatus || filterStock;
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Products ({products.length})</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Products ({filtered.length}{hasFilters ? ` of ${products.length}` : ''})</h1>
         <button onClick={() => {
           setForm({
             name: '', brand: '', category: 'Mobiles', price: '', mrp: '', description: '',
             specifications: emptySpecs.map(s => ({ ...s })),
             stock: 0, emiAvailable: true, exchangeAvailable: true,
-            isFeatured: false, isNewArrival: false, isOnOffer: false, images: [],
+            isFeatured: false, isNewArrival: false, isOnOffer: false, images: [], variants: [],
           });
           setEditingId(null);
           setShowModal(true);
@@ -440,6 +645,49 @@ export default function AdminProducts() {
           className="bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:from-gold-600 hover:to-gold-700 transition shadow-lg">
           <Plus size={16} /> Add Product
         </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-4 gold-border">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter size={16} className="text-gold-600" />
+          <span className="text-sm font-semibold text-gray-700">Filters</span>
+          {hasFilters && (
+            <button onClick={() => { setSearch(''); setFilterCategory(''); setFilterBrand(''); setFilterStatus(''); setFilterStock(''); }}
+              className="text-xs text-red-500 hover:text-red-600 ml-2 underline">Clear All</button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="relative col-span-2 md:col-span-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name or brand..."
+              className="w-full pl-9 pr-3 py-2 border-2 border-gold-200 rounded-lg text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
+          </div>
+          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+            className="border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50">
+            <option value="">All Categories</option>
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select value={filterBrand} onChange={e => setFilterBrand(e.target.value)}
+            className="border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50">
+            <option value="">All Brands</option>
+            {brands.map(b => <option key={b} value={b}>{b}</option>)}
+          </select>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+            className="border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50">
+            <option value="">All Status</option>
+            <option value="featured">Featured</option>
+            <option value="new">New Arrival</option>
+            <option value="offer">On Offer</option>
+          </select>
+          <select value={filterStock} onChange={e => setFilterStock(e.target.value)}
+            className="border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50">
+            <option value="">All Stock</option>
+            <option value="low">Low Stock (≤5)</option>
+            <option value="out">Out of Stock</option>
+            <option value="in">In Stock</option>
+          </select>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden gold-border">
@@ -452,12 +700,15 @@ export default function AdminProducts() {
                 <th className="text-left py-3 px-4 text-gray-700 font-semibold">Price</th>
                 <th className="text-left py-3 px-4 text-gray-700 font-semibold">MRP</th>
                 <th className="text-left py-3 px-4 text-gray-700 font-semibold">Stock</th>
+                <th className="text-left py-3 px-4 text-gray-700 font-semibold">Variants</th>
                 <th className="text-left py-3 px-4 text-gray-700 font-semibold">Status</th>
                 <th className="text-left py-3 px-4 text-gray-700 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {products.map(product => (
+              {filtered.length === 0 ? (
+                <tr><td colSpan={8} className="py-8 text-center text-gray-400">No products match your filters</td></tr>
+              ) : filtered.map(product => (
                 <tr key={product._id} className="border-b border-gold-100 last:border-0 hover:bg-gold-50/50 transition">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
@@ -471,7 +722,24 @@ export default function AdminProducts() {
                   <td className="py-3 px-4 text-gray-500">{product.category}</td>
                   <td className="py-3 px-4 font-semibold text-gold-600">₹{product.price?.toLocaleString()}</td>
                   <td className="py-3 px-4 text-gray-500 line-through">₹{product.mrp?.toLocaleString()}</td>
-                  <td className="py-3 px-4"><span className={`font-semibold ${product.stock <= 5 ? 'text-red-600' : 'text-green-600'}`}>{product.stock}</span></td>
+                  <td className="py-3 px-4">
+                    {product.variants?.length > 0 ? (() => {
+                      const totalVariantStock = product.variants.reduce((s, v) => s + (v.colors?.reduce((cs, c) => cs + (c.stock || 0), 0) || 0), 0);
+                      return (
+                        <span className={`font-semibold ${totalVariantStock <= 5 ? 'text-red-600' : 'text-green-600'}`}>
+                          {totalVariantStock}
+                        </span>
+                      );
+                    })() : (
+                      <span className={`font-semibold ${product.stock <= 5 ? 'text-red-600' : 'text-green-600'}`}>{product.stock}</span>
+                    )}</td>
+                <td className="py-3 px-4">
+                  {product.variants?.length > 0 ? (
+                    <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">{product.variants.length} variants</span>
+                  ) : (
+                    <span className="text-gray-400 text-xs">None</span>
+                  )}
+                </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-1 flex-wrap">
                       {product.isFeatured && <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">Featured</span>}
@@ -538,6 +806,17 @@ export default function AdminProducts() {
 
               {/* Dynamic Specifications */}
               <DynamicSpecs specs={form.specifications} onChange={specs => setForm({ ...form, specifications: specs })} />
+
+              {/* Variants */}
+              <div className="border-t border-gold-200 pt-4">
+                <VariantManager
+                  variants={form.variants || []}
+                  onChange={variants => setForm({ ...form, variants })}
+                  basePrice={form.price}
+                  baseMrp={form.mrp}
+                  baseStock={form.stock}
+                />
+              </div>
 
               {/* Checkboxes */}
               <div className="bg-gold-50/50 rounded-xl p-4 border border-gold-200">

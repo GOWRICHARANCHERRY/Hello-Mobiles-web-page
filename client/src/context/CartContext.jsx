@@ -14,23 +14,55 @@ export function CartProvider({ children }) {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product, quantity = 1, variant = null, colorObj = null) => {
+    const cartKey = variant
+      ? `${product._id}-${variant._id}${colorObj ? '-' + (colorObj._id || colorObj.name) : ''}`
+      : product._id;
+
+    const price = variant?.price ?? product.price;
+    const mrp = variant?.mrp ?? product.mrp;
+    const image = colorObj?.image || product.images?.[0] || '';
+    const colorName = colorObj?.name || '';
+
     setCart(prev => {
-      const existing = prev.find(item => item._id === product._id);
+      const existing = prev.find(item => item.cartKey === cartKey);
       if (existing) {
-        return prev.map(item => item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item);
+        return prev.map(item => item.cartKey === cartKey ? { ...item, quantity: item.quantity + quantity } : item);
       }
-      return [...prev, { _id: product._id, name: product.name, price: product.price, image: product.images?.[0], brand: product.brand, quantity }];
+      return [...prev, {
+        cartKey,
+        _id: product._id,
+        name: product.name,
+        price,
+        mrp,
+        image,
+        brand: product.brand,
+        quantity,
+        variant: variant ? {
+          _id: variant._id,
+          ram: variant.ram,
+          storage: variant.storage,
+          sku: variant.sku,
+          price: variant.price,
+          mrp: variant.mrp,
+        } : null,
+        selectedColor: colorName,
+        variantLabel: [
+          variant?.ram,
+          variant?.storage,
+          colorName,
+        ].filter(Boolean).join(' / '),
+      }];
     });
   };
 
-  const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(item => item._id !== productId));
+  const removeFromCart = (cartKey) => {
+    setCart(prev => prev.filter(item => item.cartKey !== cartKey));
   };
 
-  const updateQuantity = (productId, quantity) => {
-    if (quantity < 1) return removeFromCart(productId);
-    setCart(prev => prev.map(item => item._id === productId ? { ...item, quantity } : item));
+  const updateQuantity = (cartKey, quantity) => {
+    if (quantity < 1) return removeFromCart(cartKey);
+    setCart(prev => prev.map(item => item.cartKey === cartKey ? { ...item, quantity } : item));
   };
 
   const clearCart = () => setCart([]);

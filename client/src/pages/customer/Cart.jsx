@@ -28,7 +28,7 @@ export default function Cart() {
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
           {cart.map(item => (
-            <div key={item._id} className="bg-white rounded-xl shadow-sm p-4 flex gap-4">
+            <div key={item.cartKey} className="bg-white rounded-xl shadow-sm p-4 flex gap-4">
               <Link to={`/products/${item._id}`} className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 {item.image ? <img src={item.image} alt={item.name} className="max-h-full object-contain" /> : <span className="text-gray-400 text-xs">No Image</span>}
               </Link>
@@ -37,8 +37,9 @@ export default function Cart() {
                   <div>
                     <p className="text-xs text-gray-500">{item.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm">{item.name}</h3>
+                    {item.variantLabel && <p className="text-xs text-gold-600 font-medium mt-0.5">{item.variantLabel}</p>}
                   </div>
-                  <button onClick={() => { removeFromCart(item._id); toast.success('Removed from cart'); }}
+                  <button onClick={() => { removeFromCart(item.cartKey); toast.success('Removed from cart'); }}
                     className="text-gray-400 hover:text-red-500 transition">
                     <Trash2 size={18} />
                   </button>
@@ -46,9 +47,9 @@ export default function Cart() {
                 <p className="text-lg font-bold text-gray-900 mt-2">₹{item.price.toLocaleString()}</p>
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center border rounded-lg">
-                    <button onClick={() => updateQuantity(item._id, item.quantity - 1)} className="px-2 py-1 hover:bg-gray-100"><Minus size={14} /></button>
+                    <button onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} className="px-2 py-1 hover:bg-gray-100"><Minus size={14} /></button>
                     <span className="px-3 py-1 text-sm font-medium">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item._id, item.quantity + 1)} className="px-2 py-1 hover:bg-gray-100"><Plus size={14} /></button>
+                    <button onClick={() => updateQuantity(item.cartKey, item.quantity + 1)} className="px-2 py-1 hover:bg-gray-100"><Plus size={14} /></button>
                   </div>
                   <p className="font-bold text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</p>
                 </div>

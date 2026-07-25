@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
@@ -6,6 +6,38 @@ import { useAuth } from '../../context/AuthContext';
 import LoginPopup from '../../components/LoginPopup';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const COLOR_MAP = {
+  'black': '#1a1a1a', 'white': '#f5f5f5', 'blue': '#3b82f6', 'green': '#22c55e',
+  'red': '#ef4444', 'gold': '#d4a017', 'purple': '#a855f7', 'silver': '#c0c0c0',
+  'gray': '#6b7280', 'grey': '#6b7280', 'pink': '#ec4899', 'orange': '#f97316',
+  'yellow': '#eab308', 'cyan': '#06b6d4', 'lime': '#84cc14', 'teal': '#14b8a6',
+  'navy': '#1e3a5f', 'brown': '#92400e', 'beige': '#d4c5a9', 'bronze': '#cd7f32',
+  'copper': '#b87333', 'violet': '#7c3aed', 'indigo': '#6366f1', 'rose': '#f43f5e',
+  'maroon': '#800000', 'cream': '#fffdd0', 'titanium': '#878681', 'coral': '#ff7f50',
+  'mint': '#98ff98', 'lavender': '#e6e6fa', 'peach': '#ffcba4', 'mauve': '#e0b0ff',
+  'aqua': '#00ffff', 'charcoal': '#36454f', 'olive': '#808000', 'burgundy': '#800020',
+  'sky blue': '#87ceeb', 'rose gold': '#b76e79', 'midnight blue': '#191970',
+  'forest green': '#228b22', 'champagne': '#f7e7ce', 'ruby': '#e0115f',
+  'emerald': '#50c878', 'ivory': '#fffff0',
+  'aurora green': '#22c55e', 'starry white': '#f5f5f5', 'twilight blue': '#3b82f6',
+  'fresh': '#22c55e', 'blaze': '#ef4444', 'cappuccino brown': '#6f4e37',
+  'olive green': '#556b2f', 'prism violet': '#a855f7', 'icy blue': '#a5d8ff',
+  'glacier blue': '#5da9e9', 'midnight black': '#1a1a1a', 'phantom black': '#1a1a1a',
+  'celestial magic': '#a855f7', 'luxury purple': '#a855f7', 'luxe lavender': '#b57edc',
+  'coca brown': '#6f4e37', 'blooming purple': '#a855f7', 'sprouting green': '#22c55e',
+  'parrot purple': '#a855f7', 'master gold': '#d4a017',
+};
+
+function getColorHex(colorName) {
+  if (!colorName) return null;
+  const lower = colorName.toLowerCase().trim();
+  if (COLOR_MAP[lower]) return COLOR_MAP[lower];
+  for (const [key, val] of Object.entries(COLOR_MAP)) {
+    if (lower.includes(key) || key.includes(lower)) return val;
+  }
+  return null;
+}
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -19,22 +51,120 @@ export default function ProductDetail() {
   const { user } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
+  const [selectedRam, setSelectedRam] = useState('');
+  const [selectedStorage, setSelectedStorage] = useState('');
+  const [selectedColorName, setSelectedColorName] = useState('');
+
   useEffect(() => {
     api.get(`/products/${id}`).then(r => {
       setProduct(r.data);
+      setSelectedImage(0);
+      setSelectedRam('');
+      setSelectedStorage('');
+      setSelectedColorName('');
       setLoading(false);
     }).catch(() => { setLoading(false); });
   }, [id]);
 
+  const hasVariants = product?.variants?.length > 0;
+  const normalize = (s) => (s || '').toLowerCase().trim();
+
+  const ramOptions = useMemo(() => {
+    if (!hasVariants) return [];
+    const seen = new Map();
+    product.variants.forEach(v => {
+      if (v.ram) {
+        const key = normalize(v.ram);
+        if (!seen.has(key)) seen.set(key, v.ram.trim());
+      }
+    });
+    return [...seen.values()];
+  }, [product, hasVariants]);
+
+  const storageOptions = useMemo(() => {
+    if (!hasVariants) return [];
+    let filtered = product.variants;
+    if (selectedRam) filtered = filtered.filter(v => normalize(v.ram) === normalize(selectedRam));
+    const seen = new Map();
+    filtered.forEach(v => {
+      if (v.storage) {
+        const key = normalize(v.storage);
+        if (!seen.has(key)) seen.set(key, v.storage.trim());
+      }
+    });
+    return [...seen.values()];
+  }, [product, hasVariants, selectedRam]);
+
+  const selectedVariant = useMemo(() => {
+    if (!hasVariants || !product) return null;
+    return product.variants.find(v =>
+      (!selectedRam || normalize(v.ram) === normalize(selectedRam)) &&
+      (!selectedStorage || normalize(v.storage) === normalize(selectedStorage))
+    ) || null;
+  }, [product, hasVariants, selectedRam, selectedStorage]);
+
+  const variantColors = useMemo(() => {
+    if (!selectedVariant?.colors) return [];
+    return selectedVariant.colors.filter(c => c.name);
+  }, [selectedVariant]);
+
+  const selectedColorObj = useMemo(() => {
+    if (!selectedColorName || !variantColors.length) return null;
+    return variantColors.find(c => normalize(c.name) === normalize(selectedColorName)) || null;
+  }, [selectedColorName, variantColors]);
+
+  const currentPrice = selectedVariant?.price ?? product?.price;
+  const currentMrp = selectedVariant?.mrp ?? product?.mrp;
+  const currentStock = selectedColorObj ? selectedColorObj.stock : (selectedVariant?.colors?.reduce((s, c) => s + (c.stock || 0), 0) ?? product?.stock ?? 0);
+  const currentImage = selectedColorObj?.image || product?.images?.[selectedImage];
+  const discount = currentMrp && currentPrice ? Math.round(((currentMrp - currentPrice) / currentMrp) * 100) : 0;
+
+  useEffect(() => {
+    if (ramOptions.length > 0 && !selectedRam) setSelectedRam(ramOptions[0]);
+  }, [ramOptions]);
+
+  useEffect(() => {
+    if (storageOptions.length > 0 && !selectedStorage) setSelectedStorage(storageOptions[0]);
+  }, [storageOptions]);
+
+  useEffect(() => {
+    if (variantColors.length > 0 && !selectedColorName) {
+      setSelectedColorName(variantColors[0].name);
+    }
+  }, [variantColors]);
+
+  const handleRamSelect = (ram) => {
+    const newRam = normalize(ram) === normalize(selectedRam) ? '' : ram;
+    setSelectedRam(newRam);
+    setSelectedStorage('');
+    setSelectedColorName('');
+  };
+
+  const handleStorageSelect = (storage) => {
+    const newStorage = normalize(storage) === normalize(selectedStorage) ? '' : storage;
+    setSelectedStorage(newStorage);
+    setSelectedColorName('');
+  };
+
+  const handleColorSelect = (name) => {
+    setSelectedColorName(normalize(name) === normalize(selectedColorName) ? '' : name);
+  };
+
   const handleAddToCart = () => {
     if (!user) return setShowLoginPopup(true);
-    addToCart(product, quantity);
+    if (hasVariants && !selectedVariant) return toast.error('Please select a variant');
+    if (hasVariants && variantColors.length > 0 && !selectedColorObj) return toast.error('Please select a color');
+    if (hasVariants && currentStock <= 0) return toast.error('Selected option is out of stock');
+    addToCart(product, quantity, selectedVariant, selectedColorObj);
     toast.success('Added to cart!');
   };
 
   const handleBuyNow = () => {
     if (!user) return setShowLoginPopup(true);
-    addToCart(product, quantity);
+    if (hasVariants && !selectedVariant) return toast.error('Please select a variant');
+    if (hasVariants && variantColors.length > 0 && !selectedColorObj) return toast.error('Please select a color');
+    if (hasVariants && currentStock <= 0) return toast.error('Selected option is out of stock');
+    addToCart(product, quantity, selectedVariant, selectedColorObj);
     navigate('/checkout');
   };
 
@@ -50,14 +180,22 @@ export default function ProductDetail() {
   };
 
   const handleWhatsApp = () => {
-    const msg = `Hi, I'm interested in ${product?.name} (₹${product?.price?.toLocaleString()}). Please share more details.`;
+    const variantText = selectedVariant ? ` (${selectedRam || ''}${selectedStorage ? '/' + selectedStorage : ''}${selectedColorName ? ' - ' + selectedColorName : ''})` : '';
+    const msg = `Hi, I'm interested in ${product?.name}${variantText} (₹${currentPrice?.toLocaleString()}). Please share more details.`;
     window.open(`https://wa.me/918886888128?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  const allImages = useMemo(() => {
+    if (!product) return [];
+    const imgs = [...(product.images || [])];
+    if (selectedVariant?.colors) {
+      selectedVariant.colors.forEach(c => { if (c.image && !imgs.includes(c.image)) imgs.push(c.image); });
+    }
+    return imgs;
+  }, [product, selectedVariant]);
+
   if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div></div>;
   if (!product) return <div className="text-center py-16"><p className="text-gray-500 text-lg">Product not found</p></div>;
-
-  const discount = product.mrp ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
 
   return (
     <div className="animate-fade-in">
@@ -70,15 +208,17 @@ export default function ProductDetail() {
           {/* Images */}
           <div>
             <div className="bg-gray-100 rounded-xl p-8 h-80 flex items-center justify-center mb-4">
-              {product.images?.[selectedImage] ? (
-                <img src={product.images[selectedImage]} alt={product.name} className="max-h-full object-contain" />
+              {currentImage ? (
+                <img src={currentImage} alt={product.name} className="max-h-full object-contain" />
+              ) : allImages[selectedImage] ? (
+                <img src={allImages[selectedImage]} alt={product.name} className="max-h-full object-contain" />
               ) : (
                 <div className="text-gray-400 text-lg">No Image Available</div>
               )}
             </div>
-            {product.images?.length > 1 && (
+            {allImages.length > 1 && (
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                {product.images.map((img, i) => (
+                {allImages.map((img, i) => (
                   <button key={i} onClick={() => setSelectedImage(i)}
                     className={`w-16 h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden ${selectedImage === i ? 'border-gold-500' : 'border-gray-200'}`}>
                     <img src={img} alt="" className="w-full h-full object-contain" />
@@ -102,12 +242,72 @@ export default function ProductDetail() {
               </div>
             )}
 
+            {/* RAM Selector */}
+            {ramOptions.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">RAM: <span className="text-gold-600">{selectedRam || 'Select'}</span></p>
+                <div className="flex flex-wrap gap-2">
+                  {ramOptions.map(ram => {
+                    const isActive = normalize(selectedRam) === normalize(ram);
+                    return (
+                      <button key={ram} onClick={() => handleRamSelect(ram)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm transition font-medium ${isActive ? 'border-gold-500 bg-gold-50 text-gold-700' : 'border-gray-200 hover:border-gold-300'}`}>
+                        {ram}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Storage Selector */}
+            {storageOptions.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Storage: <span className="text-gold-600">{selectedStorage || 'Select'}</span></p>
+                <div className="flex flex-wrap gap-2">
+                  {storageOptions.map(storage => {
+                    const isActive = normalize(selectedStorage) === normalize(storage);
+                    return (
+                      <button key={storage} onClick={() => handleStorageSelect(storage)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm transition font-medium ${isActive ? 'border-gold-500 bg-gold-50 text-gold-700' : 'border-gray-200 hover:border-gold-300'}`}>
+                        {storage}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Color Selector */}
+            {variantColors.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Color: <span className="text-gold-600">{selectedColorName || 'Select'}</span></p>
+                <div className="flex flex-wrap gap-2">
+                  {variantColors.map(c => {
+                    const hex = getColorHex(c.name);
+                    const isActive = normalize(selectedColorName) === normalize(c.name);
+                    const outOfStock = c.stock <= 0;
+                    return (
+                      <button key={c._id || c.name} onClick={() => handleColorSelect(c.name)} disabled={outOfStock}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm transition ${isActive ? 'border-gold-500 bg-gold-50 font-semibold' : outOfStock ? 'border-gray-200 text-gray-300 cursor-not-allowed line-through' : 'border-gray-200 hover:border-gold-300'}`}>
+                        {hex && (
+                          <span className="w-5 h-5 rounded-full border border-gray-300 flex-shrink-0" style={{ backgroundColor: hex }}></span>
+                        )}
+                        {c.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Price */}
             <div className="mt-4 p-4 bg-gold-50 rounded-xl">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-                {product.mrp > product.price && (
+                <span className="text-3xl font-bold text-gray-900">₹{currentPrice?.toLocaleString()}</span>
+                {currentMrp > currentPrice && (
                   <>
-                    <span className="text-lg text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>
+                    <span className="text-lg text-gray-400 line-through">₹{currentMrp?.toLocaleString()}</span>
                     <span className="text-green-600 font-semibold">{discount}% off</span>
                   </>
                 )}
@@ -118,7 +318,7 @@ export default function ProductDetail() {
             {/* EMI Info */}
             {product.emiAvailable && (
               <div className="mt-4 p-3 border border-green-200 bg-green-50 rounded-xl">
-                <p className="text-green-700 font-medium text-sm">EMI starts from ₹{product.emiStarting?.toLocaleString() || Math.round(product.price / 12).toLocaleString()}/month</p>
+                <p className="text-green-700 font-medium text-sm">EMI starts from ₹{product.emiStarting?.toLocaleString() || Math.round((currentPrice || product.price) / 12).toLocaleString()}/month</p>
                 <p className="text-xs text-gray-600 mt-1">No Cost EMI available on select banks. 0% Down Payment option available.</p>
               </div>
             )}
@@ -131,8 +331,8 @@ export default function ProductDetail() {
                 <span className="px-4 py-2 font-medium">{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 hover:bg-gray-100"><Plus size={16} /></button>
               </div>
-              {product.stock > 0 ? (
-                <span className="text-green-600 text-sm flex items-center gap-1"><Check size={14} /> In Stock ({product.stock} available)</span>
+              {currentStock > 0 ? (
+                <span className="text-green-600 text-sm flex items-center gap-1"><Check size={14} /> In Stock ({currentStock} available)</span>
               ) : (
                 <span className="text-red-500 text-sm">Out of Stock</span>
               )}
@@ -140,11 +340,11 @@ export default function ProductDetail() {
 
             {/* Action Buttons */}
             <div className="mt-6 flex flex-wrap gap-3">
-              <button onClick={handleBuyNow} disabled={product.stock <= 0}
+              <button onClick={handleBuyNow} disabled={currentStock <= 0}
                 className="flex-1 bg-accent-500 hover:bg-accent-600 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50">
                 Buy Now
               </button>
-              <button onClick={handleAddToCart} disabled={product.stock <= 0}
+              <button onClick={handleAddToCart} disabled={currentStock <= 0}
                 className="flex-1 bg-gold-600 hover:bg-gold-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2">
                 <ShoppingCart size={18} /> Add to Cart
               </button>
@@ -178,6 +378,52 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        {/* Variant Price Table */}
+        {hasVariants && product.variants.length > 1 && (
+          <div className="mt-8 border-t pt-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">All Variants</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border rounded-xl overflow-hidden">
+                <thead className="bg-gold-50">
+                  <tr>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">RAM</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Storage</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Price</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">MRP</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Colors</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.variants.map((v, i) => {
+                    const totalStock = v.colors?.reduce((s, c) => s + (c.stock || 0), 0) || 0;
+                    return (
+                      <tr key={i} className="border-t hover:bg-gold-50/50 transition">
+                        <td className="py-2 px-3">{v.ram || '-'}</td>
+                        <td className="py-2 px-3">{v.storage || '-'}</td>
+                        <td className="py-2 px-3 font-semibold text-gold-600">₹{v.price?.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-gray-400 line-through">₹{v.mrp?.toLocaleString()}</td>
+                        <td className="py-2 px-3">
+                          <div className="flex flex-wrap gap-1">
+                            {v.colors?.map((c, ci) => (
+                              <span key={ci} className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{c.name} ({c.stock})</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3">
+                          <span className={totalStock > 0 ? 'text-green-600' : 'text-red-500'}>
+                            {totalStock > 0 ? `${totalStock} in stock` : 'Out of stock'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Specifications */}
         <div className="mt-8 border-t pt-6">
