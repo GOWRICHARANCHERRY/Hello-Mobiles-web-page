@@ -146,8 +146,55 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/imei/:code', auth, roleAuth('admin', 'employee'), async (req, res) => {
+  try {
+    const code = req.params.code.replace(/\s+/g, '');
+    const products = await Product.find({ category: 'Mobiles', 'variants.colors.imei.number': code }).lean();
+    for (const p of products) {
+      for (const v of (p.variants || [])) {
+        for (const c of (v.colors || [])) {
+          const entry = (c.imei || []).find(e => e.number === code);
+          if (entry) {
+            let orderDetails = null;
+            if (entry.orderId) {
+              const Order = (await import('../models/Order.js')).default;
+              orderDetails = await Order.findById(entry.orderId).lean();
+            }
+            return res.json({
+              found: true,
+              product: { _id: p._id, name: p.name, brand: p.brand, category: p.category, images: p.images },
+              variant: { ram: v.ram, storage: v.storage, price: v.price, mrp: v.mrp, sku: v.sku },
+              color: { name: c.name, image: c.image },
+              imei: entry,
+              order: orderDetails ? {
+                orderNumber: orderDetails.orderNumber,
+                createdAt: orderDetails.createdAt,
+                total: orderDetails.total,
+                paymentMethod: orderDetails.paymentMethod,
+                shippingAddress: orderDetails.shippingAddress,
+              } : null,
+            });
+          }
+        }
+      }
+    }
+    res.json({ found: false });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.post('/', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
+    if (req.body.category === 'Mobiles' && req.body.variants?.length > 0) {
+      for (const v of req.body.variants) {
+        for (const c of (v.colors || [])) {
+          if (c.stock > 0 && (!c.imei || c.imei.length !== c.stock)) {
+            return res.status(400).json({ message: `IMEI count must match stock for color "${c.name || 'Unnamed'}" in ${v.ram || ''}/${v.storage || ''} variant. Expected ${c.stock}, got ${c.imei?.length || 0}.` });
+          }
+        }
+      }
+    }
     const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
@@ -158,6 +205,15 @@ router.post('/', auth, roleAuth('admin', 'employee'), async (req, res) => {
 
 router.put('/:id', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
+    if (req.body.category === 'Mobiles' && req.body.variants?.length > 0) {
+      for (const v of req.body.variants) {
+        for (const c of (v.colors || [])) {
+          if (c.stock > 0 && (!c.imei || c.imei.length !== c.stock)) {
+            return res.status(400).json({ message: `IMEI count must match stock for color "${c.name || 'Unnamed'}" in ${v.ram || ''}/${v.storage || ''} variant. Expected ${c.stock}, got ${c.imei?.length || 0}.` });
+          }
+        }
+      }
+    }
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);

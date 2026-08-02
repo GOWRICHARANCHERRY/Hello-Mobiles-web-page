@@ -1,9 +1,21 @@
 import mongoose from 'mongoose';
 
+const imeiEntrySchema = new mongoose.Schema({
+  number: { type: String, required: true },
+  addedAt: { type: Date, default: Date.now },
+  status: { type: String, enum: ['in_stock', 'sold', 'returned'], default: 'in_stock' },
+  soldAt: Date,
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  orderNumber: String,
+  soldTo: String,
+  soldPrice: Number,
+}, { _id: true });
+
 const colorStockSchema = new mongoose.Schema({
   name: { type: String, required: true },
   stock: { type: Number, default: 0 },
   image: { type: String, default: '' },
+  imei: { type: [imeiEntrySchema], default: [] },
 }, { _id: true });
 
 const variantSchema = new mongoose.Schema({

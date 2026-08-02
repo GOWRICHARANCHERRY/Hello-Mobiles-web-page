@@ -239,21 +239,61 @@ export default function Checkout() {
         </div>
 
         {/* Summary */}
-        <div className="bg-white rounded-xl shadow-sm p-6 h-fit sticky top-20 gold-border">
-          <h2 className="text-lg font-bold mb-4 gold-text">Order Summary</h2>
-          {cart.map(item => (
-            <div key={item.cartKey} className="flex justify-between text-sm py-2 border-b border-gold-100">
-              <div className="flex-1 mr-2">
-                <span className="text-gray-600 truncate block">{item.name} x{item.quantity}</span>
-                {item.variantLabel && <span className="text-xs text-gold-600">{item.variantLabel}</span>}
+        <div className="bg-white rounded-2xl shadow-sm p-0 h-fit sticky top-20 overflow-hidden gold-border">
+          <div className="gold-gradient px-6 py-4">
+            <h2 className="text-lg font-bold text-white">Order Summary</h2>
+            <p className="text-white/80 text-xs mt-0.5">{cart.length} item{cart.length > 1 ? 's' : ''} in your cart</p>
+          </div>
+
+          <div className="px-6 py-4 max-h-64 overflow-y-auto">
+            {cart.map(item => (
+              <div key={item.cartKey} className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0">
+                <div className="w-12 h-12 rounded-lg bg-gold-50 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-100">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="w-full h-full object-contain p-0.5" />
+                  ) : (
+                    <span className="text-lg font-bold text-gold-400">{item.name?.[0]}</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
+                  {item.variantLabel && <p className="text-[11px] text-gold-600 truncate">{item.variantLabel}</p>}
+                  <p className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity}</p>
+                </div>
+                <p className="text-sm font-semibold text-gray-800 flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
               </div>
-              <span className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</span>
+            ))}
+          </div>
+
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 space-y-2.5 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Subtotal</span>
+              <span className="text-gray-700">₹{cartTotal.toLocaleString()}</span>
             </div>
-          ))}
-          <div className="mt-3 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-gray-600">Subtotal</span><span>₹{cartTotal.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span className="text-gray-600">Delivery</span><span className={deliveryCharge === 0 ? 'text-green-600 font-semibold' : ''}>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span></div>
-            <div className="flex justify-between text-lg font-bold border-t border-gold-200 pt-2"><span>Total</span><span className="gold-text">₹{total.toLocaleString()}</span></div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Delivery</span>
+              {deliveryCharge === 0 ? (
+                <span className="text-green-600 font-semibold">FREE</span>
+              ) : (
+                <span className="text-gray-700">₹{deliveryCharge}</span>
+              )}
+            </div>
+            {deliveryCharge === 0 && (
+              <p className="text-[11px] text-green-600 bg-green-50 rounded-lg px-3 py-1.5 text-center font-medium">
+                You saved ₹99 on delivery!
+              </p>
+            )}
+            <div className="flex justify-between pt-2.5 border-t border-gray-200">
+              <span className="text-base font-bold text-gray-800">Total</span>
+              <span className="text-lg font-bold gold-text">₹{total.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="px-6 py-4 border-t border-gray-100">
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-green-500 flex-shrink-0"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <span>Secure checkout · 100% genuine products</span>
+            </div>
           </div>
         </div>
       </div>

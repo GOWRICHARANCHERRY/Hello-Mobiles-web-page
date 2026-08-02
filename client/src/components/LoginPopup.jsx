@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState('login');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -17,9 +19,11 @@ export default function LoginPopup({ onClose }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(phone, password);
+      const user = await login(phone, password);
       toast.success('Logged in!');
-      onClose();
+      if (user?.role === 'admin') { onClose(); navigate('/admin'); }
+      else if (user?.role === 'employee') { onClose(); navigate('/employee'); }
+      else onClose();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
     }

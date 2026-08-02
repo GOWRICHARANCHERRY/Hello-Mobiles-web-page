@@ -1,7 +1,8 @@
 import { useState, useEffect, Fragment } from 'react';
 import api from '../../utils/api';
-import { Package, Edit2, Save, AlertTriangle, Search, Filter, ChevronDown, ChevronRight } from 'lucide-react';
+import { Package, Edit2, Save, AlertTriangle, Search, Filter, ChevronDown, ChevronRight, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ImeiScanModal from '../../components/ImeiScanModal';
 
 export default function EmployeeInventory() {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,7 @@ export default function EmployeeInventory() {
   const [filterBrand, setFilterBrand] = useState('');
   const [filterStock, setFilterStock] = useState('');
   const [expandedProducts, setExpandedProducts] = useState({});
+  const [showImeiScan, setShowImeiScan] = useState(false);
 
   useEffect(() => {
     api.get('/employee/inventory').then(r => { setProducts(r.data); setLoading(false); }).catch(() => setLoading(false));
@@ -75,7 +77,13 @@ export default function EmployeeInventory() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Inventory Management ({filtered.length}{hasFilters ? ` of ${products.length}` : ''})</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Inventory Management ({filtered.length}{hasFilters ? ` of ${products.length}` : ''})</h1>
+        <button onClick={() => setShowImeiScan(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-blue-600 transition shadow-lg">
+          <Camera size={16} /> Scan IMEI
+        </button>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4 gold-border">
         <div className="flex items-center gap-2 mb-3">
@@ -254,6 +262,8 @@ export default function EmployeeInventory() {
           </table>
         </div>
       </div>
+
+      <ImeiScanModal open={showImeiScan} onClose={() => setShowImeiScan(false)} />
     </div>
   );
 }

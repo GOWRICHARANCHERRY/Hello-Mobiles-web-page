@@ -51,6 +51,22 @@ router.post('/', auth, async (req, res) => {
           const colorEntry = variant.colors?.find(c => c.name === item.variant.color);
           if (!colorEntry) return res.status(404).json({ message: `Color "${item.variant.color}" not found for ${product.name}` });
           if (colorEntry.stock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name} (${item.variant.color} ${variant.ram}/${variant.storage})` });
+          if (product.category === 'Mobiles' && colorEntry.imei?.length > 0) {
+            const soldImeis = colorEntry.imei
+              .filter(e => (typeof e === 'object' ? e.status : 'in_stock') === 'in_stock')
+              .slice(0, item.quantity);
+            if (soldImeis.length < item.quantity) return res.status(400).json({ message: `Not enough IMEI units in stock for ${product.name} (${item.variant.color})` });
+            for (const imei of soldImeis) {
+              if (typeof imei === 'object') {
+                imei.status = 'sold';
+                imei.soldAt = new Date();
+                imei.orderId = null;
+                imei.orderNumber = null;
+                imei.soldPrice = itemPrice;
+                imei.soldTo = req.user.id;
+              }
+            }
+          }
           colorEntry.stock -= item.quantity;
           if (colorEntry.image) itemImage = colorEntry.image;
         } else {
@@ -95,6 +111,26 @@ router.post('/', auth, async (req, res) => {
     });
 
     await order.save();
+
+    if (items.some(i => i.variantId)) {
+      for (const item of items) {
+        if (!item.variantId) continue;
+        const p = await Product.findById(item.product);
+        if (!p || p.category !== 'Mobiles') continue;
+        const variant = p.variants.id(item.variantId);
+        if (!variant) continue;
+        const colorEntry = variant.colors?.find(c => c.name === item.variant?.color);
+        if (!colorEntry) continue;
+        for (const imei of (colorEntry.imei || [])) {
+          if (typeof imei === 'object' && imei.status === 'sold' && !imei.orderId) {
+            imei.orderId = order._id;
+            imei.orderNumber = order.orderNumber;
+          }
+        }
+        await p.save();
+      }
+    }
+
     res.status(201).json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
