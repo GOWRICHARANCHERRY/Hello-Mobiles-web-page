@@ -75,6 +75,19 @@ router.post('/', auth, roleAuth('admin'), upload.single('image'), async (req, re
   }
 });
 
+// Admin - reorder
+router.put('/reorder/batch', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const { order } = req.body;
+    for (const { id, order: o } of order) {
+      await Banner.findByIdAndUpdate(id, { order: o });
+    }
+    res.json({ message: 'Order updated' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Admin - update banner
 router.put('/:id', auth, roleAuth('admin'), upload.single('image'), async (req, res) => {
   try {
@@ -96,19 +109,6 @@ router.delete('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     await Banner.findByIdAndDelete(req.params.id);
     res.json({ message: 'Banner deleted' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Admin - reorder
-router.put('/reorder/batch', auth, roleAuth('admin'), async (req, res) => {
-  try {
-    const { order } = req.body;
-    for (const { id, order: o } of order) {
-      await Banner.findByIdAndUpdate(id, { order: o });
-    }
-    res.json({ message: 'Order updated' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

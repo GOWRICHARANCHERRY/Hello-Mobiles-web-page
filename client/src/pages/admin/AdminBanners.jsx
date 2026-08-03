@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../utils/api';
-import { Plus, Edit2, Trash2, X, Save, Upload, Eye, EyeOff, GripVertical, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Save, Upload, Eye, EyeOff, ChevronUp, ChevronDown, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const emptyBanner = {
@@ -123,6 +123,24 @@ export default function AdminBanners() {
     }
   };
 
+  const moveBanner = async (index, direction) => {
+    const target = index + direction;
+    if (target < 0 || target >= banners.length) return;
+    const reordered = banners.map(b => ({ ...b }));
+    const temp = reordered[index];
+    reordered[index] = reordered[target];
+    reordered[target] = temp;
+    reordered.forEach((b, i) => { b.order = i + 1; });
+    setBanners(reordered);
+    try {
+      await api.put('/banners/reorder/batch', { order: reordered.map((b, i) => ({ id: b._id, order: i + 1 })) });
+      toast.success('Banner order updated!');
+    } catch (error) {
+      toast.error('Failed to reorder');
+      loadBanners();
+    }
+  };
+
   const openAdd = () => {
     setForm(emptyBanner);
     setEditingId(null);
@@ -198,6 +216,18 @@ export default function AdminBanners() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-4">
+                    <div className="flex flex-col mr-1">
+                      <button onClick={() => moveBanner(index, -1)} disabled={index === 0}
+                        title="Move earlier"
+                        className={`p-1 rounded transition ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
+                        <ChevronUp size={16} />
+                      </button>
+                      <button onClick={() => moveBanner(index, 1)} disabled={index === banners.length - 1}
+                        title="Move later"
+                        className={`p-1 rounded transition ${index === banners.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
+                        <ChevronDown size={16} />
+                      </button>
+                    </div>
                     <button onClick={() => toggleActive(banner._id, banner.isActive)}
                       className={`p-2 rounded-lg transition ${banner.isActive ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}>
                       {banner.isActive ? <Eye size={16} /> : <EyeOff size={16} />}

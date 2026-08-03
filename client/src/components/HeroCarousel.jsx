@@ -103,7 +103,7 @@ export default function HeroCarousel() {
             </>
           )}
 
-          <div className="relative z-10 flex-1 p-8 md:p-12" style={{ color: slide.textColor || '#ffffff' }}>
+          <div className="relative z-10 flex-1 p-8 md:p-12 md:pl-20 lg:pl-28" style={{ color: slide.textColor || '#ffffff' }}>
             {slide.highlightedText && (
               <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80 animate-slide-up">{slide.highlightedText}</p>
             )}
