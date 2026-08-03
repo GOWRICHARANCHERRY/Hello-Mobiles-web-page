@@ -54,7 +54,7 @@ export default function HeroCarousel() {
         title: b.bigText,
         subtitle: b.smallText,
         offer: b.highlightedText,
-        link: b.product ? `/products/${b.product._id}` : '#',
+        link: b.link || (b.product ? `/products/${b.product._id}` : '#'),
       }))
     : fallbackSlides;
 

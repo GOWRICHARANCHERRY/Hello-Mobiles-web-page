@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import HeroCarousel from '../../components/HeroCarousel';
+import TextBannerCarousel from '../../components/TextBannerCarousel';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
@@ -111,24 +112,8 @@ export default function Home() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
-      {/* Festival Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 shadow-lg animate-fade-in">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
-        <div className="relative flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-10 py-6 md:py-8">
-          <div className="flex items-center gap-4">
-            <div className="text-4xl hidden sm:block">🎉</div>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">Festive Season Sale</p>
-              <h2 className="text-xl md:text-3xl font-bold text-white leading-tight">Independence Day Special — Up to 40% OFF</h2>
-              <p className="text-white/85 text-sm mt-1">Extra savings with coupons + No Cost EMI on mobiles, electronics & appliances</p>
-            </div>
-          </div>
-          <Link to="/products?onOffer=true"
-            className="flex-shrink-0 bg-white text-red-600 font-bold text-sm px-6 py-3 rounded-xl hover:bg-red-50 transition shadow-md">
-            Shop Offers <ChevronRight size={16} className="inline" />
-          </Link>
-        </div>
-      </div>
+      {/* Banner 2 — Text Offers Carousel */}
+      <TextBannerCarousel />
 
       {/* Feature Badges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
