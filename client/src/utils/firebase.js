@@ -16,30 +16,26 @@ export const auth = getAuth(app);
 let confirmationResult = null;
 
 export async function sendFirebaseOTP(phoneNumber) {
-  // Clear any existing reCAPTCHA
+  // Remove old verifier + container element entirely (avoids "already rendered" error)
   if (window.recaptchaVerifier) {
     try { window.recaptchaVerifier.clear(); } catch(e) {}
     window.recaptchaVerifier = null;
   }
+  const oldContainer = document.getElementById('recaptcha-container');
+  if (oldContainer) oldContainer.remove();
 
   // Remove old reCAPTCHA iframes
-  const oldFrames = document.querySelectorAll('iframe[src*="recaptcha"]');
-  oldFrames.forEach(f => f.remove());
-  const oldDivs = document.querySelectorAll('.grecaptcha-badge');
-  oldDivs.forEach(d => d.remove());
+  document.querySelectorAll('iframe[src*="recaptcha"], iframe[src*="grecaptcha"]').forEach(f => f.remove());
+  document.querySelectorAll('.grecaptcha-badge').forEach(d => d.remove());
 
-  // Create fresh container
-  let container = document.getElementById('recaptcha-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'recaptcha-container';
-    container.style.cssText = 'position:fixed;bottom:0;right:0;z-index:9999;width:0;height:0;overflow:hidden;';
-    document.body.appendChild(container);
-  }
-  container.innerHTML = '';
+  // Create a brand-new container element
+  const container = document.createElement('div');
+  container.id = 'recaptcha-container';
+  container.style.cssText = 'position:fixed;bottom:0;right:0;z-index:9999;width:0;height:0;overflow:hidden;';
+  document.body.appendChild(container);
 
   // Create reCAPTCHA verifier with size invisible (auto-verifies on user gesture)
-  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, container, {
     size: 'invisible',
     callback: () => {},
     'expired-callback': () => {
