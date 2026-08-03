@@ -171,9 +171,8 @@ router.post('/google', async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      const phone = '';
       const password = Math.random().toString(36).slice(-8);
-      user = new User({ name, email, phone, password, role: 'customer', avatar: picture, phoneVerified: true });
+      user = new User({ name, email, password, role: 'customer', avatar: picture, phoneVerified: true });
       await user.save();
     }
 
