@@ -9,6 +9,12 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - Server port `5050`, Client port `3000`; MongoDB `mongodb://localhost:27017/hello_mobiles` (env key is `MONGODB_URI`, NOT `MONGO_URI`)
 - Credentials: Admin `9999999999`/`admin123`, Employee `8888888888`/`emp123`, Customer `7777777777`/`cust123`
 - Server IS currently running on 5050 (API responds live)
+- Firebase/Google login RESTORED: `server/.env` now has `GOOGLE_CLIENT_ID` (from client), `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` (source: Service Account JSON `~/Downloads/hello-mobiles-webpage-firebase-adminsdk-fbsvc-919e301710.json`). Server log now shows `Firebase Admin initialized`
+- Servers now run via macOS LaunchAgents (persist + auto-restart): `com.hellomobiles.server` (node server.js → 5050), `com.hellomobiles.client` (vite --host → 3000), `com.hellomobiles.tunnel` (cloudflared http2). Restart one: `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.<name>`. NOTE: server runs `node server.js` directly (NO nodemon) — code changes need a manual kickstart restart
+- Vite dev (3000) now runs `vite --host` (bound 0.0.0.0, reachable from LAN devices)
+
+## Standing Rule (user instruction)
+- IMMEDIATELY after every change (code, config, seeds, images, etc.), commit to git and push to GitHub (`main`) — do not wait to be asked. Check `git status`/`git diff` first, stage only intended files, write a concise commit message matching repo style.
 
 ## Inventory State
 - Mobiles: 108, all with 3–6 variants, 6,043 unique 15-digit IMEIs (count == stock), real verified images (69 unique URLs, 0 broken)
@@ -35,13 +41,16 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - Home.jsx category grid now `grid-cols-4 md:grid-cols-7 xl:grid-cols-9` with new Electronics card (emerald chip SVG)
 - Footer (CustomerLayout.jsx) added Electronics link after Earbuds
 - Client builds clean (vite build OK)
+- `localhost:3000` FIXED: old stale Vite dev server had died/blank — now fresh `vite --host` via LaunchAgent; page title + `/src/main.jsx` transform + `/api` proxy all return 200
+- Firebase Admin FIXED (2 bugs): (a) `initFirebase()` was called at module scope in `routes/auth.js` BEFORE `dotenv.config()` ran in `server.js` (ESM import hoisting) → env keys were empty; moved the call to `server.js` after `dotenv.config()`. (b) firebase-admin v14 removed the default export → `admin.credential` was undefined; `config/firebase.js` now uses `import { initializeApp } from 'firebase-admin'` + `import { cert } from 'firebase-admin/app'`. Server log now: `Firebase Admin initialized`
+- Google login restored: `GOOGLE_CLIENT_ID=851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com` (matches the client's hardcoded `clientId`) added to `server/.env`; `/api/auth/google` (routes/auth.js:164) now has its audience
 
 ### Active
 - None — awaiting next request
 
 ### Pending / Not Done
 - Home Appliances (6) + Furniture (6) images verified/fixed earlier but pages may still show stale — re-check if needed
-- Google/Firebase social login keys NOT in server/.env (recreated without them) — phone+password login works
+- Cloudflare quick tunnel: same URL `https://volunteer-ghz-retail-preference.trycloudflare.com` still assigned, but data path currently NOT forwarding on this network (TLS + HTTP/2 stream to the edge open fine, then no HTTP response — quic had `no recent network activity` timeouts; likely VPN/hotspot UDP interference). Restarted on `--protocol http2`; still not carrying traffic. Test from another network/device, or restart tunnel via `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel`
 
 ## Next Move
 1. LIVE full-stack URL (works from any device): `https://volunteer-ghz-retail-preference.trycloudflare.com` — cloudflared quick tunnel to localhost:5050 (server serves API + built client from `client/dist`). Tunnel is temporary: lasts while this machine is on. Restart: `/usr/local/bin/cloudflared tunnel --url http://localhost:5050 --no-autoupdate` (installed at /usr/local/bin, NOT in PATH)
@@ -56,8 +65,12 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - `server/fix_images.js` — re-runnable image-fix script (model name → image URL)
 - `server/migrate_variants.js`, `server/fix_imei_images.js` — variant/IMEI migrations
 - `server/routes/products.js`, `server/routes/orders.js`, `server/models/Product.js` — IMEI schema + order-sold marking
+- `server/config/firebase.js` — Firebase Admin init (`cert` from `firebase-admin/app`; env `FIREBASE_PROJECT_ID`/`FIREBASE_CLIENT_EMAIL`/`FIREBASE_PRIVATE_KEY`)
+- `server/server.js` — calls `dotenv.config()` then `initFirebase()` (order matters: ESM imports run first)
+- `client/src/utils/firebase.js` — client Firebase web config (apiKey etc., hardcoded) for phone OTP
 - `client/src/App.jsx`, `client/src/components/ScrollToTop.jsx` — scroll-to-top
 - `client/src/pages/admin/AdminLayout.jsx`, `client/src/pages/employee/EmployeeLayout.jsx` — sticky sidebars
 - `client/src/pages/customer/Home.jsx` — category grid (hardcoded `categories` array, ~line 8)
 - `client/src/pages/customer/CustomerLayout.jsx` — footer category links (~lines 308–316)
 - `client/src/pages/customer/ProductList.jsx` — categories/brands loaded from API (`/products/categories`, `/products/brands`); filter via `/products?<query>`
+- LaunchAgents: `~/Library/LaunchAgents/com.hellomobiles.{server,client,tunnel}.plist` — run node server.js / vite --host / cloudflared http2

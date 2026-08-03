@@ -2,13 +2,10 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { auth } from '../middleware/auth.js';
-import { initFirebase, verifyFirebaseToken } from '../config/firebase.js';
+import { verifyFirebaseToken } from '../config/firebase.js';
 import { sendOTP, generateOTP } from '../utils/otp.js';
 
 const router = express.Router();
-
-// Initialize Firebase
-initFirebase();
 
 // Firebase Phone Auth - verify token and login/signup
 router.post('/firebase-auth', async (req, res) => {

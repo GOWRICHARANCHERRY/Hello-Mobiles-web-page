@@ -1,4 +1,5 @@
-import admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin';
+import { cert } from 'firebase-admin/app';
 
 let firebaseApp = null;
 
@@ -13,8 +14,8 @@ export function initFirebase() {
   };
 
   if (serviceAccount.project_id && serviceAccount.private_key) {
-    firebaseApp = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+    firebaseApp = initializeApp({
+      credential: cert(serviceAccount),
     });
     console.log('Firebase Admin initialized');
   } else {

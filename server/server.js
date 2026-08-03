@@ -13,8 +13,10 @@ import uploadRoutes from './routes/upload.js';
 import bannerRoutes from './routes/banners.js';
 import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
+import { initFirebase } from './config/firebase.js';
 
 dotenv.config();
+initFirebase();
 connectDB();
 
 const __filename = fileURLToPath(import.meta.url);
