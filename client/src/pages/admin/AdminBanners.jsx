@@ -308,6 +308,32 @@ export default function AdminBanners() {
               </div>
               )}
 
+              {/* Matching images from linked product */}
+              {form.type === 'hero' && form.product && (() => {
+                const matchedProduct = products.find(p => p._id === form.product);
+                const productImages = matchedProduct?.images?.filter(img => img) || [];
+                if (productImages.length === 0) return null;
+                return (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Matching Images <span className="font-normal text-gray-400">(from linked product: {matchedProduct.name})</span>
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {productImages.map((img, i) => (
+                        <button key={i} type="button" onClick={() => setForm({ ...form, image: img })}
+                          className={`rounded-lg overflow-hidden border-2 transition ${form.image === img ? 'border-gold-500 ring-2 ring-gold-300' : 'border-gray-200 hover:border-gold-400'}`}>
+                          <img src={img} alt="" className="w-28 h-16 object-cover" />
+                        </button>
+                      ))}
+                      {form.image && !productImages.includes(form.image) && (
+                        <span className="inline-flex items-center text-xs text-gray-400">Currently using uploaded/custom image</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Click an image to use it as the banner image — it matches the product in your text</p>
+                  </div>
+                );
+              })()}
+
               {/* Text Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
