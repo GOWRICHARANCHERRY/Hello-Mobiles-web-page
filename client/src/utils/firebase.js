@@ -33,24 +33,19 @@ export async function sendFirebaseOTP(phoneNumber) {
   if (!container) {
     container = document.createElement('div');
     container.id = 'recaptcha-container';
+    container.style.cssText = 'position:fixed;bottom:0;right:0;z-index:9999;width:0;height:0;overflow:hidden;';
     document.body.appendChild(container);
   }
   container.innerHTML = '';
 
-  // Create new reCAPTCHA verifier with size normal (visible)
+  // Create reCAPTCHA verifier with size invisible (auto-verifies on user gesture)
   window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-    size: 'normal',
+    size: 'invisible',
     callback: () => {},
     'expired-callback': () => {
       toast && toast.error('reCAPTCHA expired. Please try again.');
     }
   });
-
-  try {
-    await window.recaptchaVerifier.render();
-  } catch (e) {
-    console.error('reCAPTCHA render error:', e);
-  }
 
   const confirmation = await signInWithPhoneNumber(auth, `+91${phoneNumber}`, window.recaptchaVerifier);
   confirmationResult = confirmation;
