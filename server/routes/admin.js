@@ -109,6 +109,23 @@ router.delete('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
   }
 });
 
+router.put('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const { name, phone, email, password } = req.body;
+    const employee = await User.findById(req.params.id);
+    if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    if (employee.role !== 'employee') return res.status(400).json({ message: 'Not an employee account' });
+    if (name) employee.name = name;
+    if (phone) employee.phone = phone;
+    if (email !== undefined) employee.email = email;
+    if (password) employee.password = password;
+    await employee.save();
+    res.json({ id: employee._id, name: employee.name, phone: employee.phone, email: employee.email, role: employee.role });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get('/customers', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
     const customers = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });

@@ -1,24 +1,42 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Plus, Trash2, UserCheck } from 'lucide-react';
+import { Plus, Trash2, UserCheck, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const emptyForm = { name: '', phone: '', email: '', password: '' };
 
 export default function AdminEmployees() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', email: '', password: '' });
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
 
   useEffect(() => { api.get('/admin/employees').then(r => { setEmployees(r.data); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  const handleAdd = async (e) => {
+  const openAdd = () => { setForm(emptyForm); setEditingId(null); setShowForm(true); };
+
+  const openEdit = (emp) => {
+    setForm({ name: emp.name || '', phone: emp.phone || '', email: emp.email || '', password: '' });
+    setEditingId(emp._id);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await api.post('/admin/employees', form);
-      setEmployees(prev => [...prev, data]);
-      setForm({ name: '', phone: '', email: '', password: '' });
+      if (editingId) {
+        const { data } = await api.put(`/admin/employees/${editingId}`, form);
+        setEmployees(prev => prev.map(emp => emp._id === editingId ? { ...emp, ...data } : emp));
+        toast.success('Employee updated!');
+      } else {
+        const { data } = await api.post('/admin/employees', form);
+        setEmployees(prev => [...prev, data]);
+        toast.success('Employee added!');
+      }
+      setForm(emptyForm);
+      setEditingId(null);
       setShowForm(false);
-      toast.success('Employee added!');
     } catch (error) { toast.error(error.response?.data?.message || 'Failed'); }
   };
 
@@ -37,7 +55,7 @@ export default function AdminEmployees() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Employees ({employees.length})</h1>
-        <button onClick={() => setShowForm(!showForm)}
+        <button onClick={openAdd}
           className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gold-700">
           <Plus size={16} /> Add Employee
         </button>
@@ -45,19 +63,19 @@ export default function AdminEmployees() {
 
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="font-bold mb-4">Add New Employee</h2>
-          <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h2 className="font-bold mb-4">{editingId ? 'Edit Employee' : 'Add New Employee'}</h2>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input placeholder="Full Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input placeholder="Phone Number" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} required
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
-            <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required
+            <input type="password" placeholder={editingId ? 'New password (leave blank to keep)' : 'Password'} value={form.password} onChange={e => setForm({...form, password: e.target.value})} required={!editingId}
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <div className="md:col-span-2 flex gap-2">
-              <button type="submit" className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-700">Add Employee</button>
-              <button type="button" onClick={() => setShowForm(false)} className="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+              <button type="submit" className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-700">{editingId ? 'Update Employee' : 'Add Employee'}</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }} className="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
             </div>
           </form>
         </div>
@@ -87,7 +105,10 @@ export default function AdminEmployees() {
                 <td className="py-3 px-4 text-gray-600">{emp.email || '-'}</td>
                 <td className="py-3 px-4 text-gray-500 text-xs">{new Date(emp.createdAt).toLocaleDateString('en-IN')}</td>
                 <td className="py-3 px-4">
-                  <button onClick={() => handleDelete(emp._id)} className="text-red-500 hover:text-red-600"><Trash2 size={16} /></button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => openEdit(emp)} className="text-gold-600 hover:text-gold-700" title="Edit employee"><Pencil size={16} /></button>
+                    <button onClick={() => handleDelete(emp._id)} className="text-red-500 hover:text-red-600" title="Remove employee"><Trash2 size={16} /></button>
+                  </div>
                 </td>
               </tr>
             ))}
