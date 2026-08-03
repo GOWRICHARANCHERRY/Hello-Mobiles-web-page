@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 const emptyBanner = {
   type: 'hero', image: '', product: '', highlightedText: '', bigText: '', smallText: '',
-  bgColor: '#1a1a2e', textColor: '#ffffff', order: 0, isActive: true,
+  buttonText: '', link: '', bgColor: '#1a1a2e', textColor: '#ffffff', order: 0, isActive: true,
 };
 
 export default function AdminBanners() {
@@ -66,6 +66,8 @@ export default function AdminBanners() {
       formData.append('highlightedText', form.highlightedText);
       formData.append('bigText', form.bigText);
       formData.append('smallText', form.smallText);
+      formData.append('buttonText', form.buttonText);
+      formData.append('link', form.link);
       formData.append('bgColor', form.bgColor);
       formData.append('textColor', form.textColor);
       formData.append('order', form.order);
@@ -95,6 +97,8 @@ export default function AdminBanners() {
       highlightedText: banner.highlightedText || '',
       bigText: banner.bigText || '',
       smallText: banner.smallText || '',
+      buttonText: banner.buttonText || '',
+      link: banner.link || '',
       bgColor: banner.bgColor || '#1a1a2e',
       textColor: banner.textColor || '#ffffff',
       order: banner.order || 0,
@@ -317,7 +321,7 @@ export default function AdminBanners() {
                       {form.highlightedText && <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{form.highlightedText}</p>}
                       {form.bigText && <h2 className="text-3xl font-bold leading-tight">{form.bigText}</h2>}
                       {form.smallText && <p className="text-sm mt-2 opacity-75">{form.smallText}</p>}
-                      {form.product && <span className="inline-block mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold opacity-90" style={{ backgroundColor: form.textColor, color: form.bgColor }}>View Product →</span>}
+                      {(form.product || form.link) && <span className="inline-block mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold opacity-90" style={{ backgroundColor: form.textColor, color: form.bgColor }}>{form.buttonText || (form.product ? 'View Product' : 'Shop Now')} →</span>}
                     </div>
                   </div>
                 )}
@@ -409,6 +413,20 @@ export default function AdminBanners() {
                     placeholder="e.g. Starting at ₹1,29,999 | Trade-in available"
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
                   <p className="text-xs text-gray-400 mt-1">Subheading or call-to-action text</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Text</label>
+                  <input value={form.buttonText} onChange={e => setForm({ ...form, buttonText: e.target.value })}
+                    placeholder="e.g. Shop Offers, View Product, Shop Now"
+                    className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
+                  <p className="text-xs text-gray-400 mt-1">Defaults to "View Product" (if a product is linked) or "Shop Now"</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Link (URL)</label>
+                  <input value={form.link} onChange={e => setForm({ ...form, link: e.target.value })}
+                    placeholder="e.g. /products, /products?category=Mobiles"
+                    className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
+                  <p className="text-xs text-gray-400 mt-1">Internal path or full URL. If empty, links to the linked product</p>
                 </div>
               </div>
 

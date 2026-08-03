@@ -49,7 +49,7 @@ router.get('/admin', auth, roleAuth('admin'), async (req, res) => {
 // Admin - create banner
 router.post('/', auth, roleAuth('admin'), upload.single('image'), async (req, res) => {
   try {
-    const { type, product, highlightedText, bigText, smallText, bgColor, textColor, order, isActive } = req.body;
+    const { type, product, highlightedText, bigText, smallText, bgColor, textColor, order, isActive, buttonText, link } = req.body;
     const bannerType = type === 'text' ? 'text' : 'hero';
     const image = req.file ? `/uploads/${req.file.filename}` : (req.body.imageUrl || req.body.image || '');
 
@@ -62,6 +62,8 @@ router.post('/', auth, roleAuth('admin'), upload.single('image'), async (req, re
       highlightedText: highlightedText || '',
       bigText: bigText || '',
       smallText: smallText || '',
+      buttonText: buttonText || '',
+      link: link || '',
       bgColor: bgColor || '#000000',
       textColor: textColor || '#FFFFFF',
       order: Number(order) || 0,

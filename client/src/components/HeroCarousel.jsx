@@ -113,11 +113,11 @@ export default function HeroCarousel() {
             {slide.smallText && (
               <p className="text-lg md:text-xl opacity-75 mb-6 animate-slide-up max-w-2xl" style={{ animationDelay: '0.15s' }}>{slide.smallText}</p>
             )}
-            {slide.product && (
-              <button onClick={() => navigate(`/products/${slide.product._id}`)}
+            {(slide.product || slide.link) && (
+              <button onClick={() => navigate(slide.link || `/products/${slide.product._id}`)}
                 className="inline-block animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-lg hover:shadow-[0_0_30px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300"
                 style={{ animationDelay: '0.3s' }}>
-                View Product →
+                {slide.buttonText || (slide.product ? 'View Product' : 'Shop Now')} →
               </button>
             )}
           </div>

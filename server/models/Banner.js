@@ -7,6 +7,8 @@ const bannerSchema = new mongoose.Schema({
   highlightedText: { type: String, default: '' },
   bigText: { type: String, default: '' },
   smallText: { type: String, default: '' },
+  buttonText: { type: String, default: '' },
+  link: { type: String, default: '' },
   bgColor: { type: String, default: '#000000' },
   textColor: { type: String, default: '#FFFFFF' },
   order: { type: Number, default: 0 },
