@@ -10,6 +10,7 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - **DNS**: Cloudflare (hello-mobiles.com) — 2 CNAME records (root `@` + `www`) → `hello-mobiles.onrender.com`, **DNS only** (grey cloud, NOT proxied — proxied fails with "DNS points to prohibited IP" because Render is behind Cloudflare)
 - Render free tier: 2 custom domains only; sleeps after 15min idle (first visit ~30-60s wake); certs auto-issued per custom domain
 - **Keep-alive**: `.github/workflows/keepalive.yml` pings `https://hello-mobiles.com` every 14 min via GitHub Actions (repo is PUBLIC → free unlimited minutes; runs from GitHub's servers, independent of this Mac). Schedule `*/14 * * * *`
+- **Repo keep-alive**: `.github/workflows/repo_keepalive.yml` self-commits `.github/keepalive.txt` on the 1st & 15th of each month → counts as repo activity → prevents GitHub's 60-day inactive-repo shutdown of scheduled workflows. Optional: add Render Build Filter ignored path `.github/**` to stop those pushes triggering redeploys
 - Render env vars loaded from `.env.render` (gitignored): MONGODB_URI, JWT_SECRET, GOOGLE_CLIENT_ID, FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (literal `\n`)
 - Local dev still uses LaunchAgents + local MongoDB (see below); local DB was migrated to Atlas (mongodump/mongorestore)
 
