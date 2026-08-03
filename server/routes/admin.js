@@ -142,4 +142,128 @@ router.get('/reports/profit', auth, roleAuth('admin'), async (req, res) => {
   }
 });
 
+// ---------- Coupons ----------
+router.get('/coupons', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Coupon = (await import('../models/Coupon.js')).default;
+    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    res.json(coupons);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post('/coupons', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Coupon = (await import('../models/Coupon.js')).default;
+    const { code, discountType, value, minOrder, maxDiscount, validFrom, validTo, maxUses, isActive, appliesTo, applicableProductIds } = req.body;
+    if (!code || !value) return res.status(400).json({ message: 'Code and value are required' });
+    const existing = await Coupon.findOne({ code: code.toUpperCase().trim() });
+    if (existing) return res.status(400).json({ message: 'Coupon code already exists' });
+    const coupon = await Coupon.create({
+      code: code.toUpperCase().trim(),
+      discountType,
+      value,
+      minOrder: Number(minOrder) || 0,
+      maxDiscount: maxDiscount ? Number(maxDiscount) : undefined,
+      validFrom: validFrom ? new Date(validFrom) : undefined,
+      validTo: validTo ? new Date(validTo) : undefined,
+      maxUses: Number(maxUses) || 0,
+      isActive: isActive !== false,
+      appliesTo: appliesTo === 'selected' ? 'selected' : 'all',
+      applicableProductIds: appliesTo === 'selected' ? (applicableProductIds || []) : [],
+    });
+    res.status(201).json(coupon);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put('/coupons/:id', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Coupon = (await import('../models/Coupon.js')).default;
+    const updateData = { ...req.body };
+    if (updateData.code) updateData.code = updateData.code.toUpperCase().trim();
+    if (updateData.validFrom) updateData.validFrom = new Date(updateData.validFrom);
+    if (updateData.validTo) updateData.validTo = new Date(updateData.validTo);
+    if (updateData.appliesTo !== 'selected') {
+      updateData.appliesTo = 'all';
+      updateData.applicableProductIds = [];
+    }
+    const coupon = await Coupon.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!coupon) return res.status(404).json({ message: 'Coupon not found' });
+    res.json(coupon);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete('/coupons/:id', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Coupon = (await import('../models/Coupon.js')).default;
+    await Coupon.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Coupon deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ---------- Leads ----------
+router.get('/leads', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Lead = (await import('../models/Lead.js')).default;
+    const leads = await Lead.find().sort({ createdAt: -1 });
+    res.json(leads);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put('/leads/:id', auth, roleAuth('admin'), async (req, res) => {
+  try {
+    const Lead = (await import('../models/Lead.js')).default;
+    const lead = await Lead.findByIdAndUpdate(req.params.id, { read: true }, { new: true });
+    if (!lead) return res.status(404).json({ message: 'Lead not found' });
+    res.json(lead);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ---------- Bulk Stock Import ----------
+router.post('/bulk-stock', auth, roleAuth('admin', 'employee'), async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: 'No items provided' });
+
+    const results = { updated: [], notFound: [], errors: [] };
+    for (const row of items) {
+      const name = (row.name || '').trim();
+      const stock = Number(row.stock);
+      if (!name) { results.errors.push({ name, message: 'Missing name' }); continue; }
+      if (isNaN(stock) || stock < 0) { results.errors.push({ name, message: 'Invalid stock value' }); continue; }
+
+      const product = await Product.findOne({ name, isActive: true });
+      if (!product) {
+        const fuzzy = await Product.findOne({ name: { $regex: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }, isActive: true });
+        if (fuzzy) {
+          fuzzy.stock = stock;
+          await fuzzy.save();
+          results.updated.push({ name: fuzzy.name, stock: fuzzy.stock });
+        } else {
+          results.notFound.push(name);
+        }
+        continue;
+      }
+      product.stock = stock;
+      await product.save();
+      results.updated.push({ name: product.name, stock: product.stock });
+    }
+
+    res.json({ updated: results.updated.length, notFound: results.notFound, errors: results.errors, details: results });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;

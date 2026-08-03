@@ -309,7 +309,7 @@ export default function AdminBanners() {
               </div>
 
               {/* Colors and Order */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
                   <div className="flex gap-2 items-center">

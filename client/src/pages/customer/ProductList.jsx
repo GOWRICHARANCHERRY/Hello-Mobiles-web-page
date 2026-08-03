@@ -89,6 +89,8 @@ export default function ProductList() {
 
   const activeCount = Object.values(filters).filter(v => v && v !== '').length;
 
+  const showMobileFilters = !filters.category || filters.category === 'Mobiles';
+
   const handleAddToCart = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -179,55 +181,59 @@ export default function ProductList() {
                 </div>
               </FilterSection>
 
-              <FilterSection title="RAM">
-                <div className="space-y-1">
-                  {['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'].map(ram => (
-                    <label key={ram} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
-                      <input type="radio" name="ram" checked={filters.ram === ram}
-                        onChange={() => handleFilterChange('ram', filters.ram === ram ? '' : ram)}
-                        className="text-gold-600 w-4 h-4" />
-                      <span className="text-sm">{ram}</span>
-                    </label>
-                  ))}
-                </div>
-              </FilterSection>
+              {showMobileFilters && (
+                <>
+                  <FilterSection title="RAM">
+                    <div className="space-y-1">
+                      {['4 GB', '6 GB', '8 GB', '12 GB', '16 GB'].map(ram => (
+                        <label key={ram} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                          <input type="radio" name="ram" checked={filters.ram === ram}
+                            onChange={() => handleFilterChange('ram', filters.ram === ram ? '' : ram)}
+                            className="text-gold-600 w-4 h-4" />
+                          <span className="text-sm">{ram}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </FilterSection>
 
-              <FilterSection title="Storage">
-                <div className="space-y-1">
-                  {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(storage => (
-                    <label key={storage} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
-                      <input type="radio" name="storage" checked={filters.storage === storage}
-                        onChange={() => handleFilterChange('storage', filters.storage === storage ? '' : storage)}
-                        className="text-gold-600 w-4 h-4" />
-                      <span className="text-sm">{storage}</span>
-                    </label>
-                  ))}
-                </div>
-              </FilterSection>
+                  <FilterSection title="Storage">
+                    <div className="space-y-1">
+                      {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(storage => (
+                        <label key={storage} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                          <input type="radio" name="storage" checked={filters.storage === storage}
+                            onChange={() => handleFilterChange('storage', filters.storage === storage ? '' : storage)}
+                            className="text-gold-600 w-4 h-4" />
+                          <span className="text-sm">{storage}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </FilterSection>
 
-              <FilterSection title="Screen Size">
-                <div className="space-y-1">
-                  {screenSizes.map(size => (
-                    <label key={size} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
-                      <input type="radio" name="screenSize" checked={filters.screenSize === size}
-                        onChange={() => handleFilterChange('screenSize', filters.screenSize === size ? '' : size)}
-                        className="text-gold-600 w-4 h-4" />
-                      <span className="text-sm">{size}</span>
-                    </label>
-                  ))}
-                </div>
-              </FilterSection>
+                  <FilterSection title="Screen Size">
+                    <div className="space-y-1">
+                      {screenSizes.map(size => (
+                        <label key={size} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
+                          <input type="radio" name="screenSize" checked={filters.screenSize === size}
+                            onChange={() => handleFilterChange('screenSize', filters.screenSize === size ? '' : size)}
+                            className="text-gold-600 w-4 h-4" />
+                          <span className="text-sm">{size}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </FilterSection>
 
-              <FilterSection title="Color" defaultOpen={false}>
-                <div className="flex flex-wrap gap-2 px-1">
-                  {colors.map(color => (
-                    <button key={color} onClick={() => handleFilterChange('color', filters.color === color ? '' : color)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition ${filters.color === color ? 'border-gold-500 bg-gold-100 text-gold-700' : 'border-gray-200 text-gray-600 hover:border-gold-300'}`}>
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
+                  <FilterSection title="Color" defaultOpen={false}>
+                    <div className="flex flex-wrap gap-2 px-1">
+                      {colors.map(color => (
+                        <button key={color} onClick={() => handleFilterChange('color', filters.color === color ? '' : color)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition ${filters.color === color ? 'border-gold-500 bg-gold-100 text-gold-700' : 'border-gray-200 text-gray-600 hover:border-gold-300'}`}>
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </FilterSection>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -265,7 +271,7 @@ export default function ProductList() {
                 <Link key={product._id} to={`/products/${product._id}`} className="bg-white rounded-2xl shadow-sm overflow-hidden card-hover block gold-border">
                   <div className="bg-gray-100 p-4 h-48 flex items-center justify-center relative">
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} className="h-full object-contain" />
+                      <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain" />
                     ) : (
                       <div className="text-gray-400 text-sm">No Image</div>
                     )}

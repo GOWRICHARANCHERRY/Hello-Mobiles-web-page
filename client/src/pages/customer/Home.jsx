@@ -14,7 +14,7 @@ const categories = [
       <rect x="27" y="6" width="10" height="1.5" rx="1" fill="white" fillOpacity="0.5"/>
     </svg>
   )},
-  { name: 'TVs', color: 'from-amber-400 to-amber-600', svg: (
+  { name: 'TVs', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <rect x="4" y="8" width="56" height="36" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
       <rect x="8" y="12" width="48" height="28" rx="2" fill="white" fillOpacity="0.3"/>
@@ -22,7 +22,7 @@ const categories = [
       <rect x="20" y="50" width="24" height="3" rx="1.5" fill="white" fillOpacity="0.6"/>
     </svg>
   )},
-  { name: 'Smart Watches', color: 'from-yellow-400 to-yellow-600', svg: (
+  { name: 'Smart Watches', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <rect x="18" y="2" width="28" height="8" rx="3" fill="white" fillOpacity="0.5"/>
       <rect x="18" y="54" width="28" height="8" rx="3" fill="white" fillOpacity="0.5"/>
@@ -32,7 +32,7 @@ const categories = [
       <line x1="32" y1="32" x2="38" y2="32" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   )},
-  { name: 'Earbuds', color: 'from-gold-500 to-amber-500', svg: (
+  { name: 'Earbuds', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <ellipse cx="20" cy="24" rx="8" ry="10" stroke="white" strokeWidth="2.5" fill="white" fillOpacity="0.2"/>
       <path d="M20 34 L20 50" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
@@ -42,14 +42,25 @@ const categories = [
       <circle cx="44" cy="22" r="3" fill="white" fillOpacity="0.5"/>
     </svg>
   )},
-  { name: 'Laptops', color: 'from-orange-400 to-orange-600', svg: (
+  { name: 'Laptops', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <rect x="8" y="8" width="48" height="32" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
       <rect x="12" y="12" width="40" height="24" rx="2" fill="white" fillOpacity="0.3"/>
       <path d="M4 44 L12 40 L52 40 L60 44 L60 48 Q60 50 58 50 L6 50 Q4 50 4 48 Z" stroke="white" strokeWidth="2" fill="white" fillOpacity="0.15"/>
     </svg>
   )},
-  { name: 'Home Appliances', color: 'from-gold-600 to-gold-800', svg: (
+  { name: 'Electronics', color: 'from-gold-400 to-gold-600', svg: (
+    <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
+      <rect x="14" y="14" width="36" height="36" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
+      <rect x="20" y="20" width="24" height="24" rx="2" fill="white" fillOpacity="0.2"/>
+      <rect x="26" y="26" width="12" height="12" rx="1.5" stroke="white" strokeWidth="1.5"/>
+      <line x1="20" y1="32" x2="6" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="44" y1="32" x2="58" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="32" y1="20" x2="32" y2="8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="32" y1="44" x2="32" y2="56" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )},
+  { name: 'Home Appliances', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <rect x="10" y="6" width="44" height="52" rx="4" stroke="white" strokeWidth="2.5" fill="none"/>
       <circle cx="32" cy="30" r="14" stroke="white" strokeWidth="2" fill="white" fillOpacity="0.15"/>
@@ -59,7 +70,7 @@ const categories = [
       <rect x="42" y="50" width="8" height="2" rx="1" fill="white" fillOpacity="0.6"/>
     </svg>
   )},
-  { name: 'Furniture', color: 'from-amber-600 to-amber-800', svg: (
+  { name: 'Furniture', color: 'from-gold-400 to-gold-600', svg: (
     <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 md:w-16 md:h-16">
       <path d="M8 40 Q8 30 16 28 L16 20 Q16 16 20 16 L44 16 Q48 16 48 20 L48 28 Q56 30 56 40" stroke="white" strokeWidth="2.5" fill="none"/>
       <rect x="6" y="38" width="52" height="10" rx="4" stroke="white" strokeWidth="2.5" fill="white" fillOpacity="0.25"/>
@@ -100,6 +111,25 @@ export default function Home() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
+      {/* Festival Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 shadow-lg animate-fade-in">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
+        <div className="relative flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-10 py-6 md:py-8">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl hidden sm:block">🎉</div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">Festive Season Sale</p>
+              <h2 className="text-xl md:text-3xl font-bold text-white leading-tight">Independence Day Special — Up to 40% OFF</h2>
+              <p className="text-white/85 text-sm mt-1">Extra savings with coupons + No Cost EMI on mobiles, electronics & appliances</p>
+            </div>
+          </div>
+          <Link to="/products?onOffer=true"
+            className="flex-shrink-0 bg-white text-red-600 font-bold text-sm px-6 py-3 rounded-xl hover:bg-red-50 transition shadow-md">
+            Shop Offers <ChevronRight size={16} className="inline" />
+          </Link>
+        </div>
+      </div>
+
       {/* Feature Badges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
@@ -126,14 +156,14 @@ export default function Home() {
           <h2 className="section-title">Shop by Category</h2>
           <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
         </div>
-        <div className="grid grid-cols-4 md:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
           {categories.map((cat, i) => (
             <Link key={cat.name} to={`/products?category=${cat.name}`}
-              className="bg-white rounded-xl p-4 text-center shadow-sm card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
-              <div className={`bg-gradient-to-br ${cat.color} w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+              className="bg-white rounded-xl p-3 md:p-4 text-center shadow-sm card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className={`bg-gradient-to-br ${cat.color} w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                 {cat.svg}
               </div>
-              <p className="text-xs md:text-sm font-semibold text-gray-700 leading-tight">{cat.name}</p>
+              <p className="text-[11px] md:text-sm font-semibold text-gray-700 leading-tight">{cat.name}</p>
             </Link>
           ))}
         </div>
@@ -145,7 +175,7 @@ export default function Home() {
           <h2 className="section-title">Featured Brands</h2>
           <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
         </div>
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-4">
           {brands.map((brand, i) => (
             <Link key={brand.name} to={`/products?brand=${brand.name}`}
               className="bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm border border-gray-100 hover:border-gold-300 hover:shadow-md card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
@@ -316,7 +346,7 @@ function ProductCard({ product, delay = 0 }) {
       className="bg-white rounded-xl shadow-sm overflow-hidden card-hover block animate-fade-in-up" style={{ animationDelay: `${delay * 0.1}s` }}>
       <div className="bg-gradient-to-br from-gold-50 to-amber-50 p-4 h-48 flex items-center justify-center relative">
         {product.images?.[0] ? (
-          <img src={product.images[0]} alt={product.name} className="h-full object-contain hover:scale-110 transition-transform duration-500" />
+          <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain hover:scale-110 transition-transform duration-500" />
         ) : (
           <div className="text-gray-400 text-sm">No Image</div>
         )}

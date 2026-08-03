@@ -55,7 +55,7 @@ export default function EMICalculator() {
           <div className="bg-gradient-to-br from-gold-600 to-primary-800 rounded-2xl p-6 text-white text-center">
             <p className="text-blue-200 text-sm mb-1">Monthly EMI</p>
             <p className="text-4xl font-bold">₹{monthlyEmi.toLocaleString()}<span className="text-lg font-normal text-blue-200">/month</span></p>
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/20">
               <div>
                 <p className="text-blue-200 text-xs">Total Payable</p>
                 <p className="font-bold">₹{totalPayable.toLocaleString()}</p>

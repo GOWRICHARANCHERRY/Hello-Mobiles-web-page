@@ -1,38 +1,51 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Suspense, lazy } from 'react';
+import ScrollToTop from './components/ScrollToTop';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import CustomerLayout from './pages/customer/CustomerLayout';
-import Home from './pages/customer/Home';
-import ProductList from './pages/customer/ProductList';
-import ProductDetail from './pages/customer/ProductDetail';
-import Cart from './pages/customer/Cart';
-import Checkout from './pages/customer/Checkout';
-import Orders from './pages/customer/Orders';
-import Profile from './pages/customer/Profile';
-import Wishlist from './pages/customer/Wishlist';
-import EMICalculator from './pages/customer/EMICalculator';
-import ExchangeCalculator from './pages/customer/ExchangeCalculator';
-import TermsAndConditions from './pages/customer/TermsAndConditions';
-import AboutUs from './pages/customer/AboutUs';
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const CustomerLayout = lazy(() => import('./pages/customer/CustomerLayout'));
+const Home = lazy(() => import('./pages/customer/Home'));
+const ProductList = lazy(() => import('./pages/customer/ProductList'));
+const ProductDetail = lazy(() => import('./pages/customer/ProductDetail'));
+const Cart = lazy(() => import('./pages/customer/Cart'));
+const Checkout = lazy(() => import('./pages/customer/Checkout'));
+const Orders = lazy(() => import('./pages/customer/Orders'));
+const OrderDetail = lazy(() => import('./pages/customer/OrderDetail'));
+const Profile = lazy(() => import('./pages/customer/Profile'));
+const Wishlist = lazy(() => import('./pages/customer/Wishlist'));
+const EMICalculator = lazy(() => import('./pages/customer/EMICalculator'));
+const ExchangeCalculator = lazy(() => import('./pages/customer/ExchangeCalculator'));
+const TermsAndConditions = lazy(() => import('./pages/customer/TermsAndConditions'));
+const AboutUs = lazy(() => import('./pages/customer/AboutUs'));
 
-import EmployeeLayout from './pages/employee/EmployeeLayout';
-import EmployeeDashboard from './pages/employee/EmployeeDashboard';
-import EmployeeInventory from './pages/employee/EmployeeInventory';
-import EmployeeOrders from './pages/employee/EmployeeOrders';
+const EmployeeLayout = lazy(() => import('./pages/employee/EmployeeLayout'));
+const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
+const EmployeeInventory = lazy(() => import('./pages/employee/EmployeeInventory'));
+const EmployeeOrders = lazy(() => import('./pages/employee/EmployeeOrders'));
 
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminEmployees from './pages/admin/AdminEmployees';
-import AdminCustomers from './pages/admin/AdminCustomers';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminBanners from './pages/admin/AdminBanners';
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminEmployees = lazy(() => import('./pages/admin/AdminEmployees'));
+const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
+const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
+const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'));
+const AdminLeads = lazy(() => import('./pages/admin/AdminLeads'));
+
+function PageLoader() {
+  return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div></div>;
+}
+
+function SuspenseRoute({ children }) {
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
+}
 
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
@@ -60,41 +73,44 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to={getHomeRoute()} /> : <Login />} />
-      <Route path="/signup" element={user ? <Navigate to={getHomeRoute()} /> : <Signup />} />
+      <Route path="/login" element={user ? <Navigate to={getHomeRoute()} /> : <SuspenseRoute><Login /></SuspenseRoute>} />
+      <Route path="/signup" element={user ? <Navigate to={getHomeRoute()} /> : <SuspenseRoute><Signup /></SuspenseRoute>} />
 
-      <Route path="/" element={<OptionalAuthRoute><CustomerLayout /></OptionalAuthRoute>}>
-        <Route index element={<Home />} />
-        <Route path="products" element={<ProductList />} />
-        <Route path="products/:id" element={<ProductDetail />} />
-        <Route path="terms-and-conditions" element={<TermsAndConditions />} />
-        <Route path="about" element={<AboutUs />} />
+      <Route path="/" element={<OptionalAuthRoute><SuspenseRoute><CustomerLayout /></SuspenseRoute></OptionalAuthRoute>}>
+        <Route index element={<SuspenseRoute><Home /></SuspenseRoute>} />
+        <Route path="products" element={<SuspenseRoute><ProductList /></SuspenseRoute>} />
+        <Route path="products/:id" element={<SuspenseRoute><ProductDetail /></SuspenseRoute>} />
+        <Route path="terms-and-conditions" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
+        <Route path="about" element={<SuspenseRoute><AboutUs /></SuspenseRoute>} />
       </Route>
 
-      <Route path="/" element={<ProtectedRoute roles={['customer']}><CustomerLayout /></ProtectedRoute>}>
-        <Route path="cart" element={<Cart />} />
-        <Route path="checkout" element={<Checkout />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="wishlist" element={<Wishlist />} />
-        <Route path="emi-calculator" element={<EMICalculator />} />
-        <Route path="exchange-calculator" element={<ExchangeCalculator />} />
+      <Route path="/" element={<ProtectedRoute roles={['customer']}><SuspenseRoute><CustomerLayout /></SuspenseRoute></ProtectedRoute>}>
+        <Route path="cart" element={<SuspenseRoute><Cart /></SuspenseRoute>} />
+        <Route path="checkout" element={<SuspenseRoute><Checkout /></SuspenseRoute>} />
+        <Route path="orders" element={<SuspenseRoute><Orders /></SuspenseRoute>} />
+        <Route path="orders/:id" element={<SuspenseRoute><OrderDetail /></SuspenseRoute>} />
+        <Route path="profile" element={<SuspenseRoute><Profile /></SuspenseRoute>} />
+        <Route path="wishlist" element={<SuspenseRoute><Wishlist /></SuspenseRoute>} />
+        <Route path="emi-calculator" element={<SuspenseRoute><EMICalculator /></SuspenseRoute>} />
+        <Route path="exchange-calculator" element={<SuspenseRoute><ExchangeCalculator /></SuspenseRoute>} />
       </Route>
 
-      <Route path="/employee" element={<ProtectedRoute roles={['employee', 'admin']}><EmployeeLayout /></ProtectedRoute>}>
-        <Route index element={<EmployeeDashboard />} />
-        <Route path="inventory" element={<EmployeeInventory />} />
-        <Route path="orders" element={<EmployeeOrders />} />
+      <Route path="/employee" element={<ProtectedRoute roles={['employee', 'admin']}><SuspenseRoute><EmployeeLayout /></SuspenseRoute></ProtectedRoute>}>
+        <Route index element={<SuspenseRoute><EmployeeDashboard /></SuspenseRoute>} />
+        <Route path="inventory" element={<SuspenseRoute><EmployeeInventory /></SuspenseRoute>} />
+        <Route path="orders" element={<SuspenseRoute><EmployeeOrders /></SuspenseRoute>} />
       </Route>
 
-      <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AdminLayout /></ProtectedRoute>}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="products" element={<AdminProducts />} />
-        <Route path="banners" element={<AdminBanners />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="employees" element={<AdminEmployees />} />
-        <Route path="customers" element={<AdminCustomers />} />
-        <Route path="analytics" element={<AdminAnalytics />} />
+      <Route path="/admin" element={<ProtectedRoute roles={['admin']}><SuspenseRoute><AdminLayout /></SuspenseRoute></ProtectedRoute>}>
+        <Route index element={<SuspenseRoute><AdminDashboard /></SuspenseRoute>} />
+        <Route path="products" element={<SuspenseRoute><AdminProducts /></SuspenseRoute>} />
+        <Route path="banners" element={<SuspenseRoute><AdminBanners /></SuspenseRoute>} />
+        <Route path="orders" element={<SuspenseRoute><AdminOrders /></SuspenseRoute>} />
+        <Route path="employees" element={<SuspenseRoute><AdminEmployees /></SuspenseRoute>} />
+        <Route path="customers" element={<SuspenseRoute><AdminCustomers /></SuspenseRoute>} />
+        <Route path="analytics" element={<SuspenseRoute><AdminAnalytics /></SuspenseRoute>} />
+        <Route path="coupons" element={<SuspenseRoute><AdminCoupons /></SuspenseRoute>} />
+        <Route path="leads" element={<SuspenseRoute><AdminLeads /></SuspenseRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to={getHomeRoute()} />} />
@@ -106,6 +122,7 @@ export default function App() {
   return (
     <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <CartProvider>
             <Toaster position="top-right" />

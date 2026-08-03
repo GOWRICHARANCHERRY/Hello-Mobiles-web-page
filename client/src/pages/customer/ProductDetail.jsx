@@ -4,7 +4,7 @@ import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import LoginPopup from '../../components/LoginPopup';
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COLOR_MAP = {
@@ -55,6 +55,16 @@ export default function ProductDetail() {
   const [selectedStorage, setSelectedStorage] = useState('');
   const [selectedColorName, setSelectedColorName] = useState('');
 
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 0, title: '', comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  const loadReviews = () => {
+    setReviewsLoading(true);
+    api.get(`/products/${id}/reviews`).then(r => { setReviews(r.data); setReviewsLoading(false); }).catch(() => setReviewsLoading(false));
+  };
+
   useEffect(() => {
     api.get(`/products/${id}`).then(r => {
       setProduct(r.data);
@@ -64,7 +74,36 @@ export default function ProductDetail() {
       setSelectedColorName('');
       setLoading(false);
     }).catch(() => { setLoading(false); });
+    loadReviews();
   }, [id]);
+
+  const submitReview = async () => {
+    if (!user) return setShowLoginPopup(true);
+    if (!reviewForm.rating) return toast.error('Please select a star rating');
+    if (!reviewForm.comment.trim()) return toast.error('Please write a review');
+    setSubmittingReview(true);
+    try {
+      const { data } = await api.post(`/products/${id}/reviews`, reviewForm);
+      setReviews(prev => [data, ...prev]);
+      setReviewForm({ rating: 0, title: '', comment: '' });
+      toast.success('Thank you for your review!');
+      setProduct(prev => prev ? { ...prev, ratings: data.productRatings ?? prev.ratings, reviewCount: (prev.reviewCount || 0) + 1 } : prev);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to submit review');
+    }
+    setSubmittingReview(false);
+  };
+
+  const deleteReview = async (reviewId) => {
+    if (!confirm('Delete this review?')) return;
+    try {
+      await api.delete(`/products/${id}/reviews/${reviewId}`);
+      setReviews(prev => prev.filter(r => r._id !== reviewId));
+      toast.success('Review deleted');
+    } catch (error) {
+      toast.error('Failed to delete review');
+    }
+  };
 
   const hasVariants = product?.variants?.length > 0;
   const normalize = (s) => (s || '').toLowerCase().trim();
@@ -209,9 +248,9 @@ export default function ProductDetail() {
           <div>
             <div className="bg-gray-100 rounded-xl p-8 h-80 flex items-center justify-center mb-4">
               {currentImage ? (
-                <img src={currentImage} alt={product.name} className="max-h-full object-contain" />
+                <img src={currentImage} alt={product.name} loading="lazy" className="max-h-full object-contain" />
               ) : allImages[selectedImage] ? (
-                <img src={allImages[selectedImage]} alt={product.name} className="max-h-full object-contain" />
+                <img src={allImages[selectedImage]} alt={product.name} loading="lazy" className="max-h-full object-contain" />
               ) : (
                 <div className="text-gray-400 text-lg">No Image Available</div>
               )}
@@ -221,7 +260,7 @@ export default function ProductDetail() {
                 {allImages.map((img, i) => (
                   <button key={i} onClick={() => setSelectedImage(i)}
                     className={`w-16 h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden ${selectedImage === i ? 'border-gold-500' : 'border-gray-200'}`}>
-                    <img src={img} alt="" className="w-full h-full object-contain" />
+                    <img src={img} alt="" loading="lazy" className="w-full h-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -440,6 +479,85 @@ export default function ProductDetail() {
             <div className="mt-4">
               <h3 className="font-semibold text-gray-800 mb-2">Description</h3>
               <p className="text-gray-600 text-sm leading-relaxed">{product.description}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Reviews */}
+        <div className="mt-8 border-t pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Customer Reviews ({reviews.length})</h2>
+            <div className="flex items-center gap-2">
+              {product.ratings > 0 && (
+                <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-0.5 rounded text-sm">
+                  <Star size={14} className="fill-green-700" /> {product.ratings}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Write a review */}
+          <div className="bg-gold-50/50 rounded-xl p-4 mb-6">
+            <p className="font-semibold text-gray-800 mb-2">Write a Review</p>
+            <div className="flex gap-1 mb-3">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button key={n} onClick={() => setReviewForm(prev => ({ ...prev, rating: n }))}
+                  className={n <= reviewForm.rating ? 'text-gold-500' : 'text-gray-300'}>
+                  <Star size={24} className={n <= reviewForm.rating ? 'fill-gold-500' : ''} />
+                </button>
+              ))}
+            </div>
+            <input value={reviewForm.title} onChange={e => setReviewForm(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Review title (optional)"
+              className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm mb-2 focus:ring-2 focus:ring-gold-400 outline-none bg-white" />
+            <textarea value={reviewForm.comment} onChange={e => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+              placeholder="Share your experience with this product..."
+              rows={3}
+              className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-white resize-none" />
+            <div className="flex justify-end">
+              <button onClick={submitReview} disabled={submittingReview}
+                className="bg-gold-600 hover:bg-gold-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition disabled:opacity-50">
+                {submittingReview ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </div>
+          </div>
+
+          {/* Reviews list */}
+          {reviewsLoading ? (
+            <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-500"></div></div>
+          ) : reviews.length === 0 ? (
+            <p className="text-gray-400 text-sm text-center py-6">No reviews yet. Be the first to review this product!</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map(review => (
+                <div key={review._id} className="border border-gray-100 rounded-xl p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-full bg-gold-100 text-gold-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        {(review.user?.name || 'U').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800 text-sm">{review.user?.name || 'Customer'}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map(n => (
+                              <Star key={n} size={13} className={n <= review.rating ? 'fill-gold-500 text-gold-500' : 'text-gray-300'} />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {(user?.role === 'admin' || user?._id === review.user?._id) && (
+                      <button onClick={() => deleteReview(review._id)} className="text-red-400 hover:text-red-600 p-1 rounded-lg transition" title="Delete review">
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                  </div>
+                  {review.title && <p className="mt-2 font-semibold text-gray-800 text-sm">{review.title}</p>}
+                  <p className="mt-1 text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -43,6 +43,17 @@ router.get('/', async (req, res) => {
 
     const products = await Product.find(query).sort(sort);
 
+    // Also match against specification values (Map field can't be regex'd in Mongo)
+    if (search) {
+      const re = new RegExp(search, 'i');
+      const matchesSpec = (p) => Object.values(p.specifications || {}).some(v => v && re.test(String(v)));
+      const filtered = products.filter(p =>
+        re.test(p.name) || re.test(p.brand) || re.test(p.category) ||
+        re.test(p.description || '') || (p.tags || []).some(t => re.test(t)) || matchesSpec(p)
+      );
+      products.splice(0, products.length, ...filtered);
+    }
+
     // Attach lowest variant price for products with variants
     const enriched = products.map(p => {
       const obj = p.toObject();
@@ -85,6 +96,11 @@ router.get('/categories', async (req, res) => {
 
 router.get('/names', async (req, res) => {
   try {
+    const withIds = req.query.withIds === '1';
+    if (withIds) {
+      const products = await Product.find({ isActive: true }).select('name brand category').sort({ name: 1 }).lean();
+      return res.json(products.map(p => ({ _id: p._id, name: p.name, brand: p.brand, category: p.category })));
+    }
     const names = await Product.distinct('name', { isActive: true });
     res.json(names);
   } catch (error) {
@@ -131,6 +147,69 @@ router.get('/search/suggestions', async (req, res) => {
     const categories = await Product.distinct('category', { isActive: true, category: regex });
 
     res.json({ products: enriched, brands: brands.slice(0, 5), categories: categories.slice(0, 5) });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const Review = (await import('../models/Review.js')).default;
+    const reviews = await Review.find({ product: req.params.id }).populate('user', 'name avatar').sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post('/:id/reviews', auth, async (req, res) => {
+  try {
+    const { rating, title, comment } = req.body;
+    if (!rating || rating < 1 || rating > 5 || !comment) {
+      return res.status(400).json({ message: 'Rating (1-5) and comment are required' });
+    }
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const Review = (await import('../models/Review.js')).default;
+    const existing = await Review.findOne({ product: product._id, user: req.user.id });
+    if (existing) return res.status(400).json({ message: 'You have already reviewed this product' });
+
+    const review = await Review.create({ product: product._id, user: req.user.id, rating, title, comment });
+    const populated = await review.populate('user', 'name avatar');
+
+    const allReviews = await Review.find({ product: product._id });
+    const avg = allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length;
+    product.ratings = Math.round(avg * 10) / 10;
+    product.reviewCount = allReviews.length;
+    await product.save();
+
+    res.status(201).json(populated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete('/:id/reviews/:reviewId', auth, async (req, res) => {
+  try {
+    const Review = (await import('../models/Review.js')).default;
+    const review = await Review.findById(req.params.reviewId);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+    if (req.user.role !== 'admin' && review.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    await review.deleteOne();
+
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      const allReviews = await Review.find({ product: product._id });
+      product.reviewCount = allReviews.length;
+      product.ratings = allReviews.length
+        ? Math.round((allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length) * 10) / 10
+        : 0;
+      await product.save();
+    }
+    res.json({ message: 'Review deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

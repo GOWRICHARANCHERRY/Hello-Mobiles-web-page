@@ -5,6 +5,8 @@ import { Home, Search, ShoppingCart, User, Heart, Menu, X, LogOut, Calculator, R
 import { useState, useEffect, useRef } from 'react';
 import LoginPopup from '../../components/LoginPopup';
 import SearchBar from '../../components/SearchBar';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
 const BAJAJ_CHECK_LIMIT_URL = 'https://www.bajajfinserv.in/qr-code-rural-web-page?xc=wZJcF8vPcfuCf8IpnelpO2wo91ynp9JJsM12UNYH40AFzOXsNG4aQX+fjLXg47b9TPaQyWA9RzzmbFi7op12aw==&utm_source=RURAL_ARU&utm_medium=OFFERMART_QR_GEN';
 
@@ -17,6 +19,22 @@ export default function CustomerLayout() {
   const profileRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+
+  const handleNewsletter = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim() || !newsletterEmail.includes('@')) return toast.error('Please enter a valid email');
+    setNewsletterLoading(true);
+    try {
+      await api.post('/leads', { email: newsletterEmail.trim(), name: '', message: '', source: 'newsletter' });
+      setNewsletterEmail('');
+      toast.success('Subscribed! We will get back to you soon.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to subscribe');
+    }
+    setNewsletterLoading(false);
+  };
 
   useEffect(() => {
     if (!user) clearGuestCart();
@@ -49,7 +67,7 @@ export default function CustomerLayout() {
             <img src="/logo.png" alt="Hello Mobiles" className="w-10 h-10 rounded-xl shadow-md group-hover:scale-110 transition-transform object-contain" />
             <div className="text-center">
               <h1 className="text-lg font-bold gold-text leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
-              <p className="text-[10px] text-gray-500 whitespace-nowrap">Mobiles | Electronics | Furniture | Home Appliances</p>
+              <p className="hidden sm:block text-[10px] text-gray-500 whitespace-nowrap">Mobiles | Electronics | Furniture | Home Appliances</p>
             </div>
           </Link>
 
@@ -97,7 +115,7 @@ export default function CustomerLayout() {
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in-down">
+                  <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in-down">
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="font-semibold text-gray-800">{user?.name}</p>
                       <p className="text-xs text-gray-500">{user?.phone || user?.email}</p>
@@ -252,6 +270,28 @@ export default function CustomerLayout() {
       <footer className="bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white mt-12">
         <div className="gold-gradient h-1"></div>
 
+        {/* Newsletter */}
+        <div className="border-b border-white/10 bg-gray-800/40">
+          <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Mail className="w-8 h-8 text-gold-500 flex-shrink-0" />
+              <div>
+                <h3 className="text-lg font-bold text-white">Get the latest offers</h3>
+                <p className="text-sm text-gray-400">Subscribe for exclusive deals, new arrivals & festive discounts</p>
+              </div>
+            </div>
+            <form onSubmit={handleNewsletter} className="flex w-full md:w-auto gap-2">
+              <input type="email" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 md:w-72 bg-gray-900 border border-gray-700 text-white text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-gold-500 outline-none placeholder-gray-500" />
+              <button type="submit" disabled={newsletterLoading}
+                className="bg-gradient-to-r from-gold-500 to-gold-600 text-white font-semibold text-sm px-5 py-3 rounded-xl hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 flex-shrink-0">
+                {newsletterLoading ? 'Subscribing...' : 'Subscribe'}
+              </button>
+            </form>
+          </div>
+        </div>
+
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
@@ -306,10 +346,7 @@ export default function CustomerLayout() {
               <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Categories</h4>
               <ul className="space-y-2.5">
               <li><Link to="/products?category=Mobiles" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Mobiles</Link></li>
-              <li><Link to="/products?category=TVs" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>TVs</Link></li>
-              <li><Link to="/products?category=Earbuds" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Earbuds</Link></li>
-              <li><Link to="/products?category=Laptops" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Laptops</Link></li>
-              <li><Link to="/products?category=Tablets" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Tablets</Link></li>
+              <li><Link to="/products?category=Electronics" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Electronics</Link></li>
               <li><Link to="/products?category=Home%20Appliances" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Home Appliances</Link></li>
               <li><Link to="/products?category=Furniture" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Furniture</Link></li>
               </ul>

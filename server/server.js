@@ -11,6 +11,8 @@ import adminRoutes from './routes/admin.js';
 import employeeRoutes from './routes/employee.js';
 import uploadRoutes from './routes/upload.js';
 import bannerRoutes from './routes/banners.js';
+import couponRoutes from './routes/coupons.js';
+import leadRoutes from './routes/leads.js';
 
 dotenv.config();
 connectDB();
@@ -31,6 +33,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/banners', bannerRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/leads', leadRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Hello Mobiles API is running' });

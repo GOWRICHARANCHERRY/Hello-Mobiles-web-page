@@ -33,7 +33,7 @@ router.get('/:id', auth, async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   try {
-    const { items, shippingAddress, paymentMethod, emiDetails, exchangeDetails } = req.body;
+    const { items, shippingAddress, paymentMethod, emiDetails, exchangeDetails, couponCode } = req.body;
     let subtotal = 0;
     const orderItems = [];
 
@@ -95,7 +95,35 @@ router.post('/', auth, async (req, res) => {
     }
 
     const deliveryCharge = paymentMethod === 'store_pickup' ? 0 : (subtotal > 5000 ? 0 : 99);
-    const total = subtotal + deliveryCharge - (exchangeDetails?.exchangeValue || 0);
+    let couponDiscount = 0;
+    let appliedCoupon = null;
+    if (couponCode) {
+      const Coupon = (await import('../models/Coupon.js')).default;
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
+      const now = new Date();
+      if (!coupon || !coupon.isActive) return res.status(400).json({ message: 'Invalid coupon code' });
+      if (coupon.validFrom && now < coupon.validFrom) return res.status(400).json({ message: 'Coupon is not active yet' });
+      if (coupon.validTo && now > coupon.validTo) return res.status(400).json({ message: 'Coupon has expired' });
+      if (subtotal < coupon.minOrder) return res.status(400).json({ message: `Minimum order of ₹${coupon.minOrder.toLocaleString()} required for this coupon` });
+      if (coupon.maxUses > 0 && coupon.usedCount >= coupon.maxUses) return res.status(400).json({ message: 'Coupon usage limit reached' });
+      let eligibleSubtotal = subtotal;
+      if (coupon.appliesTo === 'selected') {
+        const allowed = coupon.applicableProductIds.map(id => String(id));
+        eligibleSubtotal = orderItems
+          .filter(oi => allowed.includes(String(oi.product)))
+          .reduce((sum, oi) => sum + oi.price * oi.quantity, 0);
+        if (eligibleSubtotal <= 0) return res.status(400).json({ message: 'This coupon is not valid for the products in your cart' });
+      }
+      if (eligibleSubtotal < coupon.minOrder) return res.status(400).json({ message: `Minimum order of ₹${coupon.minOrder.toLocaleString()} required for this coupon` });
+      couponDiscount = coupon.discountType === 'percent'
+        ? Math.round((eligibleSubtotal * coupon.value) / 100)
+        : Math.min(coupon.value, eligibleSubtotal);
+      if (coupon.discountType === 'percent' && coupon.maxDiscount) couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
+      couponDiscount = Math.round(couponDiscount);
+      appliedCoupon = coupon;
+    }
+
+    const total = Math.max(0, subtotal + deliveryCharge - (exchangeDetails?.exchangeValue || 0) - couponDiscount);
 
     const order = new Order({
       customer: req.user.id,
@@ -107,10 +135,17 @@ router.post('/', auth, async (req, res) => {
       exchangeDetails,
       subtotal,
       deliveryCharge,
+      couponCode: appliedCoupon?.code,
+      couponDiscount,
       total,
     });
 
     await order.save();
+
+    if (appliedCoupon) {
+      appliedCoupon.usedCount += 1;
+      await appliedCoupon.save();
+    }
 
     if (items.some(i => i.variantId)) {
       for (const item of items) {
@@ -154,6 +189,100 @@ router.put('/:id/status', auth, roleAuth('admin', 'employee'), async (req, res) 
 router.put('/:id/payment', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, { paymentStatus: req.body.paymentStatus }, { new: true });
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Customer: cancel an order (only before shipping)
+router.post('/:id/cancel', auth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (req.user.role === 'customer' && order.customer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    if (!['confirmed', 'processing'].includes(order.orderStatus)) {
+      return res.status(400).json({ message: 'Order can only be cancelled before it is shipped' });
+    }
+
+    // Restore stock and IMEI entries
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (!product) continue;
+      if (item.variant?.variantId) {
+        const variant = product.variants.id(item.variant.variantId);
+        if (variant) {
+          const colorEntry = item.variant.color ? variant.colors?.find(c => c.name === item.variant.color) : null;
+          if (colorEntry) {
+            colorEntry.stock += item.quantity;
+            for (const imei of (colorEntry.imei || [])) {
+              if (typeof imei === 'object' && imei.status === 'sold' && imei.orderId?.toString() === order._id.toString()) {
+                imei.status = 'in_stock';
+                imei.orderId = undefined;
+                imei.orderNumber = undefined;
+                imei.soldAt = undefined;
+                imei.soldPrice = undefined;
+                imei.soldTo = undefined;
+              }
+            }
+          } else {
+            for (const c of variant.colors) { c.stock += item.quantity; }
+          }
+        }
+      } else {
+        product.stock += item.quantity;
+      }
+      await product.save();
+    }
+
+    order.orderStatus = 'cancelled';
+    order.cancelReason = req.body.reason || 'Cancelled by customer';
+    order.cancelledAt = new Date();
+    if (order.paymentStatus === 'paid') order.paymentStatus = 'refunded';
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Customer: request a return on a delivered order
+router.post('/:id/return', auth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (req.user.role === 'customer' && order.customer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    if (order.orderStatus !== 'delivered') {
+      return res.status(400).json({ message: 'Return can only be requested after delivery' });
+    }
+    if (order.returnRequested) return res.status(400).json({ message: 'Return already requested for this order' });
+
+    order.returnRequested = true;
+    order.returnReason = req.body.reason || 'Customer requested return';
+    order.returnStatus = 'requested';
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin/Employee: approve or reject a return request
+router.put('/:id/return-status', auth, roleAuth('admin', 'employee'), async (req, res) => {
+  try {
+    const { returnStatus } = req.body;
+    if (!['approved', 'rejected'].includes(returnStatus)) return res.status(400).json({ message: 'Invalid return status' });
+    const update = { returnStatus };
+    if (returnStatus === 'approved') {
+      update.paymentStatus = 'refunded';
+      update.orderStatus = 'delivered';
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!order) return res.status(404).json({ message: 'Order not found' });
     res.json(order);
   } catch (error) {

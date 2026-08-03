@@ -7,6 +7,7 @@ export default function Cart() {
   const { cart, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
   const deliveryCharge = cartTotal > 5000 ? 0 : 99;
+  const fmt2 = (n) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   if (cart.length === 0) {
     return (
@@ -30,7 +31,7 @@ export default function Cart() {
           {cart.map(item => (
             <div key={item.cartKey} className="bg-white rounded-xl shadow-sm p-4 flex gap-4">
               <Link to={`/products/${item._id}`} className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                {item.image ? <img src={item.image} alt={item.name} className="max-h-full object-contain" /> : <span className="text-gray-400 text-xs">No Image</span>}
+                {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="max-h-full object-contain" /> : <span className="text-gray-400 text-xs">No Image</span>}
               </Link>
               <div className="flex-1">
                 <div className="flex justify-between">
@@ -68,21 +69,35 @@ export default function Cart() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-white rounded-xl shadow-sm p-6 h-fit sticky top-20">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Order Summary</h2>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-gray-600">Subtotal</span><span className="font-medium">₹{cartTotal.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span className="text-gray-600">Delivery</span><span className={`font-medium ${deliveryCharge === 0 ? 'text-green-600' : ''}`}>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span></div>
-            {deliveryCharge > 0 && <p className="text-xs text-green-600">Free delivery on orders above ₹5,000</p>}
-            <div className="border-t pt-3 flex justify-between text-lg font-bold">
-              <span>Total</span><span>₹{(cartTotal + deliveryCharge).toLocaleString()}</span>
+        <div className="bg-white rounded-xl shadow-sm h-fit sticky top-20 overflow-hidden gold-border">
+          <div className="gold-gradient px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-white">Order Summary</h2>
+              <p className="text-white/80 text-xs mt-0.5">{cart.length} item{cart.length > 1 ? 's' : ''} in your cart</p>
+            </div>
+            <div className="bg-white/20 rounded-xl p-2.5"><ShoppingBag size={20} className="text-white" /></div>
+          </div>
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Price Details</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-gray-500">Taxable Value</span><span className="text-gray-700">₹{fmt2(cartTotal / 1.18)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">CGST @ 9%</span><span className="text-gray-700">₹{fmt2((cartTotal / 1.18) * 0.09)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">SGST @ 9%</span><span className="text-gray-700">₹{fmt2((cartTotal / 1.18) * 0.09)}</span></div>
+              <div className="flex justify-between border-t border-dashed border-gray-200 pt-2"><span className="text-gray-700">Subtotal (incl. GST)</span><span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Delivery</span><span className={`font-medium ${deliveryCharge === 0 ? 'text-green-600' : ''}`}>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span></div>
+              {deliveryCharge > 0 && <p className="text-[11px] text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 font-medium">Free delivery on orders above ₹5,000</p>}
+              <div className="border-t-2 border-gray-800 pt-3 mt-1 flex justify-between items-center text-lg font-bold">
+                <span className="text-gray-900">Total</span><span className="gold-text text-xl">₹{(cartTotal + deliveryCharge).toLocaleString()}</span>
+              </div>
             </div>
           </div>
-          <button onClick={() => navigate('/checkout')}
-            className="w-full bg-accent-500 hover:bg-accent-600 text-white font-semibold py-3 rounded-xl transition mt-4 flex items-center justify-center gap-2">
-            Proceed to Checkout <ArrowRight size={18} />
-          </button>
-          <p className="text-xs text-gray-500 text-center mt-3">EMI options available at checkout</p>
+          <div className="px-6 py-4 border-t border-gray-100">
+            <button onClick={() => navigate('/checkout')}
+              className="w-full bg-accent-500 hover:bg-accent-600 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+              Proceed to Checkout <ArrowRight size={18} />
+            </button>
+            <p className="text-xs text-gray-500 text-center mt-3">EMI options & coupons available at checkout</p>
+          </div>
         </div>
       </div>
     </div>

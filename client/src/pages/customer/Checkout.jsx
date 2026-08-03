@@ -4,7 +4,9 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { CreditCard, Banknote, Store, Check, MapPin, Loader } from 'lucide-react';
+import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
+
+const STORE_UPI = 'svlnmobiles12@ybl';
 
 export default function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
@@ -13,6 +15,9 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [couponCode, setCouponCode] = useState('');
+  const [coupon, setCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '', phone: user?.phone || '',
     street: user?.address?.street || '', city: user?.address?.city || '',
@@ -21,7 +26,36 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('online');
 
   const deliveryCharge = cartTotal > 5000 ? 0 : 99;
-  const total = cartTotal + deliveryCharge;
+  const couponDiscount = coupon?.discount || 0;
+  const total = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
+
+  const taxable = Math.round((cartTotal / 1.18) * 100) / 100;
+  const cgst = Math.round((taxable * 0.09) * 100) / 100;
+  const sgst = Math.round((taxable * 0.09) * 100) / 100;
+  const fmt2 = (n) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return toast.error('Enter a coupon code');
+    setCouponLoading(true);
+    try {
+      const { data } = await api.post('/coupons/validate', {
+        code: couponCode,
+        subtotal: cartTotal,
+        items: cart.map(i => ({ product: i._id, amount: i.price * i.quantity })),
+      });
+      setCoupon(data);
+      toast.success(`Coupon applied! You save ₹${data.discount.toLocaleString()}`);
+    } catch (e) {
+      setCoupon(null);
+      toast.error(e.response?.data?.message || 'Invalid coupon');
+    }
+    setCouponLoading(false);
+  };
+
+  const removeCoupon = () => {
+    setCoupon(null);
+    setCouponCode('');
+  };
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -86,6 +120,7 @@ export default function Checkout() {
         })),
         shippingAddress: { name: form.name, phone: form.phone, street: form.street, city: form.city, state: form.state, pincode: form.pincode },
         paymentMethod,
+        couponCode: coupon?.code || undefined,
       };
       const { data } = await api.post('/orders', orderData);
       clearCart();
@@ -194,6 +229,25 @@ export default function Checkout() {
                   </label>
                 ))}
               </div>
+
+              {paymentMethod === 'online' && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> Pay via UPI (GPay / PhonePe / Paytm)</p>
+                  <p className="text-xs text-blue-700 mb-2">Send payment to our UPI ID and your order will be confirmed on payment.</p>
+                  <div className="bg-white rounded-lg border border-blue-200 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">UPI ID</p>
+                      <p className="font-mono font-bold text-gray-800 text-lg">{STORE_UPI}</p>
+                    </div>
+                    <button
+                      onClick={() => { navigator.clipboard?.writeText(STORE_UPI); toast.success('UPI ID copied!'); }}
+                      className="bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition flex-shrink-0">
+                      Copy UPI ID
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2">Supported: Google Pay, PhonePe, Paytm, BHIM & any UPI app</p>
+                </div>
+              )}
               <div className="flex gap-3 mt-6">
                 <button onClick={() => setStep(1)} className="btn-outline-gold rounded-xl">Back</button>
                 <button onClick={() => setStep(3)} className="btn-gold rounded-xl">Review Order</button>
@@ -239,18 +293,22 @@ export default function Checkout() {
         </div>
 
         {/* Summary */}
-        <div className="bg-white rounded-2xl shadow-sm p-0 h-fit sticky top-20 overflow-hidden gold-border">
-          <div className="gold-gradient px-6 py-4">
-            <h2 className="text-lg font-bold text-white">Order Summary</h2>
-            <p className="text-white/80 text-xs mt-0.5">{cart.length} item{cart.length > 1 ? 's' : ''} in your cart</p>
+        <div className="bg-white rounded-2xl shadow-sm h-fit sticky top-20 overflow-hidden gold-border">
+          <div className="gold-gradient px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-white">Order Summary</h2>
+              <p className="text-white/80 text-xs mt-0.5">{cart.length} item{cart.length > 1 ? 's' : ''} in your cart</p>
+            </div>
+            <div className="bg-white/20 rounded-xl p-2.5"><ShoppingBag size={20} className="text-white" /></div>
           </div>
 
-          <div className="px-6 py-4 max-h-64 overflow-y-auto">
+          {/* Items */}
+          <div className="px-6 py-2 max-h-72 overflow-y-auto divide-y divide-gray-100">
             {cart.map(item => (
-              <div key={item.cartKey} className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-0">
-                <div className="w-12 h-12 rounded-lg bg-gold-50 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-100">
+              <div key={item.cartKey} className="flex items-center gap-3 py-3">
+                <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-contain p-0.5" />
+                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-contain p-0.5" />
                   ) : (
                     <span className="text-lg font-bold text-gold-400">{item.name?.[0]}</span>
                   )}
@@ -258,41 +316,86 @@ export default function Checkout() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
                   {item.variantLabel && <p className="text-[11px] text-gold-600 truncate">{item.variantLabel}</p>}
-                  <p className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{item.quantity} × ₹{item.price.toLocaleString()}</p>
                 </div>
-                <p className="text-sm font-semibold text-gray-800 flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
+                <p className="text-sm font-bold text-gray-800 flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
               </div>
             ))}
           </div>
 
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 space-y-2.5 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Subtotal</span>
-              <span className="text-gray-700">₹{cartTotal.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Delivery</span>
-              {deliveryCharge === 0 ? (
-                <span className="text-green-600 font-semibold">FREE</span>
-              ) : (
-                <span className="text-gray-700">₹{deliveryCharge}</span>
-              )}
-            </div>
-            {deliveryCharge === 0 && (
-              <p className="text-[11px] text-green-600 bg-green-50 rounded-lg px-3 py-1.5 text-center font-medium">
-                You saved ₹99 on delivery!
-              </p>
+          {/* Coupon */}
+          <div className="px-6 py-4 border-t border-gray-100">
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700"><Ticket size={16} className="text-gold-600 flex-shrink-0" /> Apply Coupon</div>
+            {coupon ? (
+              <div className="flex items-center justify-between gap-3 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5 w-full overflow-hidden">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-green-700 truncate">{coupon.code}</p>
+                  <p className="text-xs text-green-600 truncate">You save ₹{coupon.discount.toLocaleString()}</p>
+                </div>
+                <button onClick={removeCoupon} className="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><X size={16} /></button>
+              </div>
+            ) : (
+              <div className="flex gap-2 w-full">
+                <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} placeholder="Enter coupon code"
+                  className="flex-1 min-w-0 border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
+                <button onClick={applyCoupon} disabled={couponLoading}
+                  className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gold-700 transition disabled:opacity-50 flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
+                  {couponLoading ? <Loader size={14} className="animate-spin" /> : 'Apply'}
+                </button>
+              </div>
             )}
-            <div className="flex justify-between pt-2.5 border-t border-gray-200">
-              <span className="text-base font-bold text-gray-800">Total</span>
-              <span className="text-lg font-bold gold-text">₹{total.toLocaleString()}</span>
+          </div>
+
+          {/* Price Details */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Price Details</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Taxable Value</span>
+                <span className="text-gray-700">₹{fmt2(taxable)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">CGST @ 9%</span>
+                <span className="text-gray-700">₹{fmt2(cgst)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">SGST @ 9%</span>
+                <span className="text-gray-700">₹{fmt2(sgst)}</span>
+              </div>
+              <div className="flex justify-between border-t border-dashed border-gray-200 pt-2">
+                <span className="text-gray-700">Subtotal (incl. GST)</span>
+                <span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Delivery</span>
+                {deliveryCharge === 0 ? (
+                  <span className="text-green-600 font-semibold">FREE</span>
+                ) : (
+                  <span className="text-gray-700">₹{deliveryCharge}</span>
+                )}
+              </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>Coupon {coupon.code}</span>
+                  <span>-₹{couponDiscount.toLocaleString()}</span>
+                </div>
+              )}
+              {deliveryCharge === 0 && (
+                <p className="text-[11px] text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 font-medium">
+                  Free delivery — you save ₹99!
+                </p>
+              )}
+              <div className="flex justify-between items-center pt-3 mt-1 border-t-2 border-gray-800">
+                <span className="text-base font-bold text-gray-900">Total</span>
+                <span className="text-xl font-bold gold-text">₹{total.toLocaleString()}</span>
+              </div>
             </div>
           </div>
 
           <div className="px-6 py-4 border-t border-gray-100">
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-green-500 flex-shrink-0"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-              <span>Secure checkout · 100% genuine products</span>
+              <ShieldCheck size={16} className="text-green-500 flex-shrink-0" />
+              <span>Secure checkout · 100% genuine products · GST invoice included</span>
             </div>
           </div>
         </div>

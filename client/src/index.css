@@ -112,3 +112,42 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-track { background: #fffbeb; }
 ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #d4a017, #b8860b); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #996515; }
+
+.invoice-print-area,
+.invoice-print-area * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body { background: #fff; }
+  header, footer, .print\:hidden { display: none !important; }
+  .invoice-print-area,
+  .invoice-print-area * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+  .invoice-print-area {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+  .invoice-print-area .gold-text {
+    background: none !important;
+    -webkit-text-fill-color: #8b6914 !important;
+    color: #8b6914 !important;
+  }
+  .invoice-table { width: 100% !important; }
+  .invoice-no-break { break-inside: avoid; page-break-inside: avoid; }
+}
+

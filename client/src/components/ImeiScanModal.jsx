@@ -145,7 +145,7 @@ export default function ImeiScanModal({ open, onClose }) {
 
           <div className="p-5">
             {/* Search bar */}
-            <div className="flex items-center gap-2 mb-5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-5">
               <div className="flex-1 relative">
                 <Hash size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
@@ -159,11 +159,11 @@ export default function ImeiScanModal({ open, onClose }) {
                 />
               </div>
               <button onClick={() => searchImei(imeiInput)} disabled={imeiInput.length < 15 || loading}
-                className="gold-gradient text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-40 flex items-center gap-2 whitespace-nowrap">
+                className="gold-gradient text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
                 <Search size={14} /> Search
               </button>
               <button onClick={() => setShowCamera(true)}
-                className="bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-600 flex items-center gap-2 whitespace-nowrap">
+                className="bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-600 flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
                 <Camera size={14} /> Scan
               </button>
             </div>

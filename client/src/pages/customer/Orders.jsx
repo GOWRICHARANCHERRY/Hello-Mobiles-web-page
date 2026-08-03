@@ -86,6 +86,9 @@ export default function Orders() {
                 <div className="text-right mt-3 md:mt-0">
                   <p className="text-lg font-bold text-gray-900">₹{order.total.toLocaleString()}</p>
                   <p className="text-xs text-gray-500 capitalize">{order.paymentMethod.replace('_', ' ')}</p>
+                  <Link to={`/orders/${order._id}`} className="inline-block mt-2 text-xs font-semibold text-gold-600 hover:text-gold-700 bg-gold-50 border border-gold-200 px-3 py-1.5 rounded-lg">
+                    View Details &amp; Invoice
+                  </Link>
                 </div>
               </div>
             </div>

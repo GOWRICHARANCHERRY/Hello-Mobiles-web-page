@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image, Tag, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout() {
@@ -16,6 +16,8 @@ export default function AdminLayout() {
     { to: '/admin/employees', label: 'Employees', icon: UserCheck },
     { to: '/admin/customers', label: 'Customers', icon: Users },
     { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/admin/coupons', label: 'Coupons', icon: Tag },
+    { to: '/admin/leads', label: 'Leads', icon: Mail },
   ];
 
   return (

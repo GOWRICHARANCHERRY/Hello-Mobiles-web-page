@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from 'react';
 import api from '../../utils/api';
-import { Package, Edit2, Save, AlertTriangle, Search, Filter, ChevronDown, ChevronRight, Camera } from 'lucide-react';
+import { Package, Edit2, Save, AlertTriangle, Search, Filter, ChevronDown, ChevronRight, Camera, Upload, X, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ImeiScanModal from '../../components/ImeiScanModal';
 
@@ -15,10 +15,66 @@ export default function EmployeeInventory() {
   const [filterStock, setFilterStock] = useState('');
   const [expandedProducts, setExpandedProducts] = useState({});
   const [showImeiScan, setShowImeiScan] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkRows, setBulkRows] = useState([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkResults, setBulkResults] = useState(null);
 
   useEffect(() => {
     api.get('/employee/inventory').then(r => { setProducts(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  const handleBulkFile = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+        if (lines.length === 0) return toast.error('Empty file');
+        let start = 0;
+        const first = lines[0].split(',').map(c => c.trim().toLowerCase());
+        if (first.includes('name') || first.includes('product')) start = 1;
+        const rows = [];
+        for (let i = start; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          const name = (cols[0] || '').trim();
+          const stock = (cols[1] || '').trim();
+          if (!name) continue;
+          rows.push({ name, stock });
+        }
+        if (rows.length === 0) return toast.error('No valid rows found. Use format: name,stock');
+        setBulkRows(rows);
+        setBulkResults(null);
+      } catch (err) {
+        toast.error('Failed to parse file');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const submitBulk = async () => {
+    setBulkLoading(true);
+    try {
+      const { data } = await api.post('/admin/bulk-stock', { items: bulkRows });
+      setBulkResults(data);
+      toast.success(`${data.updated} product(s) updated`);
+      api.get('/employee/inventory').then(r => setProducts(r.data)).catch(() => {});
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Bulk update failed');
+    }
+    setBulkLoading(false);
+  };
+
+  const downloadTemplate = () => {
+    const csv = 'name,stock\nSamsung Galaxy S24,10\niPhone 15,5\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'stock_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const variantTotalStock = (variant) => (variant.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
   const productTotalStock = (product) => product.variants?.reduce((s, v) => s + variantTotalStock(v), 0) || 0;
@@ -79,10 +135,16 @@ export default function EmployeeInventory() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Inventory Management ({filtered.length}{hasFilters ? ` of ${products.length}` : ''})</h1>
-        <button onClick={() => setShowImeiScan(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-blue-600 transition shadow-lg">
-          <Camera size={16} /> Scan IMEI
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={() => setShowBulkModal(true)}
+            className="bg-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-gold-700 transition shadow-lg">
+            <Upload size={16} /> Bulk Stock
+          </button>
+          <button onClick={() => setShowImeiScan(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-blue-600 transition shadow-lg">
+            <Camera size={16} /> Scan IMEI
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4 gold-border">
@@ -262,6 +324,101 @@ export default function EmployeeInventory() {
           </table>
         </div>
       </div>
+
+      {/* Bulk Stock Modal */}
+      {showBulkModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gold-200 bg-gradient-to-r from-gold-50 to-white sticky top-0 z-10">
+              <h2 className="text-lg font-bold gold-text">Bulk Stock Update</h2>
+              <button onClick={() => { setShowBulkModal(false); setBulkRows([]); setBulkResults(null); }} className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">Upload a CSV with <span className="font-semibold font-mono">name,stock</span> columns to update many products at once.</p>
+                <button onClick={downloadTemplate} className="flex items-center gap-1 text-xs text-gold-600 hover:text-gold-700 font-semibold flex-shrink-0">
+                  <Download size={14} /> Template
+                </button>
+              </div>
+
+              {!bulkResults && (
+                <label className="block cursor-pointer">
+                  <input type="file" accept=".csv,text/csv" className="hidden"
+                    onChange={e => { handleBulkFile(e.target.files[0]); e.target.value = ''; }} />
+                  <div className="border-2 border-dashed border-gold-300 rounded-xl p-8 text-center hover:border-gold-500 hover:bg-gold-50/50 transition">
+                    <Upload size={32} className="mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-600">Click to select a CSV file</p>
+                    <p className="text-xs text-gray-400 mt-1">Fuzzy name matching supported — exact match tried first</p>
+                  </div>
+                </label>
+              )}
+
+              {bulkRows.length > 0 && !bulkResults && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-gray-700">{bulkRows.length} row(s) parsed</p>
+                    <button onClick={() => setBulkRows([])} className="text-xs text-red-500 hover:underline">Clear</button>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="text-left py-2 px-3 text-gray-600 font-medium">Product Name</th>
+                          <th className="text-left py-2 px-3 text-gray-600 font-medium w-20">Stock</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bulkRows.map((row, i) => (
+                          <tr key={i} className="border-t">
+                            <td className="py-2 px-3 text-gray-700">{row.name}</td>
+                            <td className="py-2 px-3 font-semibold text-gold-600">{row.stock}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {bulkResults && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                    <Package size={18} className="text-green-600" />
+                    <p className="text-sm font-semibold text-green-700">{bulkResults.updated} product(s) updated successfully</p>
+                  </div>
+                  {bulkResults.notFound?.length > 0 && (
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+                      <p className="text-sm font-semibold text-yellow-700 mb-1">Not found ({bulkResults.notFound.length}):</p>
+                      <ul className="text-xs text-yellow-700 space-y-0.5 max-h-32 overflow-y-auto">
+                        {bulkResults.notFound.map((n, i) => <li key={i}>• {n}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {bulkResults.errors?.length > 0 && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-sm font-semibold text-red-700 mb-1">Errors ({bulkResults.errors.length}):</p>
+                      <ul className="text-xs text-red-700 space-y-0.5 max-h-32 overflow-y-auto">
+                        {bulkResults.errors.map((e, i) => <li key={i}>• {e.name}: {e.message}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 p-6 border-t border-gold-200 bg-gold-50/30 sticky bottom-0">
+              <button onClick={() => { setShowBulkModal(false); setBulkRows([]); setBulkResults(null); }} className="btn-outline-gold rounded-xl">Close</button>
+              {bulkRows.length > 0 && !bulkResults && (
+                <button onClick={submitBulk} disabled={bulkLoading} className="btn-gold rounded-xl flex items-center gap-2">
+                  {bulkLoading ? <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span> : <Save size={16} />}
+                  {bulkLoading ? 'Updating...' : `Update ${bulkRows.length} Product(s)`}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <ImeiScanModal open={showImeiScan} onClose={() => setShowImeiScan(false)} />
     </div>
