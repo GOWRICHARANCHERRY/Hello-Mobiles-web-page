@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Hello Mobiles</title>
+  <script>
+    (function () {
+      var base = '/Hello-Mobiles-web-page';
+      var path = window.location.pathname.replace(base, '') || '/';
+      if (!path.endsWith('/')) path += '/';
+      window.location.replace(base + path + window.location.search);
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting…</p>
+</body>
+</html>
