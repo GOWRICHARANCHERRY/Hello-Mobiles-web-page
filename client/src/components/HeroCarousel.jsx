@@ -88,8 +88,12 @@ export default function HeroCarousel() {
 
       {/* Dynamic Banners */}
       {isDynamic ? (
-        <div className="relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
+        <div key={slide._id || slide.bigText || slide.title}
+          className="relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
           style={{ backgroundColor: slide.bgColor || '#1a1a2e' }}>
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
+          </div>
           {!slide.image && (
             <>
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
@@ -101,25 +105,27 @@ export default function HeroCarousel() {
 
           <div className="relative z-10 flex-1 p-8 md:p-12" style={{ color: slide.textColor || '#ffffff' }}>
             {slide.highlightedText && (
-              <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80">{slide.highlightedText}</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80 animate-slide-up">{slide.highlightedText}</p>
             )}
             {slide.bigText && (
-              <h2 className="text-3xl md:text-5xl font-bold mb-3 animate-slide-up max-w-2xl">{slide.bigText}</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 animate-slide-up hero-text-glow max-w-2xl">{slide.bigText}</h2>
             )}
             {slide.smallText && (
-              <p className="text-lg md:text-xl opacity-75 mb-6 max-w-2xl">{slide.smallText}</p>
+              <p className="text-lg md:text-xl opacity-75 mb-6 animate-slide-up max-w-2xl" style={{ animationDelay: '0.15s' }}>{slide.smallText}</p>
             )}
             {slide.product && (
               <button onClick={() => navigate(`/products/${slide.product._id}`)}
-                className="inline-block bg-white/20 backdrop-blur-md text-white font-bold py-3 px-8 rounded-xl text-lg hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                className="inline-block animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-lg hover:shadow-[0_0_30px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300"
+                style={{ animationDelay: '0.3s' }}>
                 View Product →
               </button>
             )}
           </div>
 
           {slide.image && (
-            <div className="w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-4 md:p-8">
-              <img src={slide.image} alt="" className="max-h-36 sm:max-h-48 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl" />
+            <div className="w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-4 md:p-8 animate-float">
+              <img src={slide.image} alt="" className="animate-zoom-in max-h-36 sm:max-h-48 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
+                style={{ boxShadow: '0 25px 60px rgba(0,0,0,0.45), 0 0 40px rgba(212,160,23,0.25)' }} />
             </div>
           )}
         </div>
