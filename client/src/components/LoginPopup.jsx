@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { sendFirebaseOTP } from '../utils/firebase';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
@@ -13,6 +14,10 @@ export default function LoginPopup({ onClose }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -58,6 +63,44 @@ export default function LoginPopup({ onClose }) {
       toast.error('Google login failed');
     }
   };
+
+  const handleSendOtp = async () => {
+    if (phone.length !== 10) return toast.error('Enter valid 10-digit phone number');
+    setOtpLoading(true);
+    try {
+      const result = await sendFirebaseOTP(phone);
+      setConfirmation(result);
+      setOtpSent(true);
+      toast.success('OTP sent to your phone!');
+    } catch (error) {
+      console.error('Firebase OTP error:', error);
+      if (error.code === 'auth/quota-exceeded') toast.error('SMS quota exceeded. Try again later.');
+      else toast.error(`Failed to send OTP: ${error.message || 'Try again'}`);
+    }
+    setOtpLoading(false);
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) return toast.error('Enter valid 6-digit OTP');
+    setOtpLoading(true);
+    try {
+      const userCred = await confirmation.confirm(otp);
+      const idToken = await userCred.user.getIdToken();
+      const res = await api.post('/auth/firebase-auth', { idToken, phone });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      toast.success('Logged in!');
+      if (res.data.user?.role === 'admin') { onClose(); navigate('/admin'); }
+      else if (res.data.user?.role === 'employee') { onClose(); navigate('/employee'); }
+      else onClose();
+      window.location.reload();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Invalid OTP. Try again.');
+    }
+    setOtpLoading(false);
+  };
+
+  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
@@ -112,6 +155,11 @@ export default function LoginPopup({ onClose }) {
                 </button>
               </form>
 
+              <button type="button" onClick={() => switchMode('otp')}
+                className="w-full mt-2 border-2 border-gold-300 text-gold-700 font-semibold py-2.5 rounded-lg text-sm hover:bg-gold-50">
+                Login with OTP
+              </button>
+
               <div className="mt-3 text-center">
                 <p className="text-gray-500 text-xs">New here?{' '}
                   <button onClick={() => setMode('signup')} className="text-gold-600 font-semibold hover:underline">Create Account</button>
@@ -137,6 +185,37 @@ export default function LoginPopup({ onClose }) {
                 <button type="button" onClick={() => setMode('login')} className="text-gold-600 font-semibold hover:underline">Sign In</button>
               </p>
             </form>
+          )}
+
+          {mode === 'otp' && (
+            <div className="space-y-3">
+              {!otpSent ? (
+                <>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone Number"
+                    className="w-full px-3 py-2.5 border-2 border-gold-200 rounded-lg text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
+                  <button type="button" onClick={handleSendOtp} disabled={otpLoading}
+                    className="w-full btn-gold text-white font-semibold py-2.5 rounded-lg text-sm disabled:opacity-50">
+                    {otpLoading ? 'Sending OTP...' : 'Send OTP'}
+                  </button>
+                  <p className="text-center text-xs text-gray-400">OTP will be sent to +91 {phone || 'your number'}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-center text-gray-600">Enter the 6-digit OTP sent to <b>+91 {phone}</b></p>
+                  <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} maxLength={6} placeholder="6-digit OTP"
+                    className="w-full px-3 py-2.5 border-2 border-gold-200 rounded-lg text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50 text-center tracking-widest text-lg" />
+                  <button type="button" onClick={handleVerifyOtp} disabled={otpLoading}
+                    className="w-full btn-gold text-white font-semibold py-2.5 rounded-lg text-sm disabled:opacity-50">
+                    {otpLoading ? 'Verifying...' : 'Verify & Login'}
+                  </button>
+                  <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }} className="w-full text-xs text-gray-500 hover:text-gold-600">Change number / Resend</button>
+                </>
+              )}
+              <p className="text-center text-gray-500 text-xs">
+                Back to{' '}
+                <button type="button" onClick={() => switchMode('login')} className="text-gold-600 font-semibold hover:underline">Sign In</button>
+              </p>
+            </div>
           )}
 
           <div className="mt-3 pt-3 border-t border-gold-100 text-center">
