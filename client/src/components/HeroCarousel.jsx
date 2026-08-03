@@ -88,11 +88,8 @@ export default function HeroCarousel() {
 
       {/* Dynamic Banners */}
       {isDynamic ? (
-        <div className="relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide"
+        <div className="relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
           style={{ backgroundColor: slide.bgColor || '#1a1a2e' }}>
-          {slide.image && (
-            <img src={slide.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          )}
           {!slide.image && (
             <>
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
@@ -101,17 +98,16 @@ export default function HeroCarousel() {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
             </>
           )}
-          {slide.image && <div className="absolute inset-0 bg-black/40"></div>}
 
-          <div className="relative z-10 p-8 md:p-12 max-w-2xl" style={{ color: slide.textColor || '#ffffff' }}>
+          <div className="relative z-10 flex-1 p-8 md:p-12" style={{ color: slide.textColor || '#ffffff' }}>
             {slide.highlightedText && (
               <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80">{slide.highlightedText}</p>
             )}
             {slide.bigText && (
-              <h2 className="text-3xl md:text-5xl font-bold mb-3 animate-slide-up">{slide.bigText}</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 animate-slide-up max-w-2xl">{slide.bigText}</h2>
             )}
             {slide.smallText && (
-              <p className="text-lg md:text-xl opacity-75 mb-6">{slide.smallText}</p>
+              <p className="text-lg md:text-xl opacity-75 mb-6 max-w-2xl">{slide.smallText}</p>
             )}
             {slide.product && (
               <button onClick={() => navigate(`/products/${slide.product._id}`)}
@@ -120,6 +116,12 @@ export default function HeroCarousel() {
               </button>
             )}
           </div>
+
+          {slide.image && (
+            <div className="relative w-1/3 md:w-2/5 self-stretch flex-shrink-0 overflow-hidden">
+              <img src={slide.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+          )}
         </div>
       ) : (
         /* Fallback Slides */
