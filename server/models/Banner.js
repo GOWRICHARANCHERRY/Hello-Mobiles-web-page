@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const bannerSchema = new mongoose.Schema({
-  image: { type: String, required: true },
+  type: { type: String, enum: ['hero', 'text'], default: 'hero' },
+  image: { type: String, default: '' },
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
   highlightedText: { type: String, default: '' },
   bigText: { type: String, default: '' },

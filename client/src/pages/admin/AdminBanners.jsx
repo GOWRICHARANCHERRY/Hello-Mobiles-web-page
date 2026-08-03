@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, X, Save, Upload, Eye, EyeOff, GripVertical, Image 
 import toast from 'react-hot-toast';
 
 const emptyBanner = {
-  image: '', product: '', highlightedText: '', bigText: '', smallText: '',
+  type: 'hero', image: '', product: '', highlightedText: '', bigText: '', smallText: '',
   bgColor: '#1a1a2e', textColor: '#ffffff', order: 0, isActive: true,
 };
 
@@ -53,11 +53,13 @@ export default function AdminBanners() {
   };
 
   const handleSave = async () => {
-    if (!form.image) return toast.error('Banner image is required');
+    if (form.type === 'hero' && !form.image) return toast.error('Banner 1 requires an image');
+    if (form.type === 'text' && !form.bigText && !form.highlightedText) return toast.error('Please add at least some text');
     if (!form.bigText && !form.highlightedText) return toast.error('Please add at least some text');
 
     try {
       const formData = new FormData();
+      formData.append('type', form.type);
       formData.append('image', form.image);
       formData.append('product', form.product || '');
       formData.append('highlightedText', form.highlightedText);
@@ -86,6 +88,7 @@ export default function AdminBanners() {
 
   const handleEdit = (banner) => {
     setForm({
+      type: banner.type || 'hero',
       image: banner.image || '',
       product: banner.product?._id || '',
       highlightedText: banner.highlightedText || '',
@@ -179,6 +182,9 @@ export default function AdminBanners() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs text-gray-400">#{index + 1}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${banner.type === 'text' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                        {banner.type === 'text' ? 'Banner 2 · Text' : 'Banner 1 · Image'}
+                      </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${banner.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                         {banner.isActive ? 'Active' : 'Inactive'}
                       </span>
@@ -220,9 +226,26 @@ export default function AdminBanners() {
             </div>
 
             <div className="p-6 space-y-6">
+              {/* Banner Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Banner Type</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button type="button" onClick={() => setForm({ ...form, type: 'hero' })}
+                    className={`p-4 rounded-xl border-2 text-left transition ${form.type === 'hero' ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
+                    <p className="text-sm font-bold text-gray-800">Banner 1 — Image</p>
+                    <p className="text-xs text-gray-500 mt-1">Background image + text overlay (carousel hero banner)</p>
+                  </button>
+                  <button type="button" onClick={() => setForm({ ...form, type: 'text' })}
+                    className={`p-4 rounded-xl border-2 text-left transition ${form.type === 'text' ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
+                    <p className="text-sm font-bold text-gray-800">Banner 2 — Text Only</p>
+                    <p className="text-xs text-gray-500 mt-1">Color background + editable text + product link, no image</p>
+                  </button>
+                </div>
+              </div>
+
               {/* Live Preview */}
               <div className="rounded-2xl overflow-hidden border-2 border-gold-200" style={{ backgroundColor: form.bgColor }}>
-                {form.image && (
+                {form.type === 'hero' && form.image && (
                   <div className="relative h-56">
                     <img src={form.image} alt="" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center" style={{ color: form.textColor }}>
@@ -232,7 +255,18 @@ export default function AdminBanners() {
                     </div>
                   </div>
                 )}
-                {!form.image && (
+                {form.type === 'text' && (
+                  <div className="relative h-56 flex flex-col items-center justify-center p-6 text-center" style={{ color: form.textColor }}>
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
+                    <div className="relative">
+                      {form.highlightedText && <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{form.highlightedText}</p>}
+                      {form.bigText && <h2 className="text-3xl font-bold leading-tight">{form.bigText}</h2>}
+                      {form.smallText && <p className="text-sm mt-2 opacity-75">{form.smallText}</p>}
+                      {form.product && <span className="inline-block mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold opacity-90" style={{ backgroundColor: form.textColor, color: form.bgColor }}>View Product →</span>}
+                    </div>
+                  </div>
+                )}
+                {form.type === 'hero' && !form.image && (
                   <div className="h-56 flex items-center justify-center text-gray-400">
                     <p className="text-sm">Upload an image to see preview</p>
                   </div>
@@ -240,6 +274,7 @@ export default function AdminBanners() {
               </div>
 
               {/* Image Upload */}
+              {form.type === 'hero' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image *</label>
                 <div
@@ -269,6 +304,7 @@ export default function AdminBanners() {
                   </div>
                 )}
               </div>
+              )}
 
               {/* Text Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

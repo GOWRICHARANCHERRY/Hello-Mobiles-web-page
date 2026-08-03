@@ -93,7 +93,15 @@ export default function HeroCarousel() {
           {slide.image && (
             <img src={slide.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
           )}
-          <div className="absolute inset-0 bg-black/40"></div>
+          {!slide.image && (
+            <>
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
+            </>
+          )}
+          {slide.image && <div className="absolute inset-0 bg-black/40"></div>}
 
           <div className="relative z-10 p-8 md:p-12 max-w-2xl" style={{ color: slide.textColor || '#ffffff' }}>
             {slide.highlightedText && (

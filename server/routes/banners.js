@@ -49,12 +49,14 @@ router.get('/admin', auth, roleAuth('admin'), async (req, res) => {
 // Admin - create banner
 router.post('/', auth, roleAuth('admin'), upload.single('image'), async (req, res) => {
   try {
-    const { product, highlightedText, bigText, smallText, bgColor, textColor, order, isActive } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl;
+    const { type, product, highlightedText, bigText, smallText, bgColor, textColor, order, isActive } = req.body;
+    const bannerType = type === 'text' ? 'text' : 'hero';
+    const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl || '';
 
-    if (!image) return res.status(400).json({ message: 'Image is required' });
+    if (bannerType === 'hero' && !image) return res.status(400).json({ message: 'Image is required for Banner 1 (image banner)' });
 
     const banner = new Banner({
+      type: bannerType,
       image,
       product: product || undefined,
       highlightedText: highlightedText || '',
