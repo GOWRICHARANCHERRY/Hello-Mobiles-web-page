@@ -92,7 +92,7 @@ export default function HeroCarousel() {
       {/* Dynamic Banners */}
       {isDynamic ? (
         <div key={slide._id || slide.bigText || slide.title}
-          className="relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
+          className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
           style={{ backgroundColor: slide.bgColor || '#1a1a2e' }}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
@@ -106,19 +106,19 @@ export default function HeroCarousel() {
             </>
           )}
 
-          <div className="relative z-10 flex-1 p-8 md:p-12 md:pl-20 lg:pl-28" style={{ color: slide.textColor || '#ffffff' }}>
+          <div className="relative z-10 flex-1 p-5 sm:p-8 md:p-12 md:pl-20 lg:pl-28 min-w-0" style={{ color: slide.textColor || '#ffffff' }}>
             {slide.highlightedText && (
-              <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80 animate-slide-up">{slide.highlightedText}</p>
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2 opacity-80 animate-slide-up">{slide.highlightedText}</p>
             )}
             {slide.bigText && (
-              <h2 className="text-3xl md:text-5xl font-bold mb-3 animate-slide-up hero-text-glow max-w-2xl">{slide.bigText}</h2>
+              <h2 className="text-xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-3 animate-slide-up hero-text-glow max-w-2xl leading-tight">{slide.bigText}</h2>
             )}
             {slide.smallText && (
-              <p className="text-lg md:text-xl opacity-75 mb-6 animate-slide-up max-w-2xl" style={{ animationDelay: '0.15s' }}>{slide.smallText}</p>
+              <p className="text-xs sm:text-lg md:text-xl opacity-75 mb-3 sm:mb-6 animate-slide-up max-w-2xl" style={{ animationDelay: '0.15s' }}>{slide.smallText}</p>
             )}
             {(slide.product || slide.link) && (
               <button onClick={() => navigate(slide.link || `/products/${slide.product._id}`)}
-                className="inline-block animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-lg hover:shadow-[0_0_30px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300"
+                className="inline-block animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-8 rounded-xl text-sm sm:text-lg shadow-lg hover:shadow-[0_0_30px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300"
                 style={{ animationDelay: '0.3s' }}>
                 {slide.buttonText || (slide.product ? 'View Product' : 'Shop Now')} →
               </button>
@@ -126,29 +126,29 @@ export default function HeroCarousel() {
           </div>
 
           {slide.image && (
-            <div className="w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-4 md:p-8 animate-float">
-              <img src={slide.image} alt="" className="animate-zoom-in max-h-36 sm:max-h-48 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
+            <div className="w-1/4 sm:w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-2 sm:p-4 md:p-8 animate-float">
+              <img src={slide.image} alt="" className="animate-zoom-in max-h-24 sm:max-h-36 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
                 style={{ boxShadow: '0 25px 60px rgba(0,0,0,0.45), 0 0 40px rgba(212,160,23,0.25)' }} />
             </div>
           )}
         </div>
       ) : (
         /* Fallback Slides */
-        <div className={`bg-gradient-to-br ${slide.bg || 'from-gray-900 to-black'} relative min-h-[300px] md:min-h-[420px] flex items-center hero-slide`}>
+        <div className={`bg-gradient-to-br ${slide.bg || 'from-gray-900 to-black'} relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide`}>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
 
-          <div className="relative z-10 p-8 md:p-12 max-w-2xl">
+          <div className="relative z-10 p-5 sm:p-8 md:p-12 max-w-2xl">
             {slide.offer && (
-              <div className={`inline-block bg-gradient-to-r ${slide.accent || 'from-gold-400 to-gold-600'} text-white text-xs font-bold px-4 py-1.5 rounded-full mb-4`}>
+              <div className={`inline-block bg-gradient-to-r ${slide.accent || 'from-gold-400 to-gold-600'} text-white text-xs font-bold px-4 py-1.5 rounded-full mb-3 sm:mb-4`}>
                 {slide.offer}
               </div>
             )}
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-3 animate-slide-up">{slide.title}</h2>
-            <p className="text-lg md:text-xl text-gray-300 mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>{slide.subtitle}</p>
+            <h2 className="text-xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-3 animate-slide-up leading-tight">{slide.title}</h2>
+            <p className="text-sm sm:text-lg md:text-xl text-gray-300 mb-3 sm:mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>{slide.subtitle}</p>
             <Link to={slide.link || '/products'}
-              className={`inline-block bg-gradient-to-r ${slide.accent || 'from-gold-400 to-gold-600'} text-white font-bold py-3 px-8 rounded-xl text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
+              className={`inline-block bg-gradient-to-r ${slide.accent || 'from-gold-400 to-gold-600'} text-white font-bold py-2 px-4 sm:py-3 sm:px-8 rounded-xl text-sm sm:text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
               Shop Now →
             </Link>
           </div>
@@ -159,19 +159,19 @@ export default function HeroCarousel() {
       {slides.length > 1 && (
         <>
           <button onClick={prev}
-            className="absolute z-20 left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
-            <ChevronLeft size={22} />
+            className="absolute z-20 left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            <ChevronLeft size={20} />
           </button>
           <button onClick={next}
-            className="absolute z-20 right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
-            <ChevronRight size={22} />
+            className="absolute z-20 right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            <ChevronRight size={20} />
           </button>
         </>
       )}
 
       {/* Dots */}
       {slides.length > 1 && (
-        <div className="absolute z-20 bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute z-20 bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)}
               className={`transition-all duration-300 rounded-full ${i === current ? 'w-8 h-3 bg-gold-400' : 'w-3 h-3 bg-white/40 hover:bg-white/60'}`} />

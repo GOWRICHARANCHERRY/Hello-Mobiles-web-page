@@ -389,7 +389,7 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            <div className="mt-3 flex gap-3">
+            <div className="mt-3 flex flex-wrap gap-3">
               <button onClick={handleWishlist} className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm transition ${inWishlist ? 'bg-red-50 border-red-300 text-red-600' : 'hover:bg-gold-50'}`}>
                 <Heart size={16} className={inWishlist ? 'fill-red-500' : ''} /> {inWishlist ? 'Wishlisted' : 'Wishlist'}
               </button>

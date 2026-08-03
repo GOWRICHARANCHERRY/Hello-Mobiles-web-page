@@ -186,7 +186,7 @@ export default function Home() {
             </h2>
             <Link to="/products?onOffer=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {offerProducts.slice(0, 4).map((product, i) => (
               <ProductCard key={product._id} product={product} delay={i} />
             ))}
@@ -201,7 +201,7 @@ export default function Home() {
             <h2 className="section-title">Featured Products</h2>
             <Link to="/products?featured=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {featuredProducts.slice(0, 4).map((product, i) => (
               <ProductCard key={product._id} product={product} delay={i} />
             ))}
@@ -216,7 +216,7 @@ export default function Home() {
             <h2 className="section-title">New Arrivals</h2>
             <Link to="/products?newArrival=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {newArrivals.slice(0, 4).map((product, i) => (
               <ProductCard key={product._id} product={product} delay={i} />
             ))}
@@ -329,7 +329,7 @@ function ProductCard({ product, delay = 0 }) {
   return (
     <Link to={`/products/${product._id}`}
       className="bg-white rounded-xl shadow-sm overflow-hidden card-hover block animate-fade-in-up" style={{ animationDelay: `${delay * 0.1}s` }}>
-      <div className="bg-gradient-to-br from-gold-50 to-amber-50 p-4 h-48 flex items-center justify-center relative">
+      <div className="bg-gradient-to-br from-gold-50 to-amber-50 p-3 sm:p-4 h-32 sm:h-48 flex items-center justify-center relative">
         {product.images?.[0] ? (
           <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain hover:scale-110 transition-transform duration-500" />
         ) : (
@@ -338,12 +338,12 @@ function ProductCard({ product, delay = 0 }) {
         {discount > 0 && <span className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">{discount}% OFF</span>}
         {product.isNewArrival && <span className="absolute top-2 right-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">NEW</span>}
       </div>
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <p className="text-xs text-gold-600 font-semibold">{product.brand}</p>
         <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-          {product.mrp > product.price && <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5 sm:mt-2">
+          <span className="text-base sm:text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
+          {product.mrp > product.price && <span className="text-xs sm:text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
         </div>
         {product.emiAvailable && <p className="text-xs text-gold-600 mt-1 font-medium">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
         {product.ratings > 0 && (

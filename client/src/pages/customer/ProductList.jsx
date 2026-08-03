@@ -250,7 +250,7 @@ export default function ProductList() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {[1,2,3,4,5,6].map(i => (
                 <div key={i} className="bg-white rounded-2xl shadow-sm p-4 animate-pulse gold-border">
                   <div className="bg-gold-100 h-48 rounded-xl mb-3"></div>
@@ -266,10 +266,10 @@ export default function ProductList() {
               <button onClick={clearFilters} className="btn-gold rounded-xl mt-4">Clear All Filters</button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {products.map(product => (
                 <Link key={product._id} to={`/products/${product._id}`} className="bg-white rounded-2xl shadow-sm overflow-hidden card-hover block gold-border">
-                  <div className="bg-gray-100 p-4 h-48 flex items-center justify-center relative">
+                  <div className="bg-gray-100 p-4 h-36 sm:h-48 flex items-center justify-center relative">
                     {product.images?.[0] ? (
                       <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain" />
                     ) : (
