@@ -3,10 +3,19 @@
 ## Objective
 Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI tracking, real product images, sticky admin/employee sidebars, scroll-to-top on navigation, and now an "Electronics" category.
 
+## PRODUCTION (permanent) — LIVE
+- **Site: `https://hello-mobiles.com`** (www → 301 redirect to root). Domain bought at **Cloudflare Registrar** (accounts: `danthamsettygowricharan17@gmail.com` / GOWRICHARANCHERRY)
+- **Hosting: Render** web service `hello-mobiles` (Free, Singapore, srv-d9oeuevlk1mc738f8fkg) → `https://hello-mobiles.onrender.com`. Root `package.json` builds client + server; auto-deploys on push to `main`
+- **Database: MongoDB Atlas** cluster `Hellomobiles` (M0 Free, AWS Mumbai). User `donthamsettygowricharan_db_user` / pw in `.env.render`. URI: `mongodb+srv://donthamsettygowricharan_db_user:<pw>@hellomobiles.gtcobzs.mongodb.net/hello_mobiles`
+- **DNS**: Cloudflare (hello-mobiles.com) — 2 CNAME records (root `@` + `www`) → `hello-mobiles.onrender.com`, **DNS only** (grey cloud, NOT proxied — proxied fails with "DNS points to prohibited IP" because Render is behind Cloudflare)
+- Render free tier: 2 custom domains only; sleeps after 15min idle (first visit ~30-60s wake); certs auto-issued per custom domain
+- Render env vars loaded from `.env.render` (gitignored): MONGODB_URI, JWT_SECRET, GOOGLE_CLIENT_ID, FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (literal `\n`)
+- Local dev still uses LaunchAgents + local MongoDB (see below); local DB was migrated to Atlas (mongodump/mongorestore)
+
 ## Important Details
 - Project: `/Users/apple/Desktop/Hello Mobiles web page/` (space in folder name — quote paths)
 - GitHub repo: `https://github.com/GOWRICHARANCHERRY/Hello-Mobiles-web-page.git`
-- Server port `5050`, Client port `3000`; MongoDB `mongodb://localhost:27017/hello_mobiles` (env key is `MONGODB_URI`, NOT `MONGO_URI`)
+- Server port `5050`, Client port `3000`; local MongoDB `mongodb://localhost:27017/hello_mobiles` (env key is `MONGODB_URI`, NOT `MONGO_URI`)
 - Credentials: Admin `9999999999`/`admin123`, Employee `8888888888`/`emp123`, Customer `7777777777`/`cust123`
 - Server IS currently running on 5050 (API responds live)
 - Firebase/Google login RESTORED: `server/.env` now has `GOOGLE_CLIENT_ID` (from client), `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` (source: Service Account JSON `~/Downloads/hello-mobiles-webpage-firebase-adminsdk-fbsvc-919e301710.json`). Server log now shows `Firebase Admin initialized`
@@ -53,11 +62,12 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - Cloudflare quick tunnel: data path previously broken on this network — FIXED by changing the LaunchAgent origin from `http://localhost:5050` to `http://127.0.0.1:5050` (launchd env couldn't reach `localhost`). Now fully working from any device: `https://labeled-regarded-thanks-usage.trycloudflare.com`. NOTE: each cloudflared restart assigns a NEW random URL — grab it from `/tmp/hm-tunnel.log` after `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel`
 
 ## Next Move
-1. LIVE full-stack URL (works from any device): `https://labeled-regarded-thanks-usage.trycloudflare.com` — cloudflared quick tunnel to 127.0.0.1:5050 (server serves API + built client from `client/dist`). Tunnel is temporary: lasts while this machine is on. Restart: `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel` (new random URL after each restart — read `/tmp/hm-tunnel.log`). Manual (shell) alternative: `/usr/local/bin/cloudflared tunnel --url http://127.0.0.1:5050 --no-autoupdate` (installed at /usr/local/bin, NOT in PATH)
-2. GitHub Pages `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` is frontend-only (no backend)
-3. For a permanent public URL: deploy backend (Render/Railway) + MongoDB Atlas
+1. **Permanent live site: `https://hello-mobiles.com`** (Render + Atlas + Cloudflare DNS-only, see PRODUCTION above). Render free tier sleeps after 15min idle — first visit ~30-60s wake. Restart/deploy: push to `main` (auto-deploy) or Render dashboard Manual Deploy
+2. Tunnel (temporary, local machine only) still available: `https://labeled-regarded-thanks-usage.trycloudflare.com` — restart: `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel` (new random URL after each restart — read `/tmp/hm-tunnel.log`)
+3. GitHub Pages `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` is frontend-only (no backend) — superseded by Render
 4. All work is committed + pushed to `main`; deployed build is on `gh-pages` branch
-5. Note: local router DNS cached NXDOMAIN for trycloudflare.com briefly; flush with `sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder` if it lingers
+5. Note: local router DNS cached NXDOMAIN briefly; flush with `sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder` if it lingers (sudo needs terminal password)
+6. TODO: add `hello-mobiles.com` + `www.hello-mobiles.com` to Firebase **Authorized Domains** (Authentication → Settings) for Google/phone login to work on the live domain
 
 ## Relevant Files
 - `server/seed_full_inventory.js` — 120-product seed (108 mobiles + 12 others)
