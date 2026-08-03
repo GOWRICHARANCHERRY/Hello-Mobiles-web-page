@@ -17,6 +17,7 @@ export default function AdminBanners() {
   const [products, setProducts] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [activeType, setActiveType] = useState('hero');
   const fileInputRef = useRef(null);
 
   useEffect(() => { loadBanners(); loadProducts(); }, []);
@@ -123,17 +124,23 @@ export default function AdminBanners() {
     }
   };
 
+  const list = banners.filter(b => (b.type || 'hero') === activeType);
+  const heroCount = banners.filter(b => (b.type || 'hero') === 'hero').length;
+  const textCount = banners.filter(b => (b.type || 'hero') === 'text').length;
+
   const moveBanner = async (index, direction) => {
     const target = index + direction;
-    if (target < 0 || target >= banners.length) return;
-    const reordered = banners.map(b => ({ ...b }));
-    const temp = reordered[index];
-    reordered[index] = reordered[target];
-    reordered[target] = temp;
-    reordered.forEach((b, i) => { b.order = i + 1; });
+    if (target < 0 || target >= list.length) return;
+    const a = list[index], b = list[target];
+    const reordered = banners.map(x => ({ ...x }));
+    const ia = reordered.findIndex(x => x._id === a._id);
+    const ib = reordered.findIndex(x => x._id === b._id);
+    const orderA = reordered[ia].order, orderB = reordered[ib].order;
+    reordered[ia].order = orderB;
+    reordered[ib].order = orderA;
     setBanners(reordered);
     try {
-      await api.put('/banners/reorder/batch', { order: reordered.map((b, i) => ({ id: b._id, order: i + 1 })) });
+      await api.put('/banners/reorder/batch', { order: reordered.map(x => ({ id: x._id, order: x.order })) });
       toast.success('Banner order updated!');
     } catch (error) {
       toast.error('Failed to reorder');
@@ -142,7 +149,7 @@ export default function AdminBanners() {
   };
 
   const openAdd = () => {
-    setForm(emptyBanner);
+    setForm({ ...emptyBanner, type: activeType });
     setEditingId(null);
     setShowModal(true);
   };
@@ -151,28 +158,44 @@ export default function AdminBanners() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Home Banners ({banners.length})</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {activeType === 'hero' ? 'Banner 1 — Image' : 'Banner 2 — Text'} ({list.length})
+          </h1>
           <p className="text-sm text-gray-500 mt-1">Manage the hero carousel banners on the home page</p>
         </div>
         <button onClick={openAdd}
           className="bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:from-gold-600 hover:to-gold-700 transition shadow-lg">
-          <Plus size={16} /> Add Banner
+          <Plus size={16} /> Add {activeType === 'hero' ? 'Banner 1' : 'Banner 2'}
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-3 mb-6">
+        <button onClick={() => setActiveType('hero')}
+          className={`flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 font-medium text-sm transition ${activeType === 'hero' ? 'border-gold-500 bg-gold-50 text-gold-700 shadow' : 'border-gray-200 text-gray-500 hover:border-gold-300'}`}>
+          Banner 1 — Image
+          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${activeType === 'hero' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{heroCount}</span>
+        </button>
+        <button onClick={() => setActiveType('text')}
+          className={`flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 font-medium text-sm transition ${activeType === 'text' ? 'border-purple-500 bg-purple-50 text-purple-700 shadow' : 'border-gray-200 text-gray-500 hover:border-purple-300'}`}>
+          Banner 2 — Text
+          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${activeType === 'text' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{textCount}</span>
         </button>
       </div>
 
       {/* Banner List */}
-      {banners.length === 0 ? (
+      {list.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center gold-border">
           <ImageIcon size={48} className="mx-auto text-gold-300 mb-4" />
-          <p className="text-gray-500 text-lg font-medium">No banners yet</p>
+          <p className="text-gray-500 text-lg font-medium">No {activeType === 'hero' ? 'Banner 1' : 'Banner 2'} banners yet</p>
           <p className="text-gray-400 text-sm mt-1">Add your first banner to show on the home page</p>
           <button onClick={openAdd} className="btn-gold rounded-xl mt-4">Add Banner</button>
         </div>
       ) : (
         <div className="space-y-4">
-          {banners.map((banner, index) => (
+          {list.map((banner, index) => (
             <div key={banner._id} className="bg-white rounded-2xl shadow-sm overflow-hidden gold-border">
               <div className="flex flex-col md:flex-row">
                 {/* Preview */}
@@ -222,9 +245,9 @@ export default function AdminBanners() {
                         className={`p-1 rounded transition ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
                         <ChevronUp size={16} />
                       </button>
-                      <button onClick={() => moveBanner(index, 1)} disabled={index === banners.length - 1}
+                      <button onClick={() => moveBanner(index, 1)} disabled={index === list.length - 1}
                         title="Move later"
-                        className={`p-1 rounded transition ${index === banners.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
+                        className={`p-1 rounded transition ${index === list.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
                         <ChevronDown size={16} />
                       </button>
                     </div>
