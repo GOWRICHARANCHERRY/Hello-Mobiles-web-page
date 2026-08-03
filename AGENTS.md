@@ -50,10 +50,10 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 
 ### Pending / Not Done
 - Home Appliances (6) + Furniture (6) images verified/fixed earlier but pages may still show stale — re-check if needed
-- Cloudflare quick tunnel: same URL `https://volunteer-ghz-retail-preference.trycloudflare.com` still assigned, but data path currently NOT forwarding on this network (TLS + HTTP/2 stream to the edge open fine, then no HTTP response — quic had `no recent network activity` timeouts; likely VPN/hotspot UDP interference). Restarted on `--protocol http2`; still not carrying traffic. Test from another network/device, or restart tunnel via `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel`
+- Cloudflare quick tunnel: data path previously broken on this network — FIXED by changing the LaunchAgent origin from `http://localhost:5050` to `http://127.0.0.1:5050` (launchd env couldn't reach `localhost`). Now fully working from any device: `https://goals-nevertheless-jan-wires.trycloudflare.com`. NOTE: each cloudflared restart assigns a NEW random URL — grab it from `/tmp/hm-tunnel.log` after `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel`
 
 ## Next Move
-1. LIVE full-stack URL (works from any device): `https://volunteer-ghz-retail-preference.trycloudflare.com` — cloudflared quick tunnel to localhost:5050 (server serves API + built client from `client/dist`). Tunnel is temporary: lasts while this machine is on. Restart: `/usr/local/bin/cloudflared tunnel --url http://localhost:5050 --no-autoupdate` (installed at /usr/local/bin, NOT in PATH)
+1. LIVE full-stack URL (works from any device): `https://goals-nevertheless-jan-wires.trycloudflare.com` — cloudflared quick tunnel to 127.0.0.1:5050 (server serves API + built client from `client/dist`). Tunnel is temporary: lasts while this machine is on. Restart: `launchctl kickstart -k gui/$(id -u)/com.hellomobiles.tunnel` (new random URL after each restart — read `/tmp/hm-tunnel.log`). Manual (shell) alternative: `/usr/local/bin/cloudflared tunnel --url http://127.0.0.1:5050 --no-autoupdate` (installed at /usr/local/bin, NOT in PATH)
 2. GitHub Pages `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` is frontend-only (no backend)
 3. For a permanent public URL: deploy backend (Render/Railway) + MongoDB Atlas
 4. All work is committed + pushed to `main`; deployed build is on `gh-pages` branch
