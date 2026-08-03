@@ -150,11 +150,11 @@ export default function HeroCarousel() {
       {slides.length > 1 && (
         <>
           <button onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            className="absolute z-20 left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronLeft size={22} />
           </button>
           <button onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            className="absolute z-20 right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronRight size={22} />
           </button>
         </>
@@ -162,7 +162,7 @@ export default function HeroCarousel() {
 
       {/* Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute z-20 bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)}
               className={`transition-all duration-300 rounded-full ${i === current ? 'w-8 h-3 bg-gold-400' : 'w-3 h-3 bg-white/40 hover:bg-white/60'}`} />
