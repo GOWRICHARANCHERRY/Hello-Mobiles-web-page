@@ -44,9 +44,11 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - Google/Firebase social login keys NOT in server/.env (recreated without them) — phone+password login works
 
 ## Next Move
-1. GitHub Pages live at `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` (frontend only — GitHub can't host the Node/MongoDB backend; live data needs local server on 5050)
-2. For a fully-working public URL, run `cloudflared tunnel --url http://localhost:5050` (needs `brew install cloudflared`); or deploy backend (Render/Railway) + MongoDB Atlas
-3. All work is committed + pushed to `main`; deployed build is on `gh-pages` branch
+1. LIVE full-stack URL (works from any device): `https://volunteer-ghz-retail-preference.trycloudflare.com` — cloudflared quick tunnel to localhost:5050 (server serves API + built client from `client/dist`). Tunnel is temporary: lasts while this machine is on. Restart: `/usr/local/bin/cloudflared tunnel --url http://localhost:5050 --no-autoupdate` (installed at /usr/local/bin, NOT in PATH)
+2. GitHub Pages `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` is frontend-only (no backend)
+3. For a permanent public URL: deploy backend (Render/Railway) + MongoDB Atlas
+4. All work is committed + pushed to `main`; deployed build is on `gh-pages` branch
+5. Note: local router DNS cached NXDOMAIN for trycloudflare.com briefly; flush with `sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder` if it lingers
 
 ## Relevant Files
 - `server/seed_full_inventory.js` — 120-product seed (108 mobiles + 12 others)
