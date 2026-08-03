@@ -54,7 +54,7 @@ export default function TextBannerCarousel() {
   const backgroundColor = slide.bgColor || '#dc2626';
 
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-lg animate-fade-in"
+    <div className="group relative overflow-hidden rounded-2xl shadow-lg animate-fade-in"
       style={{ backgroundColor }}
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}>
@@ -77,7 +77,7 @@ export default function TextBannerCarousel() {
           </div>
         </div>
         <button onClick={() => navigate(slide.link || '/products?onOffer=true')}
-          className="flex-shrink-0 animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold text-sm px-6 py-3 rounded-xl hover:shadow-[0_0_24px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300 shadow-md"
+          className="flex-shrink-0 animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold text-sm px-6 py-3 rounded-xl hover:shadow-[0_0_24px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300 shadow-md md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
           style={{ animationDelay: '0.3s' }}>
           {slide.buttonText || 'Shop Offers'} <ChevronRight size={16} className="inline" />
         </button>
@@ -86,18 +86,18 @@ export default function TextBannerCarousel() {
       {slides.length > 1 && (
         <>
           <button onClick={prev}
-            className="absolute z-20 left-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110">
+            className="absolute z-20 left-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronLeft size={18} />
           </button>
           <button onClick={next}
-            className="absolute z-20 right-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110">
+            className="absolute z-20 right-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronRight size={18} />
           </button>
         </>
       )}
 
       {slides.length > 1 && (
-        <div className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <div className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto transition-opacity duration-300">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)}
               className={`transition-all duration-300 rounded-full ${i === current ? 'w-6 h-2 bg-gold-400' : 'w-2 h-2 bg-white/40 hover:bg-white/60'}`} />

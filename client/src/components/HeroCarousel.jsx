@@ -44,7 +44,10 @@ export default function HeroCarousel() {
 
   useEffect(() => {
     api.get('/banners')
-      .then(r => { if (r.data.length > 0) setBanners(r.data); })
+      .then(r => {
+        const hero = r.data.filter(b => (b.type || 'hero') === 'hero');
+        if (hero.length > 0) setBanners(hero);
+      })
       .catch(() => {});
   }, []);
 
