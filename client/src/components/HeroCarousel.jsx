@@ -118,8 +118,8 @@ export default function HeroCarousel() {
           </div>
 
           {slide.image && (
-            <div className="relative w-1/3 md:w-2/5 self-stretch flex-shrink-0 overflow-hidden">
-              <img src={slide.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-4 md:p-8">
+              <img src={slide.image} alt="" className="max-h-36 sm:max-h-48 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl" />
             </div>
           )}
         </div>

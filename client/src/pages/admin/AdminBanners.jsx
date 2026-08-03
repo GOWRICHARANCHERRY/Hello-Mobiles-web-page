@@ -246,14 +246,14 @@ export default function AdminBanners() {
               {/* Live Preview */}
               <div className="rounded-2xl overflow-hidden border-2 border-gold-200" style={{ backgroundColor: form.bgColor }}>
                 {form.type === 'hero' && form.image && (
-                  <div className="relative h-56 flex">
+                  <div className="relative h-56 flex items-center">
                     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center" style={{ color: form.textColor }}>
                       {form.highlightedText && <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{form.highlightedText}</p>}
                       {form.bigText && <h2 className="text-3xl font-bold leading-tight">{form.bigText}</h2>}
                       {form.smallText && <p className="text-sm mt-2 opacity-75">{form.smallText}</p>}
                     </div>
-                    <div className="w-2/5 flex-shrink-0">
-                      <img src={form.image} alt="" className="w-full h-full object-cover" />
+                    <div className="w-2/5 h-full flex items-center justify-center p-4">
+                      <img src={form.image} alt="" className="max-h-full max-w-full object-contain rounded-lg" />
                     </div>
                   </div>
                 )}
