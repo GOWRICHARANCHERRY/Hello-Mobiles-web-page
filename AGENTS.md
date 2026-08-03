@@ -40,13 +40,13 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 - None — awaiting next request
 
 ### Pending / Not Done
-- Home Appliances (6) + Furniture (6) images suspected 404 (gsmarena-hosted) — verify + fix
-- UNCOMMITTED/UNPUSHED to GitHub: ScrollToTop fix (App.jsx, ScrollToTop.jsx), Electronics seed + Home.jsx/CustomerLayout.jsx changes. Last pushed commit: `e150eaa`
+- Home Appliances (6) + Furniture (6) images verified/fixed earlier but pages may still show stale — re-check if needed
+- Google/Firebase social login keys NOT in server/.env (recreated without them) — phone+password login works
 
 ## Next Move
-1. Verify + fix the 6 Home Appliances + 6 Furniture image URLs (likely 404)
-2. Commit + push pending changes to GitHub (user must explicitly ask)
-3. Note: Vite warns about >500kB chunk — code-splitting possible if user cares
+1. GitHub Pages live at `https://gowricharancherry.github.io/Hello-Mobiles-web-page/` (frontend only — GitHub can't host the Node/MongoDB backend; live data needs local server on 5050)
+2. For a fully-working public URL, run `cloudflared tunnel --url http://localhost:5050` (needs `brew install cloudflared`); or deploy backend (Render/Railway) + MongoDB Atlas
+3. All work is committed + pushed to `main`; deployed build is on `gh-pages` branch
 
 ## Relevant Files
 - `server/seed_full_inventory.js` — 120-product seed (108 mobiles + 12 others)
