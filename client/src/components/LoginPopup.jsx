@@ -49,6 +49,7 @@ export default function LoginPopup({ onClose }) {
       const res = await api.post('/auth/google', { credential: credentialResponse.credential });
       if (res.data.token) {
         localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
         window.location.reload();
       } else {
         toast.error(res.data.message || 'Google login failed');
