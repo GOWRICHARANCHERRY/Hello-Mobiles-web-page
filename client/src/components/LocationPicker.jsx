@@ -32,9 +32,12 @@ export default function LocationPicker({ initial, onLocation, onError }) {
 
   const fillFromLatLng = (latLng) => {
     if (!mapApi) return;
+    const lat = typeof latLng?.lat === 'function' ? latLng.lat() : latLng?.lat;
+    const lng = typeof latLng?.lng === 'function' ? latLng.lng() : latLng?.lng;
+    if (lat == null || lng == null) return;
     setGeocoding(true);
     const geocoder = new mapApi.Geocoder();
-    geocoder.geocode({ location: latLng }, (results, status) => {
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       setGeocoding(false);
       if (status !== 'OK' || !results?.[0]) return;
       const r = results[0];
@@ -49,8 +52,8 @@ export default function LocationPicker({ initial, onLocation, onError }) {
       const pincode = addr.postal_code || '';
       setLabel(r.formatted_address);
       onLocation({
-        lat: latLng.lat(),
-        lng: latLng.lng(),
+        lat,
+        lng,
         street,
         city,
         state,
