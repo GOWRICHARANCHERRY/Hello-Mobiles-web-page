@@ -57,7 +57,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
         <header className="bg-white shadow-sm p-4 flex items-center justify-between md:hidden">
           <button onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -65,7 +65,7 @@ export default function AdminLayout() {
           <h1 className="font-bold">{t('admin.adminPanel')}</h1>
           <div></div>
         </header>
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 min-w-0 p-6 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

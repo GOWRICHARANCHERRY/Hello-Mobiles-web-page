@@ -135,7 +135,7 @@ export default function EmployeeInventory() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">{t('emp.inventoryManagement')} ({filtered.length}{hasFilters ? ` ${t('emp.ofTotal', { total: products.length })}` : ''})</h1>
         <div className="flex items-center gap-3">
           <button onClick={() => setShowBulkModal(true)}
@@ -216,11 +216,11 @@ export default function EmployeeInventory() {
                         ) : null}
                       </td>
                       <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          {product.images?.[0] ? <img src={product.images[0]} alt="" className="w-10 h-10 rounded object-contain bg-gray-100" /> : <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center"><Package size={16} className="text-gray-400" /></div>}
-                          <div>
-                            <span className="font-medium">{product.name}</span>
-                            {hasVariants && <span className="ml-2 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{t('emp.variantsCount', { count: product.variants.length })}</span>}
+                        <div className="flex items-center gap-3 min-w-0">
+                          {product.images?.[0] ? <img src={product.images[0]} alt="" className="w-10 h-10 rounded object-contain bg-gray-100 flex-shrink-0" /> : <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center flex-shrink-0"><Package size={16} className="text-gray-400" /></div>}
+                          <div className="min-w-0">
+                            <span className="font-medium block truncate">{product.name}</span>
+                            {hasVariants && <span className="mt-1 inline-block text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{t('emp.variantsCount', { count: product.variants.length })}</span>}
                           </div>
                         </div>
                       </td>

@@ -32,7 +32,7 @@ export default function AdminLeads() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.enquiriesLeadsTitle')} ({leads.length})</h1>
           <p className="text-sm text-gray-500 mt-1">{t('admin.unreadSummary', { count: unreadCount })}</p>
@@ -62,8 +62,8 @@ export default function AdminLeads() {
                   {lead.name ? <><User size={14} className="text-gold-500 flex-shrink-0" />{lead.name}</> : t('admin.anonymousVisitor')}
                 </p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-                  {lead.email && <span className="flex items-center gap-1.5"><Mail size={13} className="text-gray-400" />{lead.email}</span>}
-                  {lead.phone && <span className="flex items-center gap-1.5"><Phone size={13} className="text-gray-400" />{lead.phone}</span>}
+                  {lead.email && <span className="flex items-center gap-1.5 min-w-0"><Mail size={13} className="text-gray-400 flex-shrink-0" /><span className="truncate">{lead.email}</span></span>}
+                  {lead.phone && <span className="flex items-center gap-1.5"><Phone size={13} className="text-gray-400 flex-shrink-0" />{lead.phone}</span>}
                 </div>
                 {lead.message && (
                   <p className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2 flex items-start gap-2">

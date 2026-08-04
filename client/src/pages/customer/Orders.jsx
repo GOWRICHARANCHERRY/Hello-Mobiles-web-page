@@ -75,11 +75,11 @@ export default function Orders() {
               <div className="flex flex-col md:flex-row md:items-center justify-between">
                 <div className="flex gap-2 overflow-x-auto">
                   {order.items.slice(0, 3).map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-gold-50 rounded-lg p-2">
-                      {item.image && <img src={item.image} alt="" className="w-10 h-10 object-contain" />}
-                      <div>
+                    <div key={i} className="flex items-center gap-2 bg-gold-50 rounded-lg p-2 min-w-0">
+                      {item.image && <img src={item.image} alt="" className="w-10 h-10 object-contain flex-shrink-0" />}
+                      <div className="min-w-0">
                         <p className="text-xs font-medium text-gray-800 truncate max-w-[120px]">{item.name}</p>
-                        <p className="text-xs text-gray-500">{t('cust.qty')}: {item.quantity}</p>
+                        <p className="text-xs text-gray-500">{t('cust.qty', { count: item.quantity })}</p>
                       </div>
                     </div>
                   ))}

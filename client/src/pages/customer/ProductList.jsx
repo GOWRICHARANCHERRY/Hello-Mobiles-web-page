@@ -110,12 +110,12 @@ export default function ProductList() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
             {filters.search ? `${t('cust.resultsFor')} "${filters.search}"` : filters.category || t('cust.allProducts')}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">{products.length} {t('cust.productsFound')}</p>
+          <p className="text-sm text-gray-500 mt-1">{t('cust.productsFound', { count: products.length })}</p>
         </div>
         <div className="flex items-center gap-3">
           <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}
@@ -287,7 +287,7 @@ export default function ProductList() {
                   <div className="p-4">
                     <p className="text-xs text-gold-600 font-medium">{product.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
                       <span className="text-lg font-bold gold-text">
                         {product.variants?.length > 0 ? (
                           <>₹{Math.min(...product.variants.map(v => v.price)).toLocaleString()}</>

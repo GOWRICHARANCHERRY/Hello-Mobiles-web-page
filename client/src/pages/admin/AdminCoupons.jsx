@@ -141,7 +141,7 @@ export default function AdminCoupons() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.coupons')} ({coupons.length})</h1>
           <p className="text-sm text-gray-500 mt-1">{t('admin.couponsDesc')}</p>

@@ -55,7 +55,7 @@ export default function AdminEmployees() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">{t('admin2.employees')} ({employees.length})</h1>
         <button onClick={openAdd}
           className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gold-700">

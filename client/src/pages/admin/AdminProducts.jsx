@@ -898,7 +898,7 @@ export default function AdminProducts() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Products ({filtered.length}{hasFilters ? ` of ${products.length}` : ''})</h1>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowImeiScan(true)}
@@ -985,11 +985,11 @@ export default function AdminProducts() {
               ) : filtered.map(product => (
                 <tr key={product._id} className="border-b border-gold-100 last:border-0 hover:bg-gold-50/50 transition">
                   <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      {product.images?.[0] ? <img src={product.images[0]} alt="" className="w-10 h-10 rounded-lg object-contain bg-gray-100 border border-gold-200" /> : <div className="w-10 h-10 bg-gold-100 rounded-lg flex items-center justify-center"><Package size={16} className="text-gold-500" /></div>}
-                      <div>
-                        <p className="font-medium text-gray-800">{product.name}</p>
-                        <p className="text-xs text-gold-600">{product.brand}</p>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {product.images?.[0] ? <img src={product.images[0]} alt="" className="w-10 h-10 rounded-lg object-contain bg-gray-100 border border-gold-200 flex-shrink-0" /> : <div className="w-10 h-10 bg-gold-100 rounded-lg flex items-center justify-center flex-shrink-0"><Package size={16} className="text-gold-500" /></div>}
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 truncate">{product.name}</p>
+                        <p className="text-xs text-gold-600 truncate">{product.brand}</p>
                       </div>
                     </div>
                   </td>
