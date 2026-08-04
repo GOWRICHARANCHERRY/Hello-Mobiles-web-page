@@ -345,7 +345,7 @@ export default function Home() {
         <h2 className="section-title">{t('cust.reviewsTitle')}</h2>
         <p className="text-gray-600 text-sm sm:text-base max-w-xl mx-auto mb-6">{t('cust.reviewsText')}</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
+          <a href="https://g.page/r/CfOazVSRGsdHEBM/review" target="_blank" rel="noopener noreferrer"
             className="btn-gold inline-flex items-center gap-2">
             <Star size={16} /> {t('cust.reviewOnGoogle')}
           </a>
