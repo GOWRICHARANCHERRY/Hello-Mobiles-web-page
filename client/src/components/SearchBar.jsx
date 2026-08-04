@@ -67,7 +67,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query || query.trim().length < 1) {
       setSuggestions({ products: [], brands: [], categories: [] });
-      setShowDropdown(false);
+      if (!isFocused || recent.length === 0) setShowDropdown(false);
       setLoading(false);
       return;
     }
@@ -128,7 +128,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
   const handleClear = () => {
     setQuery('');
     setSuggestions({ products: [], brands: [], categories: [] });
-    setShowDropdown(false);
+    setShowDropdown(recent.length > 0);
     if (onSearch) onSearch('');
     inputRef.current?.focus();
   };
@@ -183,7 +183,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
         <div className={`absolute z-50 top-full left-0 right-0 mt-2 bg-white ${isLarge ? 'rounded-2xl' : 'rounded-xl'} shadow-2xl overflow-hidden max-h-[70vh] overflow-y-auto border border-gray-100`}>
           {!query && recent.length > 0 && (
             <>
-              <div className="px-4 py-2 bg-purple-50 text-xs font-semibold text-purple-700 flex items-center gap-1.5 border-b border-purple-100">
+              <div className="px-4 py-2 bg-gold-50 text-xs font-semibold text-gold-700 flex items-center gap-1.5 border-b border-gold-100">
                 <Clock size={12} /> {t('comp.recentSearches')}
                 <button type="button" onClick={clearRecent}
                   className="ml-auto text-[11px] font-medium text-gray-400 hover:text-red-500 flex items-center gap-1 transition normal-case">
@@ -192,8 +192,8 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
               </div>
               {recent.map(term => (
                 <button key={term} onClick={() => handleSuggestionSearch(term)}
-                  className="w-full px-4 py-2.5 flex items-center gap-2.5 hover:bg-purple-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-purple-100">
-                  <Clock size={14} className="text-purple-400 flex-shrink-0" />
+                  className="w-full px-4 py-2.5 flex items-center gap-2.5 hover:bg-gold-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-gold-100">
+                  <Clock size={14} className="text-gold-500 flex-shrink-0" />
                   <span className="text-sm text-gray-700 font-medium truncate">{term}</span>
                   <span className="text-xs text-gray-400 ml-auto flex-shrink-0">{t('comp.viewAll')}</span>
                 </button>
