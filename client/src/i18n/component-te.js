@@ -101,6 +101,8 @@ export default {
   'comp.brands': 'బ్రాండ్లు',
   'comp.viewAll': 'అన్నీ చూడండి →',
   'comp.searchAllResultsFor': '"{query}" కోసం అన్ని ఫలితాలను వెతకండి',
+  'comp.recentSearches': 'ఇటీవలి శోధనలు',
+  'comp.clearAll': 'అన్నీ క్లియర్ చేయండి',
   // HeroCarousel
   'comp.slide1Subtitle': 'టైటానియం. చాలా బలమైనది. చాలా తేలికైనది. చాలా ప్రో.',
   'comp.slide1Offer': 'ఎక్స్ఛేంజ్ ఆఫర్ ₹65,000 వరకు',

@@ -101,6 +101,8 @@ export default {
   'comp.brands': 'ब्रांड',
   'comp.viewAll': 'सभी देखें →',
   'comp.searchAllResultsFor': '"{query}" के सभी परिणाम खोजें',
+  'comp.recentSearches': 'हाल की खोजें',
+  'comp.clearAll': 'सभी हटाएँ',
   // HeroCarousel
   'comp.slide1Subtitle': 'टाइटेनियम। इतना मजबूत। इतना हल्का। इतना प्रो।',
   'comp.slide1Offer': 'एक्सचेंज ऑफर ₹65,000 तक',

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
-import { Search, X, Package, Tag, Folder } from 'lucide-react';
+import { Search, X, Package, Tag, Folder, Clock, Trash2 } from 'lucide-react';
 
 export default function SearchBar({ placeholder, className = '', autoFocus = false, initialValue = '', onSearch, size = 'normal' }) {
   const navigate = useNavigate();
@@ -16,6 +16,10 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
   const inputRef = useRef(null);
   const debounceRef = useRef(null);
   const fetchIdRef = useRef(0);
+  const RECENT_KEY = 'hm_recent_searches';
+  const [recent, setRecent] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch { return []; }
+  });
 
   const isLarge = size === 'large';
 
@@ -71,9 +75,25 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, fetchSuggestions]);
 
+  const saveRecent = (term) => {
+    const q = term.trim();
+    if (!q) return;
+    setRecent(prev => {
+      const next = [q, ...prev.filter(x => x.toLowerCase() !== q.toLowerCase())].slice(0, 8);
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  const clearRecent = () => {
+    setRecent([]);
+    try { localStorage.removeItem(RECENT_KEY); } catch {}
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
+      saveRecent(query);
       setShowDropdown(false);
       if (onSearch) onSearch(query.trim());
       else navigate(`/products?search=${encodeURIComponent(query.trim())}`);
@@ -99,6 +119,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
   };
 
   const handleSuggestionSearch = (term) => {
+    saveRecent(term);
     setShowDropdown(false);
     if (onSearch) onSearch(term);
     else navigate(`/products?search=${encodeURIComponent(term)}`);
@@ -113,7 +134,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
   };
 
   const hasResults = suggestions.products.length > 0 || suggestions.brands.length > 0 || suggestions.categories.length > 0;
-  const showSuggestions = showDropdown && isFocused && (query || loading);
+  const showSuggestions = showDropdown && isFocused && (query || loading || recent.length > 0);
 
   const getHighlight = (text, q) => {
     if (!q) return text;
@@ -134,7 +155,11 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            onFocus={() => { setIsFocused(true); if (query && hasResults) setShowDropdown(true); }}
+            onFocus={() => {
+              setIsFocused(true);
+              if (!query && recent.length > 0) setShowDropdown(true);
+              else if (query && hasResults) setShowDropdown(true);
+            }}
             placeholder={placeholder || t('comp.searchProducts')}
             autoFocus={autoFocus}
             className={`w-full ${isLarge ? 'pl-12 pr-10 py-4 text-base' : 'pl-10 pr-10 py-2.5 text-sm'} bg-white outline-none ${isLarge ? 'rounded-l-2xl' : 'rounded-l-xl'}`}
@@ -156,6 +181,26 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
       {/* Suggestions Dropdown */}
       {showSuggestions && (
         <div className={`absolute z-50 top-full left-0 right-0 mt-2 bg-white ${isLarge ? 'rounded-2xl' : 'rounded-xl'} shadow-2xl overflow-hidden max-h-[70vh] overflow-y-auto border border-gray-100`}>
+          {!query && recent.length > 0 && (
+            <>
+              <div className="px-4 py-2 bg-purple-50 text-xs font-semibold text-purple-700 flex items-center gap-1.5 border-b border-purple-100">
+                <Clock size={12} /> {t('comp.recentSearches')}
+                <button type="button" onClick={clearRecent}
+                  className="ml-auto text-[11px] font-medium text-gray-400 hover:text-red-500 flex items-center gap-1 transition normal-case">
+                  <Trash2 size={11} /> {t('comp.clearAll')}
+                </button>
+              </div>
+              {recent.map(term => (
+                <button key={term} onClick={() => handleSuggestionSearch(term)}
+                  className="w-full px-4 py-2.5 flex items-center gap-2.5 hover:bg-purple-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-purple-100">
+                  <Clock size={14} className="text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 font-medium truncate">{term}</span>
+                  <span className="text-xs text-gray-400 ml-auto flex-shrink-0">{t('comp.viewAll')}</span>
+                </button>
+              ))}
+            </>
+          )}
+
           {loading && (
               <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-gold-500 border-t-transparent"></div>

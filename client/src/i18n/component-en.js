@@ -101,6 +101,8 @@ export default {
   'comp.brands': 'Brands',
   'comp.viewAll': 'View all →',
   'comp.searchAllResultsFor': 'Search all results for "{query}"',
+  'comp.recentSearches': 'Recent Searches',
+  'comp.clearAll': 'Clear all',
   // HeroCarousel
   'comp.slide1Subtitle': 'Titanium. So strong. So light. So Pro.',
   'comp.slide1Offer': 'Exchange Offer Upto ₹65,000',
