@@ -75,7 +75,7 @@ export default function Cart() {
           <div className="gold-gradient px-6 py-4 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-white">{t('cust.orderSummary')}</h2>
-              <p className="text-white/80 text-xs mt-0.5">{cart.length} {t('cust.itemsInCart')}</p>
+              <p className="text-white/80 text-xs mt-0.5">{t('cust.itemsInCart', { count: cart.length })}</p>
             </div>
             <div className="bg-white/20 rounded-xl p-2.5"><ShoppingBag size={20} className="text-white" /></div>
           </div>

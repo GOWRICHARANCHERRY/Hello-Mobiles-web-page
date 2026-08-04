@@ -311,7 +311,7 @@ export default function ProductList() {
                       ) : null}
                     </div>
                     {product.variants?.length > 1 && (
-                      <p className="text-xs text-gray-500 mt-1">{product.variants.length} {t('cust.variantsAvailable')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{t('cust.variantsAvailable', { count: product.variants.length })}</p>
                     )}
                     {product.ratings > 0 && (
                       <div className="flex items-center gap-1 mt-1">
