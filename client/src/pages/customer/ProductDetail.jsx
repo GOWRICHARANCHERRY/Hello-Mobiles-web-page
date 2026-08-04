@@ -314,7 +314,7 @@ export default function ProductDetail() {
             {/* RAM Selector */}
             {ramOptions.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">RAM: <span className="text-gold-600">{selectedRam || 'Select'}</span></p>
+                <p className="text-sm font-medium text-gray-700 mb-2">RAM: <span className="text-gold-700">{selectedRam || 'Select'}</span></p>
                 <div className="flex flex-wrap gap-2">
                   {ramOptions.map(ram => {
                     const isActive = normalize(selectedRam) === normalize(ram);
@@ -332,7 +332,7 @@ export default function ProductDetail() {
             {/* Storage Selector */}
             {storageOptions.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Storage: <span className="text-gold-600">{selectedStorage || 'Select'}</span></p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Storage: <span className="text-gold-700">{selectedStorage || 'Select'}</span></p>
                 <div className="flex flex-wrap gap-2">
                   {storageOptions.map(storage => {
                     const isActive = normalize(selectedStorage) === normalize(storage);
@@ -350,7 +350,7 @@ export default function ProductDetail() {
             {/* Color Selector */}
             {variantColors.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Color: <span className="text-gold-600">{selectedColorName || 'Select'}</span></p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Color: <span className="text-gold-700">{selectedColorName || 'Select'}</span></p>
                 <div className="flex flex-wrap gap-2">
                   {variantColors.map(c => {
                     const hex = getColorHex(c.name);
@@ -440,7 +440,7 @@ export default function ProductDetail() {
                 { icon: RotateCcw, label: 'Easy Returns' },
               ].map((f, i) => (
                 <div key={i} className="text-center p-3 bg-gold-50 rounded-xl">
-                  <f.icon size={20} className="mx-auto text-gold-600 mb-1" />
+                  <f.icon size={20} className="mx-auto text-gold-700 mb-1" />
                   <p className="text-xs font-medium text-gray-700">{f.label}</p>
                 </div>
               ))}
@@ -471,7 +471,7 @@ export default function ProductDetail() {
                       <tr key={i} className="border-t hover:bg-gold-50/50 transition">
                         <td className="py-2 px-3">{v.ram || '-'}</td>
                         <td className="py-2 px-3">{v.storage || '-'}</td>
-                        <td className="py-2 px-3 font-semibold text-gold-600">₹{v.price?.toLocaleString()}</td>
+                        <td className="py-2 px-3 font-semibold text-gold-700">₹{v.price?.toLocaleString()}</td>
                         <td className="py-2 px-3 text-gray-500 line-through">₹{v.mrp?.toLocaleString()}</td>
                         <td className="py-2 px-3">
                           <div className="flex flex-wrap gap-1">

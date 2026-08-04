@@ -151,7 +151,7 @@ export default function ProductList() {
                 {activeCount > 0 && (
                   <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">{activeCount} {t('cust.active')}</span>
                 )}
-                <button onClick={clearFilters} className="text-sm text-gold-600 hover:underline font-medium">{t('cust.clearAll')}</button>
+                <button onClick={clearFilters} className="text-sm text-gold-700 hover:underline font-medium">{t('cust.clearAll')}</button>
                 {showFilters && <button onClick={() => setShowFilters(false)} aria-label="Close filters" className="lg:hidden p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>}
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function ProductList() {
                     <label key={cat} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
                       <input type="radio" name="category" checked={filters.category === cat}
                         onChange={() => handleFilterChange('category', filters.category === cat ? '' : cat)}
-                        className="text-gold-600 w-4 h-4" />
+                        className="text-gold-700 w-4 h-4" />
                       <span className="text-sm">{cat}</span>
                     </label>
                   ))}
@@ -176,7 +176,7 @@ export default function ProductList() {
                     <label key={brand} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
                       <input type="radio" name="brand" checked={filters.brand === brand}
                         onChange={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)}
-                        className="text-gold-600 w-4 h-4" />
+                        className="text-gold-700 w-4 h-4" />
                       <span className="text-sm">{brand}</span>
                     </label>
                   ))}
@@ -200,7 +200,7 @@ export default function ProductList() {
                         <label key={ram} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
                           <input type="radio" name="ram" checked={filters.ram === ram}
                             onChange={() => handleFilterChange('ram', filters.ram === ram ? '' : ram)}
-                            className="text-gold-600 w-4 h-4" />
+                            className="text-gold-700 w-4 h-4" />
                           <span className="text-sm">{ram}</span>
                         </label>
                       ))}
@@ -213,7 +213,7 @@ export default function ProductList() {
                         <label key={storage} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
                           <input type="radio" name="storage" checked={filters.storage === storage}
                             onChange={() => handleFilterChange('storage', filters.storage === storage ? '' : storage)}
-                            className="text-gold-600 w-4 h-4" />
+                            className="text-gold-700 w-4 h-4" />
                           <span className="text-sm">{storage}</span>
                         </label>
                       ))}
@@ -226,7 +226,7 @@ export default function ProductList() {
                         <label key={size} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
                           <input type="radio" name="screenSize" checked={filters.screenSize === size}
                             onChange={() => handleFilterChange('screenSize', filters.screenSize === size ? '' : size)}
-                            className="text-gold-600 w-4 h-4" />
+                            className="text-gold-700 w-4 h-4" />
                           <span className="text-sm">{size}</span>
                         </label>
                       ))}
@@ -294,7 +294,7 @@ export default function ProductList() {
                     {product.stock <= 0 && !product.variants?.length && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">{t('cust.outOfStock')}</span>}
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-gold-600 font-medium">{product.brand}</p>
+                    <p className="text-xs text-gold-700 font-medium">{product.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
                       <span className="text-lg font-bold gold-text">

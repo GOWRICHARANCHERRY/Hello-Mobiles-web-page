@@ -164,7 +164,7 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="section-title">{t('cust.shopByCategory')}</h2>
-          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
+          <Link to="/products" className="text-gold-700 text-sm flex items-center gap-1 hover:text-gold-800 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
           {categories.map((cat, i) => (
@@ -183,7 +183,7 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="section-title">{t('cust.featuredBrands')}</h2>
-          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
+          <Link to="/products" className="text-gold-700 text-sm flex items-center gap-1 hover:text-gold-800 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-4">
           {brands.map((brand, i) => (
@@ -209,7 +209,7 @@ export default function Home() {
             <h2 className="section-title flex items-center gap-2">
               <Gift className="text-gold-500" size={28} /> {t('cust.todaysOffers')}
             </h2>
-            <Link to="/products?onOffer=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
+            <Link to="/products?onOffer=true" className="text-gold-700 text-sm flex items-center gap-1 hover:text-gold-800 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {offerProducts.slice(0, 4).map((product, i) => (
@@ -224,7 +224,7 @@ export default function Home() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title">{t('cust.featuredProducts')}</h2>
-            <Link to="/products?featured=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
+            <Link to="/products?featured=true" className="text-gold-700 text-sm flex items-center gap-1 hover:text-gold-800 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {featuredProducts.slice(0, 4).map((product, i) => (
@@ -239,7 +239,7 @@ export default function Home() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title">{t('cust.newArrivals')}</h2>
-            <Link to="/products?newArrival=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
+            <Link to="/products?newArrival=true" className="text-gold-700 text-sm flex items-center gap-1 hover:text-gold-800 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {newArrivals.slice(0, 4).map((product, i) => (
@@ -316,7 +316,7 @@ export default function Home() {
             <p className="text-gray-600 text-sm">📍 Allur, Andhra Pradesh</p>
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
-            <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
           </a>
@@ -326,7 +326,7 @@ export default function Home() {
             <p className="text-gray-600 text-sm">📍 Buchi, Andhra Pradesh</p>
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
-            <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
           </a>
@@ -364,13 +364,13 @@ function ProductCard({ product, delay = 0 }) {
         {product.isNewArrival && <span className="absolute top-2 right-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md">NEW</span>}
       </div>
       <div className="p-3 sm:p-4">
-        <p className="text-xs text-gold-600 font-semibold">{product.brand}</p>
+        <p className="text-xs text-gold-700 font-semibold">{product.brand}</p>
         <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5 sm:mt-2">
           <span className="text-base sm:text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
           {product.mrp > product.price && <span className="text-xs sm:text-sm text-gray-500 line-through">₹{product.mrp.toLocaleString()}</span>}
         </div>
-        {product.emiAvailable && <p className="text-xs text-gold-600 mt-1 font-medium">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
+        {product.emiAvailable && <p className="text-xs text-gold-700 mt-1 font-medium">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
         {product.ratings > 0 && (
           <div className="flex items-center gap-1 mt-2">
             <Star size={12} className="fill-gold-400 text-gold-400" />

@@ -162,7 +162,7 @@ export default function HeroCarousel() {
 
           {slide.image && (
             <div className="w-1/4 sm:w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-2 sm:p-4 md:p-8 animate-float">
-              <img src={slide.image} alt="" className="animate-zoom-in max-h-24 sm:max-h-36 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
+              <img src={slide.image} alt="" fetchPriority="high" className="animate-zoom-in max-h-24 sm:max-h-36 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
                 style={{ boxShadow: '0 25px 60px rgba(0,0,0,0.45), 0 0 40px rgba(212,160,23,0.25)' }} />
             </div>
           )}

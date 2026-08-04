@@ -1,0 +1,27 @@
+# Hello Mobiles
+
+Hello Mobiles is a mobile phone and electronics store in Visakhapatnam (Alluri and Buchi), Andhra Pradesh, India. We sell smartphones, laptops, TVs, headphones, smartwatches, speakers, cameras, gaming consoles, PC accessories, networking equipment, home appliances, and furniture with EMI options and home delivery.
+
+## Business Info
+
+- Name: Hello Mobiles & Electronics
+- Phone: +91 88868 88128
+- Email: svlnmobiles12@gmail.com
+- Hours: 10:00 AM - 9:00 PM daily
+- Location: Allur and Buchi, Visakhapatnam, Andhra Pradesh, India
+
+## Key Pages
+
+- [Home](https://hello-mobiles.com/): Shop all categories
+- [All Products](https://hello-mobiles.com/products): Browse the full catalog
+- [Mobiles](https://hello-mobiles.com/products?category=Mobiles): Smartphones with EMI
+- [Electronics](https://hello-mobiles.com/products?category=Electronics): TVs, laptops, audio, gaming
+- [About Us](https://hello-mobiles.com/about)
+- [Terms & Conditions](https://hello-mobiles.com/terms-and-conditions)
+
+## Features
+
+- EMI options via Bajaj Finserv, TVS Credit, and Chola Finance
+- Exchange your old phone for a new one
+- WhatsApp order support: https://wa.me/918886888128
+- Home delivery in Visakhapatnam
