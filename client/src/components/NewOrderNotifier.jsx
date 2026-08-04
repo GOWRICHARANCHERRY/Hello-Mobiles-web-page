@@ -34,14 +34,23 @@ export default function NewOrderNotifier() {
   const toastIdRef = useRef(null);
   const lastIdRef = useRef(null);
 
+  const getAudioCtx = () => {
+    if (!audioCtxRef.current) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      try {
+        audioCtxRef.current = new Ctx();
+      } catch (e) {
+        return null;
+      }
+    }
+    return audioCtxRef.current;
+  };
+
   const stopAlarm = () => {
     if (alarmIntervalRef.current) {
       clearInterval(alarmIntervalRef.current);
       alarmIntervalRef.current = null;
-    }
-    if (audioCtxRef.current) {
-      audioCtxRef.current.close().catch(() => {});
-      audioCtxRef.current = null;
     }
     if (toastIdRef.current) {
       toast.dismiss(toastIdRef.current);
@@ -57,6 +66,18 @@ export default function NewOrderNotifier() {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {});
     }
+
+    // Mobile browsers block Web Audio (and vibration) until the page has had a
+    // user gesture. Prime + resume the AudioContext on the first tap/key and
+    // whenever the tab becomes visible, so the alarm can actually ring when a
+    // new order arrives — even if the context wasn't created inside a gesture.
+    const unlockAudio = () => {
+      const ctx = getAudioCtx();
+      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+    };
+    const gestureEvents = ['pointerdown', 'touchstart', 'click', 'keydown'];
+    gestureEvents.forEach(evt => document.addEventListener(evt, unlockAudio, true));
+    document.addEventListener('visibilitychange', unlockAudio);
 
     let active = true;
 
@@ -111,18 +132,26 @@ export default function NewOrderNotifier() {
             { duration: Infinity, position: 'top-right' }
           );
 
+          // Ring the alarm (audio when allowed, vibration as a mobile fallback)
           try {
-            if (!audioCtxRef.current) {
-              audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = getAudioCtx();
+            if (ctx) {
+              if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
+              if (ctx.state === 'running') {
+                playAlarmCycle(ctx);
+                alarmIntervalRef.current = setInterval(() => {
+                  const c = audioCtxRef.current;
+                  if (c && c.state === 'running') playAlarmCycle(c);
+                }, 2600);
+              }
             }
-            const ctx = audioCtxRef.current;
-            if (ctx.state === 'suspended') await ctx.resume();
-            playAlarmCycle(ctx);
-            alarmIntervalRef.current = setInterval(() => {
-              if (audioCtxRef.current) playAlarmCycle(audioCtxRef.current);
-            }, 2600);
           } catch (e) {
             console.warn('[NewOrderNotifier] audio unavailable:', e);
+          }
+          try {
+            if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500, 300, 500]);
+          } catch (e) {
+            // vibration unsupported
           }
         }
       } catch (e) {
@@ -136,6 +165,12 @@ export default function NewOrderNotifier() {
       active = false;
       clearInterval(poll);
       stopAlarm();
+      gestureEvents.forEach(evt => document.removeEventListener(evt, unlockAudio, true));
+      document.removeEventListener('visibilitychange', unlockAudio);
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
     };
   }, [user, t]);
 
