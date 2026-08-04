@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Home, Search, ShoppingCart, User, Heart, Menu, X, LogOut, Calculator, RotateCcw, LogIn, Mail, Instagram, CreditCard, Package, MapPin, Ticket, HelpCircle, Globe, ChevronDown, Settings } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import LoginPopup from '../../components/LoginPopup';
@@ -13,6 +14,7 @@ const BAJAJ_CHECK_LIMIT_URL = 'https://www.bajajfinserv.in/qr-code-rural-web-pag
 export default function CustomerLayout() {
   const { user, logout } = useAuth();
   const { cartCount, clearGuestCart } = useCart();
+  const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -24,14 +26,14 @@ export default function CustomerLayout() {
 
   const handleNewsletter = async (e) => {
     e.preventDefault();
-    if (!newsletterEmail.trim() || !newsletterEmail.includes('@')) return toast.error('Please enter a valid email');
+    if (!newsletterEmail.trim() || !newsletterEmail.includes('@')) return toast.error(t('comp.invalidEmail'));
     setNewsletterLoading(true);
     try {
       await api.post('/leads', { email: newsletterEmail.trim(), name: '', message: '', source: 'newsletter' });
       setNewsletterEmail('');
-      toast.success('Subscribed! We will get back to you soon.');
+      toast.success(t('comp.subscribed'));
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to subscribe');
+      toast.error(error.response?.data?.message || t('comp.subscribeFailed'));
     }
     setNewsletterLoading(false);
   };
@@ -49,13 +51,13 @@ export default function CustomerLayout() {
   }, []);
 
   const navLinks = [
-    { to: '/', label: 'Home', icon: Home },
-    { to: '/products', label: 'Products', icon: Search },
-    { to: '/wishlist', label: 'Wishlist', icon: Heart, requiresAuth: true },
-    { to: '/cart', label: 'Cart', icon: ShoppingCart, badge: user ? cartCount : 0, requiresAuth: true },
-    { to: '/emi-calculator', label: 'EMI Calc', icon: Calculator, requiresAuth: true },
-    { to: '/exchange-calculator', label: 'Exchange', icon: RotateCcw, requiresAuth: true },
-    { href: BAJAJ_CHECK_LIMIT_URL, label: 'Check Limit', icon: CreditCard },
+    { to: '/', label: t('comp.navHome'), icon: Home },
+    { to: '/products', label: t('comp.navProducts'), icon: Search },
+    { to: '/wishlist', label: t('comp.navWishlist'), icon: Heart, requiresAuth: true },
+    { to: '/cart', label: t('comp.navCart'), icon: ShoppingCart, badge: user ? cartCount : 0, requiresAuth: true },
+    { to: '/emi-calculator', label: t('comp.navEmiCalc'), icon: Calculator, requiresAuth: true },
+    { to: '/exchange-calculator', label: t('comp.navExchange'), icon: RotateCcw, requiresAuth: true },
+    { href: BAJAJ_CHECK_LIMIT_URL, label: t('comp.navCheckLimit'), icon: CreditCard },
   ];
 
   return (
@@ -67,11 +69,11 @@ export default function CustomerLayout() {
             <img src="/logo.png" alt="Hello Mobiles" className="w-10 h-10 rounded-xl shadow-md group-hover:scale-110 transition-transform object-contain" />
             <div className="text-center">
               <h1 className="text-lg font-bold gold-text leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
-              <p className="hidden sm:block text-[10px] text-gray-500 whitespace-nowrap">Mobiles | Electronics | Furniture | Home Appliances</p>
+              <p className="hidden sm:block text-[10px] text-gray-500 whitespace-nowrap">{t('comp.headerTagline')}</p>
             </div>
           </Link>
 
-          <SearchBar placeholder="Search products..." className="hidden md:flex flex-1 max-w-xl mx-8" />
+          <SearchBar placeholder={t('comp.searchProducts')} className="hidden md:flex flex-1 max-w-xl mx-8" />
 
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map(link => {
@@ -127,8 +129,8 @@ export default function CustomerLayout() {
                         <Package size={16} className="text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">Orders</p>
-                        <p className="text-xs text-gray-500">Track your orders</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.orders')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.trackOrders')}</p>
                       </div>
                     </Link>
 
@@ -138,8 +140,8 @@ export default function CustomerLayout() {
                         <User size={16} className="text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">Personal Details</p>
-                        <p className="text-xs text-gray-500">Name, Email, Phone Number</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.personalDetails')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.personalDetailsSub')}</p>
                       </div>
                     </Link>
 
@@ -149,8 +151,8 @@ export default function CustomerLayout() {
                         <MapPin size={16} className="text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">Saved Address</p>
-                        <p className="text-xs text-gray-500">Manage delivery addresses</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.savedAddress')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.manageAddresses')}</p>
                       </div>
                     </Link>
 
@@ -160,8 +162,8 @@ export default function CustomerLayout() {
                         <Ticket size={16} className="text-orange-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">My Coupons</p>
-                        <p className="text-xs text-gray-500">Manage coupons for additional discounts</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.myCoupons')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.manageCoupons')}</p>
                       </div>
                     </Link>
 
@@ -171,8 +173,8 @@ export default function CustomerLayout() {
                         <HelpCircle size={16} className="text-pink-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">Help and Support</p>
-                        <p className="text-xs text-gray-500">Get assistance with your orders</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.helpSupport')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.helpSupportSub')}</p>
                       </div>
                     </Link>
 
@@ -182,15 +184,15 @@ export default function CustomerLayout() {
                         <Globe size={16} className="text-gray-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">Preferred Language</p>
-                        <p className="text-xs text-gray-500">English</p>
+                        <p className="text-sm font-semibold text-gray-800">{t('comp.preferredLanguage')}</p>
+                        <p className="text-xs text-gray-500">{t('comp.langName')}</p>
                       </div>
                     </Link>
 
                     <div className="border-t border-gray-100 mt-1 pt-1">
                       <button onClick={() => { setProfileOpen(false); logout(); }}
                         className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-50 transition text-left text-red-600">
-                        <LogOut size={16} /> <span className="text-sm font-semibold">Logout</span>
+                        <LogOut size={16} /> <span className="text-sm font-semibold">{t('comp.logout')}</span>
                       </button>
                     </div>
                   </div>
@@ -199,7 +201,7 @@ export default function CustomerLayout() {
             ) : (
               <button onClick={() => setShowLoginPopup(true)}
                 className="gold-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:opacity-90 transition shadow-md">
-                <LogIn size={16} /> Login
+                <LogIn size={16} /> {t('comp.login')}
               </button>
             )}
           </div>
@@ -211,7 +213,7 @@ export default function CustomerLayout() {
 
         {/* Mobile Search */}
         <div className="md:hidden px-4 pb-3">
-          <SearchBar placeholder="Search products..." />
+          <SearchBar placeholder={t('comp.searchProducts')} />
         </div>
       </header>
 
@@ -247,17 +249,17 @@ export default function CustomerLayout() {
           })}
           {user ? (
             <>
-              <Link to="/profile?tab=orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><Package size={18} /> My Orders</Link>
-              <Link to="/profile?tab=personal" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><User size={18} /> Personal Details</Link>
-              <Link to="/profile?tab=address" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><MapPin size={18} /> Saved Address</Link>
-              <Link to="/profile?tab=coupons" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><Ticket size={18} /> My Coupons</Link>
-              <Link to="/profile?tab=help" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><HelpCircle size={18} /> Help and Support</Link>
-              <Link to="/profile?tab=language" onClick={() => setMenuOpen(false)} className="px-6 py-3 text-gray-500 text-sm flex items-center gap-3 hover:bg-gold-50"><Globe size={18} /> Language: English</Link>
+              <Link to="/profile?tab=orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><Package size={18} /> {t('comp.myOrders')}</Link>
+              <Link to="/profile?tab=personal" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><User size={18} /> {t('comp.personalDetails')}</Link>
+              <Link to="/profile?tab=address" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><MapPin size={18} /> {t('comp.savedAddress')}</Link>
+              <Link to="/profile?tab=coupons" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><Ticket size={18} /> {t('comp.myCoupons')}</Link>
+              <Link to="/profile?tab=help" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gold-50"><HelpCircle size={18} /> {t('comp.helpSupport')}</Link>
+              <Link to="/profile?tab=language" onClick={() => setMenuOpen(false)} className="px-6 py-3 text-gray-500 text-sm flex items-center gap-3 hover:bg-gold-50"><Globe size={18} /> {t('comp.languagePref', { langName: t('comp.langName') })}</Link>
               <div className="border-t border-gray-200"></div>
-              <button onClick={() => { logout(); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-red-500 w-full hover:bg-red-50"><LogOut size={18} /> Logout</button>
+              <button onClick={() => { logout(); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-red-500 w-full hover:bg-red-50"><LogOut size={18} /> {t('comp.logout')}</button>
             </>
           ) : (
-            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-600 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> Login</button>
+            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-600 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> {t('comp.login')}</button>
           )}
         </div>
       )}
@@ -276,17 +278,17 @@ export default function CustomerLayout() {
             <div className="flex items-center gap-3">
               <Mail className="w-8 h-8 text-gold-500 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-bold text-white">Get the latest offers</h3>
-                <p className="text-sm text-gray-400">Subscribe for exclusive deals, new arrivals & festive discounts</p>
+                <h3 className="text-lg font-bold text-white">{t('comp.latestOffers')}</h3>
+                <p className="text-sm text-gray-400">{t('comp.newsletterSub')}</p>
               </div>
             </div>
             <form onSubmit={handleNewsletter} className="flex w-full md:w-auto gap-2">
               <input type="email" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('comp.enterEmail')}
                 className="flex-1 md:w-72 bg-gray-900 border border-gray-700 text-white text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-gold-500 outline-none placeholder-gray-500" />
               <button type="submit" disabled={newsletterLoading}
                 className="bg-gradient-to-r from-gold-500 to-gold-600 text-white font-semibold text-sm px-5 py-3 rounded-xl hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 flex-shrink-0">
-                {newsletterLoading ? 'Subscribing...' : 'Subscribe'}
+                {newsletterLoading ? t('comp.subscribing') : t('comp.subscribe')}
               </button>
             </form>
           </div>
@@ -301,10 +303,10 @@ export default function CustomerLayout() {
                 <img src="/logo.png" alt="Hello Mobiles" className="w-12 h-12 rounded-xl shadow-lg object-contain border-2 border-gold-500/30" />
                 <div>
                   <h3 className="text-xl font-bold gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h3>
-                  <p className="text-[11px] text-gold-500/70 tracking-wider">MOBILES | TVS | ELECTRONICS</p>
+                  <p className="text-[11px] text-gold-500/70 tracking-wider">{t('comp.footerBrandTagline')}</p>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-5 max-w-sm">Your trusted destination for mobiles, TVs, electronics, furniture, and home appliances. Best prices, easy EMI options, and exciting exchange offers.</p>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5 max-w-sm">{t('comp.aboutDescription')}</p>
               <div className="flex items-center gap-3">
                 <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-500 hover:text-white hover:scale-110 transition-all duration-300">
@@ -331,44 +333,44 @@ export default function CustomerLayout() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Quick Links</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.quickLinks')}</h4>
               <ul className="space-y-2.5">
-                <li><Link to="/" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Home</Link></li>
-                <li><Link to="/products" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>All Products</Link></li>
-                <li><Link to="/emi-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>EMI Calculator</Link></li>
-                <li><Link to="/exchange-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Exchange Calculator</Link></li>
-                <li><a href={BAJAJ_CHECK_LIMIT_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Check Bajaj Limit</a></li>
+                <li><Link to="/" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.navHome')}</Link></li>
+                <li><Link to="/products" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.allProducts')}</Link></li>
+                <li><Link to="/emi-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.emiCalculator')}</Link></li>
+                <li><Link to="/exchange-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.exchangeCalculator')}</Link></li>
+                <li><a href={BAJAJ_CHECK_LIMIT_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.checkBajajLimit')}</a></li>
               </ul>
             </div>
 
             {/* Categories */}
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Categories</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.categories')}</h4>
               <ul className="space-y-2.5">
-              <li><Link to="/products?category=Mobiles" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Mobiles</Link></li>
-              <li><Link to="/products?category=Electronics" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Electronics</Link></li>
-              <li><Link to="/products?category=Home%20Appliances" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Home Appliances</Link></li>
-              <li><Link to="/products?category=Furniture" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>Furniture</Link></li>
+              <li><Link to="/products?category=Mobiles" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryMobiles')}</Link></li>
+              <li><Link to="/products?category=Electronics" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryElectronics')}</Link></li>
+              <li><Link to="/products?category=Home%20Appliances" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryHomeAppliances')}</Link></li>
+              <li><Link to="/products?category=Furniture" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryFurniture')}</Link></li>
               </ul>
             </div>
 
             {/* Our Stores */}
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Our Stores</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.ourStores')}</h4>
               <div className="space-y-4">
                 <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer" className="block group">
                   <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    Hello Mobiles — Allur
+                    {t('comp.storeAllur')}
                   </p>
-                  <p className="text-gray-500 text-xs mt-0.5">Allur, Andhra Pradesh</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeAllurSub')}</p>
                 </a>
                 <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer" className="block group">
                   <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    Hello Mobiles — Buchi
+                    {t('comp.storeBuchi')}
                   </p>
-                  <p className="text-gray-500 text-xs mt-0.5">Buchi, Andhra Pradesh</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
                 </a>
                 <div className="pt-2 space-y-1.5 text-sm text-gray-400">
                   <p className="flex items-center gap-2">📞 <span>+91 88868 88128</span></p>
@@ -385,10 +387,10 @@ export default function CustomerLayout() {
           <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500">&copy; 2024 Hello Mobiles & Electronics. All rights reserved.</p>
             <div className="flex items-center gap-6 text-sm text-gray-500 flex-wrap justify-center">
-              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">Terms & Conditions</Link>
-              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">Privacy Policy</Link>
-              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">Returns & Refunds</Link>
-              <Link to="/about" className="hover:text-gold-400 transition">About Us</Link>
+              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">{t('comp.termsConditions')}</Link>
+              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">{t('comp.privacyPolicy')}</Link>
+              <Link to="/terms-and-conditions" className="hover:text-gold-400 transition">{t('comp.returnsRefunds')}</Link>
+              <Link to="/about" className="hover:text-gold-400 transition">{t('comp.aboutUs')}</Link>
             </div>
           </div>
         </div>

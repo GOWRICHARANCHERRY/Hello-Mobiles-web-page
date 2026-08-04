@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
 const fallbackSlides = [
@@ -41,6 +42,7 @@ export default function HeroCarousel() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.get('/banners')
@@ -51,6 +53,39 @@ export default function HeroCarousel() {
       .catch(() => {});
   }, []);
 
+  const translatedFallbackSlides = [
+    {
+      _id: '1',
+      title: 'iPhone 15 Pro Max',
+      subtitle: t('comp.slide1Subtitle'),
+      offer: t('comp.slide1Offer'),
+      bg: 'from-gray-900 via-gray-800 to-black',
+      accent: 'from-gold-400 to-gold-600',
+      cta: t('comp.shopNow'),
+      link: '/products',
+    },
+    {
+      _id: '2',
+      title: 'Samsung Galaxy S24 Ultra',
+      subtitle: t('comp.slide2Subtitle'),
+      offer: t('comp.slide2Offer'),
+      bg: 'from-blue-900 via-blue-800 to-indigo-900',
+      accent: 'from-blue-400 to-cyan-400',
+      cta: t('comp.buyNow'),
+      link: '/products?brand=Samsung',
+    },
+    {
+      _id: '3',
+      title: t('comp.slide3Title'),
+      subtitle: t('comp.slide3Subtitle'),
+      offer: t('comp.slide3Offer'),
+      bg: 'from-red-900 via-rose-800 to-pink-900',
+      accent: 'from-red-400 to-orange-400',
+      cta: t('comp.exploreDeals'),
+      link: '/products?onOffer=true',
+    },
+  ];
+
   const slides = banners.length > 0
     ? banners.map(b => ({
         ...b,
@@ -59,7 +94,7 @@ export default function HeroCarousel() {
         offer: b.highlightedText,
         link: b.link || (b.product ? `/products/${b.product._id}` : '#'),
       }))
-    : fallbackSlides;
+    : translatedFallbackSlides;
 
   const next = useCallback(() => {
     setCurrent(prev => (prev + 1) % slides.length);
@@ -120,7 +155,7 @@ export default function HeroCarousel() {
               <button onClick={() => navigate(slide.link || `/products/${slide.product._id}`)}
                 className="inline-block animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-8 rounded-xl text-sm sm:text-lg shadow-lg hover:shadow-[0_0_30px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300"
                 style={{ animationDelay: '0.3s' }}>
-                {slide.buttonText || (slide.product ? 'View Product' : 'Shop Now')} →
+                {slide.buttonText || (slide.product ? t('comp.viewProduct') : t('comp.shopNow'))} →
               </button>
             )}
           </div>
@@ -149,7 +184,7 @@ export default function HeroCarousel() {
             <p className="text-sm sm:text-lg md:text-xl text-gray-300 mb-3 sm:mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>{slide.subtitle}</p>
             <Link to={slide.link || '/products'}
               className={`inline-block bg-gradient-to-r ${slide.accent || 'from-gold-400 to-gold-600'} text-white font-bold py-2 px-4 sm:py-3 sm:px-8 rounded-xl text-sm sm:text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
-              Shop Now →
+              {t('comp.shopNow')} →
             </Link>
           </div>
         </div>

@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
@@ -125,8 +126,10 @@ export default function App() {
         <ScrollToTop />
         <AuthProvider>
           <CartProvider>
-            <Toaster position="top-right" />
-            <AppRoutes />
+            <LanguageProvider>
+              <Toaster position="top-right" />
+              <AppRoutes />
+            </LanguageProvider>
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>

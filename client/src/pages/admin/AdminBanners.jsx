@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../utils/api';
+import { useLanguage } from '../../context/LanguageContext';
 import { Plus, Edit2, Trash2, X, Save, Upload, Eye, EyeOff, ChevronUp, ChevronDown, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -9,6 +10,7 @@ const emptyBanner = {
 };
 
 export default function AdminBanners() {
+  const { t } = useLanguage();
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -31,17 +33,17 @@ export default function AdminBanners() {
   };
 
   const uploadImage = async (file) => {
-    if (!file || !file.type.startsWith('image/')) { toast.error('Please select an image'); return; }
-    if (file.size > 10 * 1024 * 1024) { toast.error('Image must be under 10MB'); return; }
+    if (!file || !file.type.startsWith('image/')) { toast.error(t('admin.toastSelectImage')); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error(t('admin.toastImageTooLarge')); return; }
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('images', file);
       const { data } = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(prev => ({ ...prev, image: data.urls[0] }));
-      toast.success('Image uploaded!');
+      toast.success(t('admin.toastImageUploaded'));
     } catch (error) {
-      toast.error('Upload failed');
+      toast.error(t('admin.toastUploadFailed'));
     }
     setUploading(false);
   };
@@ -54,9 +56,9 @@ export default function AdminBanners() {
   };
 
   const handleSave = async () => {
-    if (form.type === 'hero' && !form.image) return toast.error('Banner 1 requires an image');
-    if (form.type === 'text' && !form.bigText && !form.highlightedText) return toast.error('Please add at least some text');
-    if (!form.bigText && !form.highlightedText) return toast.error('Please add at least some text');
+    if (form.type === 'hero' && !form.image) return toast.error(t('admin.toastHeroRequiresImage'));
+    if (form.type === 'text' && !form.bigText && !form.highlightedText) return toast.error(t('admin.toastAddSomeText'));
+    if (!form.bigText && !form.highlightedText) return toast.error(t('admin.toastAddSomeText'));
 
     try {
       const formData = new FormData();
@@ -75,17 +77,17 @@ export default function AdminBanners() {
 
       if (editingId) {
         await api.put(`/banners/${editingId}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        toast.success('Banner updated!');
+        toast.success(t('admin.toastBannerUpdated'));
       } else {
         await api.post('/banners', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        toast.success('Banner created!');
+        toast.success(t('admin.toastBannerCreated'));
       }
       setShowModal(false);
       setEditingId(null);
       setForm(emptyBanner);
       loadBanners();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to save');
+      toast.error(error.response?.data?.message || t('admin.toastFailedSave'));
     }
   };
 
@@ -109,13 +111,13 @@ export default function AdminBanners() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this banner?')) return;
+    if (!confirm(t('admin.confirmDeleteBanner'))) return;
     try {
       await api.delete(`/banners/${id}`);
       setBanners(prev => prev.filter(b => b._id !== id));
-      toast.success('Banner deleted!');
+      toast.success(t('admin.toastBannerDeleted'));
     } catch (error) {
-      toast.error('Failed to delete');
+      toast.error(t('admin.toastFailedDelete'));
     }
   };
 
@@ -124,7 +126,7 @@ export default function AdminBanners() {
       await api.put(`/banners/${id}`, { isActive: !current });
       setBanners(prev => prev.map(b => b._id === id ? { ...b, isActive: !current } : b));
     } catch (error) {
-      toast.error('Failed to update');
+      toast.error(t('admin.toastFailedUpdate'));
     }
   };
 
@@ -145,9 +147,9 @@ export default function AdminBanners() {
     setBanners(reordered);
     try {
       await api.put('/banners/reorder/batch', { order: reordered.map(x => ({ id: x._id, order: x.order })) });
-      toast.success('Banner order updated!');
+      toast.success(t('admin.toastBannerOrderUpdated'));
     } catch (error) {
-      toast.error('Failed to reorder');
+      toast.error(t('admin.toastFailedReorder'));
       loadBanners();
     }
   };
@@ -165,13 +167,13 @@ export default function AdminBanners() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            {activeType === 'hero' ? 'Banner 1 — Image' : 'Banner 2 — Text'} ({list.length})
+            {t(activeType === 'hero' ? 'admin.banner1Image' : 'admin.banner2Text')} ({list.length})
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Manage the hero carousel banners on the home page</p>
+          <p className="text-sm text-gray-500 mt-1">{t('admin.manageBannersDesc')}</p>
         </div>
         <button onClick={openAdd}
           className="bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:from-gold-600 hover:to-gold-700 transition shadow-lg">
-          <Plus size={16} /> Add {activeType === 'hero' ? 'Banner 1' : 'Banner 2'}
+          <Plus size={16} /> {t('admin.addBannerType', { banner: t(activeType === 'hero' ? 'admin.banner1' : 'admin.banner2') })}
         </button>
       </div>
 
@@ -179,12 +181,12 @@ export default function AdminBanners() {
       <div className="flex gap-3 mb-6">
         <button onClick={() => setActiveType('hero')}
           className={`flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 font-medium text-sm transition ${activeType === 'hero' ? 'border-gold-500 bg-gold-50 text-gold-700 shadow' : 'border-gray-200 text-gray-500 hover:border-gold-300'}`}>
-          Banner 1 — Image
+          {t('admin.banner1Image')}
           <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${activeType === 'hero' ? 'bg-gold-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{heroCount}</span>
         </button>
         <button onClick={() => setActiveType('text')}
           className={`flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 font-medium text-sm transition ${activeType === 'text' ? 'border-purple-500 bg-purple-50 text-purple-700 shadow' : 'border-gray-200 text-gray-500 hover:border-purple-300'}`}>
-          Banner 2 — Text
+          {t('admin.banner2Text')}
           <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${activeType === 'text' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{textCount}</span>
         </button>
       </div>
@@ -193,9 +195,9 @@ export default function AdminBanners() {
       {list.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center gold-border">
           <ImageIcon size={48} className="mx-auto text-gold-300 mb-4" />
-          <p className="text-gray-500 text-lg font-medium">No {activeType === 'hero' ? 'Banner 1' : 'Banner 2'} banners yet</p>
-          <p className="text-gray-400 text-sm mt-1">Add your first banner to show on the home page</p>
-          <button onClick={openAdd} className="btn-gold rounded-xl mt-4">Add Banner</button>
+          <p className="text-gray-500 text-lg font-medium">{t('admin.noBannersYet', { banner: t(activeType === 'hero' ? 'admin.banner1' : 'admin.banner2') })}</p>
+          <p className="text-gray-400 text-sm mt-1">{t('admin.firstBannerHint')}</p>
+          <button onClick={openAdd} className="btn-gold rounded-xl mt-4">{t('admin.addBanner')}</button>
         </div>
       ) : (
         <div className="space-y-4">
@@ -228,29 +230,29 @@ export default function AdminBanners() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs text-gray-400">#{index + 1}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${banner.type === 'text' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                        {banner.type === 'text' ? 'Banner 2 · Text' : 'Banner 1 · Image'}
+                        {banner.type === 'text' ? t('admin.banner2TextBadge') : t('admin.banner1ImageBadge')}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${banner.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                        {banner.isActive ? 'Active' : 'Inactive'}
+                        {banner.isActive ? t('admin.active') : t('admin.inactive')}
                       </span>
                     </div>
                     <div className="space-y-1 text-sm">
-                      {banner.highlightedText && <p><span className="text-gray-400">Highlight:</span> <span className="font-medium text-gold-600">{banner.highlightedText}</span></p>}
-                      {banner.bigText && <p><span className="text-gray-400">Big Text:</span> <span className="font-medium">{banner.bigText}</span></p>}
-                      {banner.smallText && <p><span className="text-gray-400">Small Text:</span> {banner.smallText}</p>}
-                      {banner.product && <p><span className="text-gray-400">Links to:</span> <span className="font-medium text-blue-600">{banner.product.name}</span></p>}
-                      {!banner.product && <p className="text-gray-400 text-xs">No product linked</p>}
+                      {banner.highlightedText && <p><span className="text-gray-400">{t('admin.highlightLabel')}</span> <span className="font-medium text-gold-600">{banner.highlightedText}</span></p>}
+                      {banner.bigText && <p><span className="text-gray-400">{t('admin.bigTextLabel')}</span> <span className="font-medium">{banner.bigText}</span></p>}
+                      {banner.smallText && <p><span className="text-gray-400">{t('admin.smallTextLabel')}</span> {banner.smallText}</p>}
+                      {banner.product && <p><span className="text-gray-400">{t('admin.linksToLabel')}</span> <span className="font-medium text-blue-600">{banner.product.name}</span></p>}
+                      {!banner.product && <p className="text-gray-400 text-xs">{t('admin.noProductLinked')}</p>}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-4">
                     <div className="flex flex-col mr-1">
                       <button onClick={() => moveBanner(index, -1)} disabled={index === 0}
-                        title="Move earlier"
+                        title={t('admin.moveEarlier')}
                         className={`p-1 rounded transition ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
                         <ChevronUp size={16} />
                       </button>
                       <button onClick={() => moveBanner(index, 1)} disabled={index === list.length - 1}
-                        title="Move later"
+                        title={t('admin.moveLater')}
                         className={`p-1 rounded transition ${index === list.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-100'}`}>
                         <ChevronDown size={16} />
                       </button>
@@ -278,24 +280,24 @@ export default function AdminBanners() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gold-200 bg-gradient-to-r from-gold-50 to-white sticky top-0 z-10">
-              <h2 className="text-lg font-bold gold-text">{editingId ? 'Edit Banner' : 'Add New Banner'}</h2>
+              <h2 className="text-lg font-bold gold-text">{editingId ? t('admin.editBanner') : t('admin.addNewBanner')}</h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>
             </div>
 
             <div className="p-6 space-y-6">
               {/* Banner Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Banner Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.bannerType')}</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button type="button" onClick={() => setForm({ ...form, type: 'hero' })}
                     className={`p-4 rounded-xl border-2 text-left transition ${form.type === 'hero' ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                    <p className="text-sm font-bold text-gray-800">Banner 1 — Image</p>
-                    <p className="text-xs text-gray-500 mt-1">Background image + text overlay (carousel hero banner)</p>
+                    <p className="text-sm font-bold text-gray-800">{t('admin.banner1Image')}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.heroBannerDesc')}</p>
                   </button>
                   <button type="button" onClick={() => setForm({ ...form, type: 'text' })}
                     className={`p-4 rounded-xl border-2 text-left transition ${form.type === 'text' ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                    <p className="text-sm font-bold text-gray-800">Banner 2 — Text Only</p>
-                    <p className="text-xs text-gray-500 mt-1">Color background + editable text + product link, no image</p>
+                    <p className="text-sm font-bold text-gray-800">{t('admin.banner2TextOnly')}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.textBannerDesc')}</p>
                   </button>
                 </div>
               </div>
@@ -321,13 +323,13 @@ export default function AdminBanners() {
                       {form.highlightedText && <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{form.highlightedText}</p>}
                       {form.bigText && <h2 className="text-3xl font-bold leading-tight">{form.bigText}</h2>}
                       {form.smallText && <p className="text-sm mt-2 opacity-75">{form.smallText}</p>}
-                      {(form.product || form.link) && <span className="inline-block mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold opacity-90" style={{ backgroundColor: form.textColor, color: form.bgColor }}>{form.buttonText || (form.product ? 'View Product' : 'Shop Now')} →</span>}
+                      {(form.product || form.link) && <span className="inline-block mt-3 px-4 py-1.5 rounded-lg text-xs font-semibold opacity-90" style={{ backgroundColor: form.textColor, color: form.bgColor }}>{form.buttonText || (form.product ? t('admin.viewProduct') : t('admin.shopNow'))} →</span>}
                     </div>
                   </div>
                 )}
                 {form.type === 'hero' && !form.image && (
                   <div className="h-56 flex items-center justify-center text-gray-400">
-                    <p className="text-sm">Upload an image to see preview</p>
+                    <p className="text-sm">{t('admin.uploadPreviewHint')}</p>
                   </div>
                 )}
               </div>
@@ -335,7 +337,7 @@ export default function AdminBanners() {
               {/* Image Upload */}
               {form.type === 'hero' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.bannerImageField')}</label>
                 <div
                   onDrop={handleDrop}
                   onDragOver={e => { e.preventDefault(); setDragging(true); }}
@@ -346,12 +348,12 @@ export default function AdminBanners() {
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                     onChange={e => uploadImage(e.target.files[0])} />
                   {uploading ? (
-                    <p className="text-sm text-gold-600 font-medium">Uploading...</p>
+                    <p className="text-sm text-gold-600 font-medium">{t('admin.uploading')}</p>
                   ) : (
                     <>
                       <Upload size={32} className="mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-600">Drag & drop or click to upload banner image</p>
-                      <p className="text-xs text-gray-400 mt-1">Recommended: 1200x500px, JPG/PNG/WebP, max 10MB</p>
+                      <p className="text-sm text-gray-600">{t('admin.uploadHint')}</p>
+                      <p className="text-xs text-gray-400 mt-1">{t('admin.uploadRecommendation')}</p>
                     </>
                   )}
                 </div>
@@ -359,7 +361,7 @@ export default function AdminBanners() {
                   <div className="mt-3 flex items-center gap-3">
                     <img src={form.image} alt="" className="w-20 h-12 rounded-lg object-cover border border-gold-200" />
                     <button onClick={() => setForm(prev => ({ ...prev, image: '' }))}
-                      className="text-red-500 text-xs hover:underline">Remove</button>
+                      className="text-red-500 text-xs hover:underline">{t('admin.remove')}</button>
                   </div>
                 )}
               </div>
@@ -373,7 +375,7 @@ export default function AdminBanners() {
                 return (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Matching Images <span className="font-normal text-gray-400">(from linked product: {matchedProduct.name})</span>
+                      {t('admin.matchingImages')} <span className="font-normal text-gray-400">{t('admin.fromLinkedProduct', { name: matchedProduct.name })}</span>
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {productImages.map((img, i) => (
@@ -383,10 +385,10 @@ export default function AdminBanners() {
                         </button>
                       ))}
                       {form.image && !productImages.includes(form.image) && (
-                        <span className="inline-flex items-center text-xs text-gray-400">Currently using uploaded/custom image</span>
+                        <span className="inline-flex items-center text-xs text-gray-400">{t('admin.currentlyUsingCustom')}</span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">Click an image to use it as the banner image — it matches the product in your text</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('admin.clickImageHint')}</p>
                   </div>
                 );
               })()}
@@ -394,59 +396,59 @@ export default function AdminBanners() {
               {/* Text Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Highlighted Text</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.highlightedTextField')}</label>
                   <input value={form.highlightedText} onChange={e => setForm({ ...form, highlightedText: e.target.value })}
-                    placeholder="e.g. NEW ARRIVAL, LIMITED OFFER"
+                    placeholder={t('admin.placeholderHighlighted')}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
-                  <p className="text-xs text-gray-400 mt-1">Small accent text above the main heading</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('admin.accentTextHint')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Big Text (Heading)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.bigTextField')}</label>
                   <input value={form.bigText} onChange={e => setForm({ ...form, bigText: e.target.value })}
-                    placeholder="e.g. iPhone 15 Pro Max"
+                    placeholder={t('admin.placeholderBigText')}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
-                  <p className="text-xs text-gray-400 mt-1">Main heading text on the banner</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('admin.bigTextHint')}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Small Text (Subheading)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.smallTextField')}</label>
                   <input value={form.smallText} onChange={e => setForm({ ...form, smallText: e.target.value })}
-                    placeholder="e.g. Starting at ₹1,29,999 | Trade-in available"
+                    placeholder={t('admin.placeholderSmallText')}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
-                  <p className="text-xs text-gray-400 mt-1">Subheading or call-to-action text</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('admin.smallTextHint')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Text</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.buttonTextField')}</label>
                   <input value={form.buttonText} onChange={e => setForm({ ...form, buttonText: e.target.value })}
-                    placeholder="e.g. Shop Offers, View Product, Shop Now"
+                    placeholder={t('admin.placeholderButtonText')}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
-                  <p className="text-xs text-gray-400 mt-1">Defaults to "View Product" (if a product is linked) or "Shop Now"</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('admin.buttonTextHint')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Link (URL)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.buttonLinkField')}</label>
                   <input value={form.link} onChange={e => setForm({ ...form, link: e.target.value })}
-                    placeholder="e.g. /products, /products?category=Mobiles"
+                    placeholder={t('admin.placeholderButtonLink')}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
-                  <p className="text-xs text-gray-400 mt-1">Internal path or full URL. If empty, links to the linked product</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('admin.buttonLinkHint')}</p>
                 </div>
               </div>
 
               {/* Product Link */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link to Product (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.linkToProduct')}</label>
                 <select value={form.product} onChange={e => setForm({ ...form, product: e.target.value })}
                   className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50">
-                  <option value="">No product (no redirect)</option>
+                  <option value="">{t('admin.noProductNoRedirect')}</option>
                   {products.map(p => (
                     <option key={p._id} value={p._id}>{p.name} — ₹{p.price?.toLocaleString()}</option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-400 mt-1">Clicking the banner will redirect to this product page</p>
+                <p className="text-xs text-gray-400 mt-1">{t('admin.clickBannerHint')}</p>
               </div>
 
               {/* Colors and Order */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.backgroundColor')}</label>
                   <div className="flex gap-2 items-center">
                     <input type="color" value={form.bgColor} onChange={e => setForm({ ...form, bgColor: e.target.value })}
                       className="w-10 h-10 rounded-lg cursor-pointer border-2 border-gold-200" />
@@ -455,7 +457,7 @@ export default function AdminBanners() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.textColor')}</label>
                   <div className="flex gap-2 items-center">
                     <input type="color" value={form.textColor} onChange={e => setForm({ ...form, textColor: e.target.value })}
                       className="w-10 h-10 rounded-lg cursor-pointer border-2 border-gold-200" />
@@ -464,7 +466,7 @@ export default function AdminBanners() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.displayOrder')}</label>
                   <input type="number" value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
                 </div>
@@ -472,14 +474,14 @@ export default function AdminBanners() {
 
               <label className="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="text-gold-600 rounded" />
-                Active (visible on home page)
+                {t('admin.activeVisible')}
               </label>
             </div>
 
             <div className="flex justify-end gap-3 p-6 border-t border-gold-200 bg-gold-50/30 sticky bottom-0">
-              <button onClick={() => setShowModal(false)} className="btn-outline-gold rounded-xl">Cancel</button>
+              <button onClick={() => setShowModal(false)} className="btn-outline-gold rounded-xl">{t('admin.cancel')}</button>
               <button onClick={handleSave} className="btn-gold rounded-xl flex items-center gap-2">
-                <Save size={16} /> {editingId ? 'Update Banner' : 'Create Banner'}
+                <Save size={16} /> {editingId ? t('admin.updateBanner') : t('admin.createBanner')}
               </button>
             </div>
           </div>

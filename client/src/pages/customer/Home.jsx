@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
@@ -96,6 +97,7 @@ import LoginPopup from '../../components/LoginPopup';
 
 export default function Home() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [offerProducts, setOfferProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -118,10 +120,10 @@ export default function Home() {
       {/* Feature Badges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { icon: Zap, label: 'No Cost EMI', desc: '0% interest available' },
-          { icon: Percent, label: 'Festival Offers', desc: 'Up to 40% off' },
-          { icon: Truck, label: 'Free Delivery', desc: 'On orders above ₹5K' },
-          { icon: Shield, label: 'Genuine Products', desc: '100% authentic' },
+          { icon: Zap, label: t('cust.noCostEmi'), desc: t('cust.noCostEmiDesc') },
+          { icon: Percent, label: t('cust.festivalOffers'), desc: t('cust.festivalOffersDesc') },
+          { icon: Truck, label: t('cust.freeDelivery'), desc: t('cust.freeDeliveryDesc') },
+          { icon: Shield, label: t('cust.genuineProducts'), desc: t('cust.genuineProductsDesc') },
         ].map((item, i) => (
           <div key={i} className="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm card-hover animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
             <div className="bg-gradient-to-br from-gold-400 to-gold-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md">
@@ -138,8 +140,8 @@ export default function Home() {
       {/* Categories */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="section-title">Shop by Category</h2>
-          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
+          <h2 className="section-title">{t('cust.shopByCategory')}</h2>
+          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
           {categories.map((cat, i) => (
@@ -157,8 +159,8 @@ export default function Home() {
       {/* Brands */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="section-title">Featured Brands</h2>
-          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">View All <ChevronRight size={16} /></Link>
+          <h2 className="section-title">{t('cust.featuredBrands')}</h2>
+          <Link to="/products" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium transition">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-4">
           {brands.map((brand, i) => (
@@ -182,9 +184,9 @@ export default function Home() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title flex items-center gap-2">
-              <Gift className="text-gold-500" size={28} /> Today's Offers
+              <Gift className="text-gold-500" size={28} /> {t('cust.todaysOffers')}
             </h2>
-            <Link to="/products?onOffer=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
+            <Link to="/products?onOffer=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {offerProducts.slice(0, 4).map((product, i) => (
@@ -198,8 +200,8 @@ export default function Home() {
       {featuredProducts.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="section-title">Featured Products</h2>
-            <Link to="/products?featured=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
+            <h2 className="section-title">{t('cust.featuredProducts')}</h2>
+            <Link to="/products?featured=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {featuredProducts.slice(0, 4).map((product, i) => (
@@ -213,8 +215,8 @@ export default function Home() {
       {newArrivals.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="section-title">New Arrivals</h2>
-            <Link to="/products?newArrival=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">View All <ChevronRight size={16} /></Link>
+            <h2 className="section-title">{t('cust.newArrivals')}</h2>
+            <Link to="/products?newArrival=true" className="text-gold-600 text-sm flex items-center gap-1 hover:text-gold-700 font-medium">{t('cust.viewAll')} <ChevronRight size={16} /></Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {newArrivals.slice(0, 4).map((product, i) => (
@@ -229,26 +231,26 @@ export default function Home() {
         <Link to="/emi-calculator" className="bg-gradient-to-br from-gold-600 via-gold-500 to-amber-500 rounded-2xl p-8 text-white card-hover group block">
           <div className="flex items-center gap-3 mb-3">
             <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform"><CreditCard size={28} /></div>
-            <h3 className="text-xl font-bold">No Cost EMI Available</h3>
+            <h3 className="text-xl font-bold">{t('cust.noCostEmiAvailable')}</h3>
           </div>
-          <p className="text-gold-100 text-sm mb-4">Buy now and pay in easy installments. 0% interest on all major banks.</p>
-          <span className="bg-white text-gold-700 px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">Calculate EMI →</span>
+          <p className="text-gold-100 text-sm mb-4">{t('cust.noCostEmiDesc')}</p>
+          <span className="bg-white text-gold-700 px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">{t('cust.calculateEmi')} →</span>
         </Link>
         <Link to="/exchange-calculator" className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl p-8 text-white card-hover group block">
           <div className="flex items-center gap-3 mb-3">
             <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform"><RotateCcw size={28} /></div>
-            <h3 className="text-xl font-bold">Exchange Your Old Phone</h3>
+            <h3 className="text-xl font-bold">{t('cust.exchangeYourOldPhone')}</h3>
           </div>
-          <p className="text-gray-300 text-sm mb-4">Get instant exchange value for your old phone. Best prices guaranteed.</p>
-          <span className="bg-gold-500 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">Check Value →</span>
+          <p className="text-gray-300 text-sm mb-4">{t('cust.exchangeDesc')}</p>
+          <span className="bg-gold-500 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">{t('cust.checkValue')} →</span>
         </Link>
       </div>
 
       {/* Financing Partners */}
       <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm gold-border">
         <div className="text-center mb-6">
-          <h2 className="section-title inline-block">Finance Partners</h2>
-          <p className="text-gray-500 text-sm mt-2">Easy EMI options available with leading finance partners</p>
+          <h2 className="section-title inline-block">{t('cust.financePartners')}</h2>
+          <p className="text-gray-500 text-sm mt-2">{t('cust.financePartnersDesc')}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <a href="https://www.bajajfinserv.in/qr-code-rural-web-page?xc=wZJcF8vPcfuCf8IpnelpO2wo91ynp9JJsM12UNYH40AFzOXsNG4aQX+fjLXg47b9TPaQyWA9RzzmbFi7op12aw==&utm_source=RURAL_ARU&utm_medium=OFFERMART_QR_GEN" target="_blank" rel="noopener noreferrer"
@@ -283,7 +285,7 @@ export default function Home() {
 
       {/* Store Info */}
       <div className="bg-white rounded-2xl p-8 shadow-sm gold-border">
-        <h2 className="section-title">Visit Our Stores</h2>
+        <h2 className="section-title">{t('cust.visitOurStores')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
@@ -292,7 +294,7 @@ export default function Home() {
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
             <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-              View on Google Maps →
+              {t('cust.viewOnGoogleMaps')} →
             </span>
           </a>
           <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer"
@@ -302,7 +304,7 @@ export default function Home() {
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
             <span className="text-gold-600 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-              View on Google Maps →
+              {t('cust.viewOnGoogleMaps')} →
             </span>
           </a>
         </div>
@@ -311,10 +313,10 @@ export default function Home() {
       {/* Login CTA for guests */}
       {!user && (
         <div className="gold-gradient rounded-2xl p-6 text-center text-white">
-          <p className="text-lg font-semibold mb-2">Login to unlock exclusive deals, track orders & manage your cart!</p>
+          <p className="text-lg font-semibold mb-2">{t('cust.loginUnlockDeals')}</p>
           <button onClick={() => setShowLoginPopup(true)}
             className="bg-white text-gold-700 px-6 py-2 rounded-lg font-semibold text-sm hover:shadow-lg transition inline-flex items-center gap-2">
-            <LogIn size={16} /> Login Now
+            <LogIn size={16} /> {t('cust.loginNow')}
           </button>
         </div>
       )}

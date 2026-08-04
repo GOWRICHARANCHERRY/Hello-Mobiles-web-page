@@ -5,10 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 const STORE_UPI = 'svlnmobiles12@ybl';
 
 export default function Checkout() {
+  const { t } = useLanguage();
   const { cart, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ export default function Checkout() {
   const fmt2 = (n) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const applyCoupon = async () => {
-    if (!couponCode.trim()) return toast.error('Enter a coupon code');
+    if (!couponCode.trim()) return toast.error(t('cust.toastEnterCouponCode'));
     setCouponLoading(true);
     try {
       const { data } = await api.post('/coupons/validate', {
@@ -44,10 +46,10 @@ export default function Checkout() {
         items: cart.map(i => ({ product: i._id, amount: i.price * i.quantity })),
       });
       setCoupon(data);
-      toast.success(`Coupon applied! You save ₹${data.discount.toLocaleString()}`);
+      toast.success(t('cust.toastCouponApplied', { amount: data.discount.toLocaleString() }));
     } catch (e) {
       setCoupon(null);
-      toast.error(e.response?.data?.message || 'Invalid coupon');
+      toast.error(e.response?.data?.message || t('cust.toastInvalidCoupon'));
     }
     setCouponLoading(false);
   };
@@ -59,7 +61,7 @@ export default function Checkout() {
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      return toast.error('Geolocation is not supported by your browser');
+      return toast.error(t('cust.toastGeoNotSupported'));
     }
     setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
@@ -84,16 +86,16 @@ export default function Checkout() {
             street: street || data.display_name?.split(',')?.slice(0, 3)?.join(',') || '',
             city, state, pincode,
           }));
-          toast.success('Location detected!');
+          toast.success(t('cust.toastLocationDetected'));
         } catch (error) {
-          toast.error('Failed to get address. Please enter manually.');
+          toast.error(t('cust.toastGetAddressFailed'));
         }
         setLocationLoading(false);
       },
       (error) => {
         setLocationLoading(false);
-        if (error.code === 1) toast.error('Location permission denied. Please allow location access.');
-        else toast.error('Failed to get location. Please enter manually.');
+        if (error.code === 1) toast.error(t('cust.toastLocationDenied'));
+        else toast.error(t('cust.toastGetLocationFailed'));
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -101,7 +103,7 @@ export default function Checkout() {
 
   const handlePlaceOrder = async () => {
     if (!form.name || !form.phone || !form.street || !form.city || !form.pincode) {
-      return toast.error('Please fill all shipping details');
+      return toast.error(t('cust.toastFillShipping'));
     }
     setLoading(true);
     try {
@@ -124,10 +126,10 @@ export default function Checkout() {
       };
       const { data } = await api.post('/orders', orderData);
       clearCart();
-      toast.success('Order placed successfully!');
+      toast.success(t('cust.toastOrderPlaced'));
       navigate('/orders');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to place order');
+      toast.error(error.response?.data?.message || t('cust.toastOrderFailed'));
     }
     setLoading(false);
   };
@@ -139,7 +141,7 @@ export default function Checkout() {
 
   return (
     <div className="animate-fade-in max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Checkout</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('cust.checkout')}</h1>
 
       <div className="flex items-center mb-8">
         {[1, 2, 3].map(s => (
@@ -148,7 +150,7 @@ export default function Checkout() {
               {step > s ? <Check size={16} /> : s}
             </div>
             <span className={`ml-2 text-sm ${step >= s ? 'text-gold-600 font-medium' : 'text-gray-500'}`}>
-              {s === 1 ? 'Shipping' : s === 2 ? 'Payment' : 'Review'}
+              {s === 1 ? t('cust.stepShipping') : s === 2 ? t('cust.stepPayment') : t('cust.stepReview')}
             </span>
             {s < 3 && <div className={`w-12 h-0.5 mx-2 ${step > s ? 'bg-gold-600' : 'bg-gray-200'}`}></div>}
           </div>
@@ -161,50 +163,50 @@ export default function Checkout() {
           {step === 1 && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold">Shipping Details</h2>
+                <h2 className="text-lg font-bold">{t('cust.shippingDetails')}</h2>
                 <button onClick={handleGetLocation} disabled={locationLoading}
                   className="flex items-center gap-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 shadow-md">
                   {locationLoading ? (
-                    <><Loader size={16} className="animate-spin" /> Detecting...</>
+                    <><Loader size={16} className="animate-spin" /> {t('cust.detecting')}</>
                   ) : (
-                    <><MapPin size={16} /> Use Current Location</>
+                    <><MapPin size={16} /> {t('cust.useCurrentLocation')}</>
                   )}
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.fullName')}</label>
                   <input value={form.name} onChange={e => setForm({...form, name: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.phone')}</label>
                   <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.address')}</label>
                   <input value={form.street} onChange={e => setForm({...form, street: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.city')}</label>
                   <input value={form.city} onChange={e => setForm({...form, city: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.state')}</label>
                   <input value={form.state} onChange={e => setForm({...form, state: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.pincode')}</label>
                   <input value={form.pincode} onChange={e => setForm({...form, pincode: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
               </div>
               <button onClick={() => setStep(2)} className="mt-6 btn-gold rounded-xl">
-                Continue to Payment
+                {t('cust.continueToPayment')}
               </button>
             </div>
           )}
@@ -212,19 +214,19 @@ export default function Checkout() {
           {/* Step 2: Payment */}
           {step === 2 && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold mb-4">Payment Method</h2>
+              <h2 className="text-lg font-bold mb-4">{t('cust.paymentMethod')}</h2>
               <div className="space-y-3">
                 {[
-                  { id: 'online', label: 'Online Payment', icon: CreditCard, desc: 'UPI / Card / Net Banking' },
-                  { id: 'cod', label: 'Cash on Delivery', icon: Banknote, desc: 'Pay when you receive' },
-                  { id: 'store_pickup', label: 'Store Pickup', icon: Store, desc: 'Pay at the store' },
+                  { id: 'online', label: 'cust.onlinePayment', icon: CreditCard, desc: 'cust.upiCardNetBanking' },
+                  { id: 'cod', label: 'cust.cashOnDelivery', icon: Banknote, desc: 'cust.payWhenReceive' },
+                  { id: 'store_pickup', label: 'cust.storePickup', icon: Store, desc: 'cust.payAtStore' },
                 ].map(method => (
                   <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${paymentMethod === method.id ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
                     <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={e => setPaymentMethod(e.target.value)} className="text-gold-600" />
                     <method.icon size={22} className={paymentMethod === method.id ? 'text-gold-600' : 'text-gray-400'} />
                     <div>
-                      <p className="font-medium">{method.label}</p>
-                      <p className="text-sm text-gray-500">{method.desc}</p>
+                      <p className="font-medium">{t(method.label)}</p>
+                      <p className="text-sm text-gray-500">{t(method.desc)}</p>
                     </div>
                   </label>
                 ))}
@@ -232,25 +234,25 @@ export default function Checkout() {
 
               {paymentMethod === 'online' && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> Pay via UPI (GPay / PhonePe / Paytm)</p>
-                  <p className="text-xs text-blue-700 mb-2">Send payment to our UPI ID and your order will be confirmed on payment.</p>
+                  <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> {t('cust.payViaUpi')}</p>
+                  <p className="text-xs text-blue-700 mb-2">{t('cust.upiInstruction')}</p>
                   <div className="bg-white rounded-lg border border-blue-200 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-semibold">UPI ID</p>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">{t('cust.upiId')}</p>
                       <p className="font-mono font-bold text-gray-800 text-lg">{STORE_UPI}</p>
                     </div>
                     <button
-                      onClick={() => { navigator.clipboard?.writeText(STORE_UPI); toast.success('UPI ID copied!'); }}
+                      onClick={() => { navigator.clipboard?.writeText(STORE_UPI); toast.success(t('cust.toastUpiCopied')); }}
                       className="bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition flex-shrink-0">
-                      Copy UPI ID
+                      {t('cust.copyUpiId')}
                     </button>
                   </div>
-                  <p className="text-[11px] text-gray-500 mt-2">Supported: Google Pay, PhonePe, Paytm, BHIM & any UPI app</p>
+                  <p className="text-[11px] text-gray-500 mt-2">{t('cust.supportedUpi')}</p>
                 </div>
               )}
               <div className="flex gap-3 mt-6">
-                <button onClick={() => setStep(1)} className="btn-outline-gold rounded-xl">Back</button>
-                <button onClick={() => setStep(3)} className="btn-gold rounded-xl">Review Order</button>
+                <button onClick={() => setStep(1)} className="btn-outline-gold rounded-xl">{t('cust.back')}</button>
+                <button onClick={() => setStep(3)} className="btn-gold rounded-xl">{t('cust.reviewOrder')}</button>
               </div>
             </div>
           )}
@@ -258,18 +260,18 @@ export default function Checkout() {
           {/* Step 3: Review */}
           {step === 3 && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold mb-4">Review Order</h2>
+              <h2 className="text-lg font-bold mb-4">{t('cust.reviewOrder')}</h2>
               <div className="space-y-4">
                 <div className="border-b pb-4">
-                  <h3 className="font-medium text-gray-700 mb-1">Shipping To:</h3>
+                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.shippingTo')}</h3>
                   <p className="text-sm text-gray-600">{form.name}, {form.street}, {form.city}, {form.state} - {form.pincode}</p>
-                  <p className="text-sm text-gray-600">Phone: {form.phone}</p>
+                  <p className="text-sm text-gray-600">{t('cust.phoneLabel', { phone: form.phone })}</p>
                 </div>
                 <div className="border-b pb-4">
-                  <h3 className="font-medium text-gray-700 mb-1">Payment: {paymentMethod === 'online' ? 'Online Payment' : paymentMethod === 'cod' ? 'Cash on Delivery' : 'Store Pickup'}</h3>
+                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-2">Items:</h3>
+                  <h3 className="font-medium text-gray-700 mb-2">{t('cust.items')}</h3>
                   {cart.map(item => (
                     <div key={item.cartKey} className="flex justify-between text-sm py-1">
                       <div>
@@ -282,10 +284,10 @@ export default function Checkout() {
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={() => setStep(2)} className="btn-outline-gold rounded-xl">Back</button>
+                <button onClick={() => setStep(2)} className="btn-outline-gold rounded-xl">{t('cust.back')}</button>
                 <button onClick={handlePlaceOrder} disabled={loading}
                   className="bg-gradient-to-r from-accent-500 to-accent-600 text-white px-8 py-3 rounded-xl font-bold transition disabled:opacity-50 hover:from-accent-600 hover:to-accent-700 shadow-lg">
-                  {loading ? 'Placing Order...' : 'Place Order'}
+                  {loading ? t('cust.placingOrder') : t('cust.placeOrder')}
                 </button>
               </div>
             </div>
@@ -296,8 +298,8 @@ export default function Checkout() {
         <div className="bg-white rounded-2xl shadow-sm h-fit sticky top-20 overflow-hidden gold-border">
           <div className="gold-gradient px-6 py-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-white">Order Summary</h2>
-              <p className="text-white/80 text-xs mt-0.5">{cart.length} item{cart.length > 1 ? 's' : ''} in your cart</p>
+              <h2 className="text-lg font-bold text-white">{t('cust.orderSummary')}</h2>
+              <p className="text-white/80 text-xs mt-0.5">{t(cart.length > 1 ? 'cust.itemsInCart' : 'cust.itemInCart', { count: cart.length })}</p>
             </div>
             <div className="bg-white/20 rounded-xl p-2.5"><ShoppingBag size={20} className="text-white" /></div>
           </div>
@@ -325,22 +327,22 @@ export default function Checkout() {
 
           {/* Coupon */}
           <div className="px-6 py-4 border-t border-gray-100">
-            <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700"><Ticket size={16} className="text-gold-600 flex-shrink-0" /> Apply Coupon</div>
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700"><Ticket size={16} className="text-gold-600 flex-shrink-0" /> {t('cust.applyCoupon')}</div>
             {coupon ? (
               <div className="flex items-center justify-between gap-3 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5 w-full overflow-hidden">
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-green-700 truncate">{coupon.code}</p>
-                  <p className="text-xs text-green-600 truncate">You save ₹{coupon.discount.toLocaleString()}</p>
+                  <p className="text-xs text-green-600 truncate">{t('cust.youSave', { amount: coupon.discount.toLocaleString() })}</p>
                 </div>
                 <button onClick={removeCoupon} className="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><X size={16} /></button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">
-                <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} placeholder="Enter coupon code"
+                <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} placeholder={t('cust.enterCouponCodePlaceholder')}
                   className="flex-1 min-w-0 border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
                 <button onClick={applyCoupon} disabled={couponLoading}
                   className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gold-700 transition disabled:opacity-50 flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                  {couponLoading ? <Loader size={14} className="animate-spin" /> : 'Apply'}
+                  {couponLoading ? <Loader size={14} className="animate-spin" /> : t('cust.apply')}
                 </button>
               </div>
             )}
@@ -348,45 +350,45 @@ export default function Checkout() {
 
           {/* Price Details */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Price Details</p>
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">{t('cust.priceDetails')}</p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Taxable Value</span>
+                <span className="text-gray-500">{t('cust.taxableValue')}</span>
                 <span className="text-gray-700">₹{fmt2(taxable)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">CGST @ 9%</span>
+                <span className="text-gray-500">{t('cust.cgst9')}</span>
                 <span className="text-gray-700">₹{fmt2(cgst)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">SGST @ 9%</span>
+                <span className="text-gray-500">{t('cust.sgst9')}</span>
                 <span className="text-gray-700">₹{fmt2(sgst)}</span>
               </div>
               <div className="flex justify-between border-t border-dashed border-gray-200 pt-2">
-                <span className="text-gray-700">Subtotal (incl. GST)</span>
+                <span className="text-gray-700">{t('cust.subtotalInclGst')}</span>
                 <span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Delivery</span>
+                <span className="text-gray-500">{t('cust.delivery')}</span>
                 {deliveryCharge === 0 ? (
-                  <span className="text-green-600 font-semibold">FREE</span>
+                  <span className="text-green-600 font-semibold">{t('cust.free')}</span>
                 ) : (
                   <span className="text-gray-700">₹{deliveryCharge}</span>
                 )}
               </div>
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-green-600 font-medium">
-                  <span>Coupon {coupon.code}</span>
+                  <span>{t('cust.couponLabel', { code: coupon.code })}</span>
                   <span>-₹{couponDiscount.toLocaleString()}</span>
                 </div>
               )}
               {deliveryCharge === 0 && (
                 <p className="text-[11px] text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 font-medium">
-                  Free delivery — you save ₹99!
+                  {t('cust.freeDeliveryYouSave')}
                 </p>
               )}
               <div className="flex justify-between items-center pt-3 mt-1 border-t-2 border-gray-800">
-                <span className="text-base font-bold text-gray-900">Total</span>
+                <span className="text-base font-bold text-gray-900">{t('cust.total')}</span>
                 <span className="text-xl font-bold gold-text">₹{total.toLocaleString()}</span>
               </div>
             </div>
@@ -395,7 +397,7 @@ export default function Checkout() {
           <div className="px-6 py-4 border-t border-gray-100">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <ShieldCheck size={16} className="text-green-500 flex-shrink-0" />
-              <span>Secure checkout · 100% genuine products · GST invoice included</span>
+              <span>{t('cust.secureCheckout')}</span>
             </div>
           </div>
         </div>

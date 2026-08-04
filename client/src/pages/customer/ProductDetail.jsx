@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import LoginPopup from '../../components/LoginPopup';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -49,6 +50,7 @@ export default function ProductDetail() {
   const [inWishlist, setInWishlist] = useState(false);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const [selectedRam, setSelectedRam] = useState('');

@@ -44,6 +44,7 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 
 ## Work State
 ### Completed
+- **Preferred Language (Full app translation)**: new `client/src/context/LanguageContext.jsx` + `client/src/i18n/` — **5 areas × 3 langs** (en/hi/te, 1,210 keys total, perfect key parity verified): `customer-*` (552), `component-*` (193), `admin-*` (180), `admin2-*` (205), `employee-*` (80). Every page translated: 13 customer pages, 7 shared components (CustomerLayout, LoginPopup, SearchBar, HeroCarousel, TextBannerCarousel, ImeiScanModal, Login, Signup), 11 admin files, 4 employee files. Pattern: `const { t } = useLanguage();` + `t('cust.key', { var })`. Provider mounted in `App.jsx` (inside AuthProvider, so it reads `user.language`). Language persisted 3 ways: `localStorage['hm_language']`, `PUT /profile` → `User.language` (enum en/hi/te, default en, added to `server/models/User.js`), and header/dropdown label via `t('comp.langName')`/`t('comp.languagePref', { langName })`. Profile → Preferred Language tab now functional (checked radios call `handleLanguageChange` → `setLanguage` + save). Fallback: missing hi/te key → en → raw key. `t()` is pure lookup (NO server round-trip) — server only needs the `language` field on User
 - All 108 Mobiles: variants + 6,043 unique IMEIs + real verified images (0 placeholders)
 - IMEI lookup `GET /api/products/imei/:code`; fixed orders.js bug (`product` out of scope → `items.some()`); test order HM1003 → IMEI `863456906168269` marked `sold` with `soldAt` + order link
 - Admin/Employee sidebars sticky: `md:static` → `md:sticky md:top-0 md:h-screen` in `AdminLayout.jsx` + `EmployeeLayout.jsx`
@@ -73,6 +74,9 @@ Build out the Hello Mobiles store (MERN): 108-mobile inventory with IMEI trackin
 6. TODO: add `hello-mobiles.com` + `www.hello-mobiles.com` to Firebase **Authorized Domains** (Authentication → Settings) for Google/phone login to work on the live domain
 
 ## Relevant Files
+- `client/src/context/LanguageContext.jsx` — i18n provider (`useLanguage()` → `{ language, setLanguage, t }`; t() does key→translation lookup w/ `{var}` interpolation, falls back en→key). Provider in App.jsx inside AuthProvider
+- `client/src/i18n/` — 15 dictionary files (customer/component/admin/admin2/employee × en/hi/te) + `index.js` merge. Keys MUST stay in sync across the 3 langs of each area (parity-check: node key-scan script)
+- `server/models/User.js` — `language` field (enum en/hi/te, default en); `PUT /api/profile` accepts it
 - `server/seed_full_inventory.js` — 120-product seed (108 mobiles + 12 others)
 - `server/seed_electronics.js` — NEW 28-product Electronics seed (idempotent)
 - `server/fix_images.js` — re-runnable image-fix script (model name → image URL)

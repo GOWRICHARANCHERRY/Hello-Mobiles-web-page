@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Camera, Search, Package, Smartphone, Calendar, CreditCard, MapPin, Hash, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
 function CameraScanModal({ open, onClose, onDetected }) {
@@ -8,6 +9,7 @@ function CameraScanModal({ open, onClose, onDetected }) {
   const streamRef = useRef(null);
   const detectorRef = useRef(null);
   const rafRef = useRef(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!open) return;
@@ -41,7 +43,7 @@ function CameraScanModal({ open, onClose, onDetected }) {
           detect();
         }
       } catch {
-        toast.error('Camera access denied.');
+        toast.error(t('comp.cameraAccessDenied'));
         onClose();
       }
     };
@@ -63,7 +65,7 @@ function CameraScanModal({ open, onClose, onDetected }) {
     <div className="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl overflow-hidden max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
-          <h3 className="font-bold text-sm flex items-center gap-2"><Camera size={16} /> Scan IMEI Barcode</h3>
+          <h3 className="font-bold text-sm flex items-center gap-2"><Camera size={16} /> {t('comp.scanImeiBarcode')}</h3>
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full"><X size={16} /></button>
         </div>
         <div className="relative bg-black aspect-video">
@@ -78,10 +80,10 @@ function CameraScanModal({ open, onClose, onDetected }) {
           </div>
         </div>
         <div className="p-4 text-center">
-          <p className="text-sm text-gray-600">Point camera at the barcode</p>
-          <p className="text-xs text-gray-400 mt-1">It will detect automatically</p>
+          <p className="text-sm text-gray-600">{t('comp.pointCamera')}</p>
+          <p className="text-xs text-gray-400 mt-1">{t('comp.autoDetect')}</p>
           {!('BarcodeDetector' in window) && (
-            <p className="text-xs text-amber-500 mt-2 bg-amber-50 rounded-lg p-2">Auto-scan not supported. Type IMEI manually.</p>
+            <p className="text-xs text-amber-500 mt-2 bg-amber-50 rounded-lg p-2">{t('comp.autoScanNotSupported')}</p>
           )}
         </div>
       </div>
@@ -95,6 +97,7 @@ export default function ImeiScanModal({ open, onClose }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!open) { setImeiInput(''); setResult(null); setSearched(false); setShowCamera(false); }
@@ -136,8 +139,8 @@ export default function ImeiScanModal({ open, onClose }) {
                 <Smartphone size={20} />
               </div>
               <div>
-                <h2 className="font-bold text-lg">IMEI Lookup</h2>
-                <p className="text-white/80 text-xs">Scan or enter IMEI to view full details</p>
+                <h2 className="font-bold text-lg">{t('comp.imeiLookup')}</h2>
+                <p className="text-white/80 text-xs">{t('comp.imeiLookupSub')}</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full"><X size={18} /></button>
@@ -153,30 +156,30 @@ export default function ImeiScanModal({ open, onClose }) {
                   value={imeiInput}
                   onChange={e => setImeiInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
                   onKeyDown={handleKeyDown}
-                  placeholder="Enter 15-digit IMEI number"
+                  placeholder={t('comp.enterImei')}
                   maxLength={15}
                   className="w-full border-2 border-gold-200 rounded-xl pl-9 pr-3 py-2.5 text-sm font-mono focus:ring-2 focus:ring-gold-400 outline-none"
                 />
               </div>
               <button onClick={() => searchImei(imeiInput)} disabled={imeiInput.length < 15 || loading}
                 className="gold-gradient text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
-                <Search size={14} /> Search
+                <Search size={14} /> {t('comp.search')}
               </button>
               <button onClick={() => setShowCamera(true)}
                 className="bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-600 flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
-                <Camera size={14} /> Scan
+                <Camera size={14} /> {t('comp.scan')}
               </button>
             </div>
 
             {imeiInput.length > 0 && imeiInput.length < 15 && (
-              <p className="text-xs text-amber-500 mb-3">{imeiInput.length}/15 digits</p>
+              <p className="text-xs text-amber-500 mb-3">{t('comp.digitsProgress', { count: imeiInput.length })}</p>
             )}
 
             {/* Loading */}
             {loading && (
               <div className="text-center py-12">
                 <div className="w-8 h-8 border-3 border-gold-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                <p className="text-sm text-gray-500">Looking up IMEI...</p>
+                <p className="text-sm text-gray-500">{t('comp.lookingUpImei')}</p>
               </div>
             )}
 
@@ -186,8 +189,8 @@ export default function ImeiScanModal({ open, onClose }) {
                 {!result.found ? (
                   <div className="text-center py-10 bg-gray-50 rounded-xl">
                     <AlertCircle size={40} className="text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-600 font-medium">IMEI Not Found</p>
-                    <p className="text-xs text-gray-400 mt-1">This IMEI is not registered in inventory</p>
+                    <p className="text-gray-600 font-medium">{t('comp.imeiNotFound')}</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('comp.imeiNotRegistered')}</p>
                   </div>
                 ) : (
                   <>
@@ -210,11 +213,11 @@ export default function ImeiScanModal({ open, onClose }) {
                     {/* Variant & Color */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-white rounded-xl p-3 border border-gray-200">
-                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">Variant</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">{t('comp.variant')}</p>
                         <p className="text-sm font-bold text-gray-800">{result.variant?.ram} / {result.variant?.storage}</p>
                       </div>
                       <div className="bg-white rounded-xl p-3 border border-gray-200">
-                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">Color</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">{t('comp.color')}</p>
                         <p className="text-sm font-bold text-gray-800">{result.color?.name}</p>
                       </div>
                     </div>
@@ -222,32 +225,32 @@ export default function ImeiScanModal({ open, onClose }) {
                     {/* IMEI Details */}
                     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                       <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
-                        <p className="text-xs font-bold text-gray-700">IMEI Details</p>
+                        <p className="text-xs font-bold text-gray-700">{t('comp.imeiDetails')}</p>
                       </div>
                       <div className="p-4 space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">IMEI Number</span>
+                          <span className="text-xs text-gray-500">{t('comp.imeiNumber')}</span>
                           <span className="text-sm font-mono font-bold text-gray-800">{result.imei?.number}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Status</span>
+                          <span className="text-xs text-gray-500">{t('comp.status')}</span>
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${result.imei?.status === 'sold' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                            {result.imei?.status === 'sold' ? 'SOLD' : 'In Stock'}
+                            {result.imei?.status === 'sold' ? t('comp.sold') : t('comp.inStock')}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500 flex items-center gap-1"><Calendar size={11} /> Added to Stock</span>
+                          <span className="text-xs text-gray-500 flex items-center gap-1"><Calendar size={11} /> {t('comp.addedToStock')}</span>
                           <span className="text-xs text-gray-700">{result.imei?.addedAt ? new Date(result.imei.addedAt).toLocaleString() : '—'}</span>
                         </div>
                         {result.imei?.soldAt && (
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500 flex items-center gap-1"><Clock size={11} /> Sold On</span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1"><Clock size={11} /> {t('comp.soldOn')}</span>
                             <span className="text-xs text-red-600 font-medium">{new Date(result.imei.soldAt).toLocaleString()}</span>
                           </div>
                         )}
                         {result.imei?.soldPrice && (
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">Sold Price</span>
+                            <span className="text-xs text-gray-500">{t('comp.soldPrice')}</span>
                             <span className="text-sm font-bold text-gray-800">₹{result.imei.soldPrice?.toLocaleString()}</span>
                           </div>
                         )}
@@ -257,11 +260,11 @@ export default function ImeiScanModal({ open, onClose }) {
                     {/* Pricing */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-white rounded-xl p-3 border border-gray-200">
-                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">Selling Price</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">{t('comp.sellingPrice')}</p>
                         <p className="text-lg font-bold gold-text">₹{result.variant?.price?.toLocaleString()}</p>
                       </div>
                       <div className="bg-white rounded-xl p-3 border border-gray-200">
-                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">MRP</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1">{t('comp.mrp')}</p>
                         <p className="text-lg font-bold text-gray-400 line-through">₹{result.variant?.mrp?.toLocaleString()}</p>
                       </div>
                     </div>
@@ -270,31 +273,31 @@ export default function ImeiScanModal({ open, onClose }) {
                     {result.imei?.status === 'sold' && result.order && (
                       <div className="bg-blue-50 rounded-xl border border-blue-200 overflow-hidden">
                         <div className="px-4 py-2.5 bg-blue-100/50 border-b border-blue-200">
-                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1"><CreditCard size={12} /> Order Details</p>
+                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1"><CreditCard size={12} /> {t('comp.orderDetails')}</p>
                         </div>
                         <div className="p-4 space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">Order Number</span>
+                            <span className="text-xs text-gray-500">{t('comp.orderNumber')}</span>
                             <span className="text-sm font-bold text-blue-700">#{result.order.orderNumber}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">Order Date</span>
+                            <span className="text-xs text-gray-500">{t('comp.orderDate')}</span>
                             <span className="text-xs text-gray-700">{new Date(result.order.createdAt).toLocaleString()}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">Order Total</span>
+                            <span className="text-xs text-gray-500">{t('comp.orderTotal')}</span>
                             <span className="text-sm font-bold text-gray-800">₹{result.order.total?.toLocaleString()}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">Payment</span>
-                            <span className="text-xs text-gray-700 capitalize">{result.order.paymentMethod === 'cod' ? 'Cash on Delivery' : result.order.paymentMethod}</span>
+                            <span className="text-xs text-gray-500">{t('comp.payment')}</span>
+                            <span className="text-xs text-gray-700 capitalize">{result.order.paymentMethod === 'cod' ? t('comp.cashOnDelivery') : result.order.paymentMethod}</span>
                           </div>
                           {result.order.shippingAddress && (
                             <div className="pt-2 border-t border-blue-200">
-                              <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1 flex items-center gap-1"><MapPin size={10} /> Shipping Address</p>
+                              <p className="text-[10px] text-gray-400 uppercase font-semibold mb-1 flex items-center gap-1"><MapPin size={10} /> {t('comp.shippingAddress')}</p>
                               <p className="text-xs text-gray-600">{result.order.shippingAddress.name}, {result.order.shippingAddress.street}</p>
                               <p className="text-xs text-gray-600">{result.order.shippingAddress.city}, {result.order.shippingAddress.state} - {result.order.shippingAddress.pincode}</p>
-                              <p className="text-xs text-gray-500 mt-1">Phone: {result.order.shippingAddress.phone}</p>
+                              <p className="text-xs text-gray-500 mt-1">{t('comp.phoneLabel', { phone: result.order.shippingAddress.phone })}</p>
                             </div>
                           )}
                         </div>
@@ -308,8 +311,8 @@ export default function ImeiScanModal({ open, onClose }) {
             {!searched && !loading && (
               <div className="text-center py-10 bg-gray-50 rounded-xl">
                 <Package size={40} className="text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Enter or scan an IMEI to view details</p>
-                <p className="text-xs text-gray-400 mt-1">Shows product info, stock status, and order history</p>
+                <p className="text-gray-500">{t('comp.enterOrScanImei')}</p>
+                <p className="text-xs text-gray-400 mt-1">{t('comp.showsInfo')}</p>
               </div>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import api from '../../utils/api';
 import { Plus, Edit2, Trash2, X, Save, Package, Upload, Search, ChevronDown, GripVertical, Filter, Copy, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -14,6 +15,7 @@ const emptySpecs = [
 ];
 
 function Autocomplete({ label, value, onChange, fetchUrl, required }) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState(value || '');
   const [options, setOptions] = useState([]);
   const [show, setShow] = useState(false);
@@ -69,7 +71,7 @@ function Autocomplete({ label, value, onChange, fetchUrl, required }) {
           value={query}
           onChange={e => { handleSearch(e.target.value); setIsAdding(false); }}
           onFocus={() => { if (query.length >= 1) handleSearch(query); }}
-          placeholder={`Search or type ${label.toLowerCase()}...`}
+          placeholder={t('admin2.autocomplete.searchOrType', { label: label.toLowerCase() })}
           className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50"
         />
       </div>
@@ -77,7 +79,7 @@ function Autocomplete({ label, value, onChange, fetchUrl, required }) {
         <div className="absolute z-20 w-full bg-white border-2 border-gold-200 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg">
           <button onClick={handleAddNew}
             className="w-full text-left px-3 py-2 text-sm text-gold-600 font-semibold hover:bg-gold-50 border-b border-gold-100 flex items-center gap-2">
-            <Plus size={14} /> Add New "{query}"
+            <Plus size={14} /> {t('admin2.autocomplete.addNew', { query })}
           </button>
           {loading && <div className="px-3 py-2 text-sm text-gray-400">Searching...</div>}
           {!loading && options.filter(o => o !== query).length === 0 && query.length >= 1 && (

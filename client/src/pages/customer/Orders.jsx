@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useLanguage } from '../../context/LanguageContext';
 import { Package, Check, Clock, Truck, CheckCircle, XCircle } from 'lucide-react';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
@@ -8,6 +9,7 @@ const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false));
@@ -28,16 +30,16 @@ export default function Orders() {
     return (
       <div className="text-center py-16 animate-fade-in">
         <Package size={64} className="mx-auto text-gray-300 mb-4" />
-        <h2 className="text-xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
-        <p className="text-gray-500 mb-6">Start shopping to see your orders here</p>
-        <Link to="/products" className="bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-700 transition inline-block">Shop Now</Link>
+        <h2 className="text-xl font-bold text-gray-800 mb-2">{t('cust.noOrdersYet')}</h2>
+        <p className="text-gray-500 mb-6">{t('cust.startShopping')}</p>
+        <Link to="/products" className="bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-700 transition inline-block">{t('cust.shopNow')}</Link>
       </div>
     );
   }
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">My Orders</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('cust.myOrders')}</h1>
       <div className="space-y-4">
         {orders.map(order => {
           const currentStep = statusSteps.indexOf(order.orderStatus);
@@ -45,7 +47,7 @@ export default function Orders() {
             <div key={order._id} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm text-gray-500">Order #{order.orderNumber}</p>
+                  <p className="text-sm text-gray-500">{t('cust.order')} #{order.orderNumber}</p>
                   <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className="flex items-center gap-2 mt-2 md:mt-0">
@@ -77,17 +79,17 @@ export default function Orders() {
                       {item.image && <img src={item.image} alt="" className="w-10 h-10 object-contain" />}
                       <div>
                         <p className="text-xs font-medium text-gray-800 truncate max-w-[120px]">{item.name}</p>
-                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-xs text-gray-500">{t('cust.qty')}: {item.quantity}</p>
                       </div>
                     </div>
                   ))}
-                  {order.items.length > 3 && <span className="text-sm text-gray-500 self-center">+{order.items.length - 3} more</span>}
+                  {order.items.length > 3 && <span className="text-sm text-gray-500 self-center">+{order.items.length - 3} {t('cust.more')}</span>}
                 </div>
                 <div className="text-right mt-3 md:mt-0">
                   <p className="text-lg font-bold text-gray-900">₹{order.total.toLocaleString()}</p>
                   <p className="text-xs text-gray-500 capitalize">{order.paymentMethod.replace('_', ' ')}</p>
                   <Link to={`/orders/${order._id}`} className="inline-block mt-2 text-xs font-semibold text-gold-600 hover:text-gold-700 bg-gold-50 border border-gold-200 px-3 py-1.5 rounded-lg">
-                    View Details &amp; Invoice
+                    {t('cust.viewDetailsInvoice')}
                   </Link>
                 </div>
               </div>

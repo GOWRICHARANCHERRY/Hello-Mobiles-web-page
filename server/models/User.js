@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
   phoneVerified: { type: Boolean, default: false },
   otp: String,
   otpExpiry: Date,
+  language: { type: String, enum: ['en', 'hi', 'te'], default: 'en' },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

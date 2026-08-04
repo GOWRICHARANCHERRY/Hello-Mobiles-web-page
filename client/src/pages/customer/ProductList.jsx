@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import LoginPopup from '../../components/LoginPopup';
 import SearchBar from '../../components/SearchBar';
 import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
@@ -30,6 +31,7 @@ export default function ProductList() {
   const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -100,7 +102,7 @@ export default function ProductList() {
       return;
     }
     addToCart(product);
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} ${t('cust.addedToCart')}`);
   };
 
   const screenSizes = ['5.5 inch', '6.1 inch', '6.5 inch', '6.7 inch', '6.8 inch', '15.6 inch', '32 inch', '43 inch', '50 inch', '55 inch', '65 inch'];
@@ -111,21 +113,21 @@ export default function ProductList() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            {filters.search ? `Results for "${filters.search}"` : filters.category || 'All Products'}
+            {filters.search ? `${t('cust.resultsFor')} "${filters.search}"` : filters.category || t('cust.allProducts')}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">{products.length} product{products.length !== 1 ? 's' : ''} found</p>
+          <p className="text-sm text-gray-500 mt-1">{products.length} {t('cust.productsFound')}</p>
         </div>
         <div className="flex items-center gap-3">
           <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}
             className="border-2 border-gold-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50">
-            <option value="">Sort By</option>
-            <option value="price_low">Price: Low to High</option>
-            <option value="price_high">Price: High to Low</option>
-            <option value="name">Name A-Z</option>
-            <option value="rating">Rating</option>
+            <option value="">{t('cust.sortBy')}</option>
+            <option value="price_low">{t('cust.priceLowToHigh')}</option>
+            <option value="price_high">{t('cust.priceHighToLow')}</option>
+            <option value="name">{t('cust.nameAZ')}</option>
+            <option value="rating">{t('cust.rating')}</option>
           </select>
           <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl flex items-center gap-1 text-sm font-medium shadow-lg">
-            <Filter size={16} /> Filter {activeCount > 0 && <span className="bg-white text-gold-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">{activeCount}</span>}
+            <Filter size={16} /> {t('cust.filter')} {activeCount > 0 && <span className="bg-white text-gold-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">{activeCount}</span>}
           </button>
         </div>
       </div>
@@ -135,18 +137,18 @@ export default function ProductList() {
         <div className={`${showFilters ? 'fixed inset-0 z-50 bg-black/50 lg:relative lg:bg-transparent' : 'hidden'} lg:block`}>
           <div className={`${showFilters ? 'absolute right-0 top-0 h-full w-80 bg-white p-5 overflow-y-auto shadow-2xl' : 'w-72 flex-shrink-0'} lg:relative lg:w-72 bg-white rounded-2xl shadow-sm p-5 gold-border`}>
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-lg gold-text flex items-center gap-2"><Filter size={18} /> Filters</h3>
+              <h3 className="font-bold text-lg gold-text flex items-center gap-2"><Filter size={18} /> {t('cust.filters')}</h3>
               <div className="flex gap-2 items-center">
                 {activeCount > 0 && (
-                  <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">{activeCount} active</span>
+                  <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">{activeCount} {t('cust.active')}</span>
                 )}
-                <button onClick={clearFilters} className="text-sm text-gold-600 hover:underline font-medium">Clear All</button>
+                <button onClick={clearFilters} className="text-sm text-gold-600 hover:underline font-medium">{t('cust.clearAll')}</button>
                 {showFilters && <button onClick={() => setShowFilters(false)} className="lg:hidden p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>}
               </div>
             </div>
 
             <div>
-              <FilterSection title="Category">
+              <FilterSection title={t('cust.category')}>
                 <div className="space-y-1">
                   {categories.map(cat => (
                     <label key={cat} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
@@ -159,7 +161,7 @@ export default function ProductList() {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Brand">
+              <FilterSection title={t('cust.brand')}>
                 <div className="space-y-1">
                   {brands.map(brand => (
                     <label key={brand} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
@@ -172,7 +174,7 @@ export default function ProductList() {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Price Range">
+              <FilterSection title={t('cust.priceRange')}>
                 <div className="flex gap-2 px-1">
                   <input type="number" placeholder="Min ₹" value={filters.minPrice} onChange={e => handleFilterChange('minPrice', e.target.value)}
                     className="w-1/2 border-2 border-gold-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-gold-400 outline-none bg-gold-50/50" />
@@ -196,7 +198,7 @@ export default function ProductList() {
                     </div>
                   </FilterSection>
 
-                  <FilterSection title="Storage">
+                  <FilterSection title={t('cust.storage')}>
                     <div className="space-y-1">
                       {['64 GB', '128 GB', '256 GB', '512 GB', '1 TB'].map(storage => (
                         <label key={storage} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
@@ -209,7 +211,7 @@ export default function ProductList() {
                     </div>
                   </FilterSection>
 
-                  <FilterSection title="Screen Size">
+                  <FilterSection title={t('cust.screenSize')}>
                     <div className="space-y-1">
                       {screenSizes.map(size => (
                         <label key={size} className="flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer hover:bg-gold-50 transition">
@@ -222,7 +224,7 @@ export default function ProductList() {
                     </div>
                   </FilterSection>
 
-                  <FilterSection title="Color" defaultOpen={false}>
+                  <FilterSection title={t('cust.color')} defaultOpen={false}>
                     <div className="flex flex-wrap gap-2 px-1">
                       {colors.map(color => (
                         <button key={color} onClick={() => handleFilterChange('color', filters.color === color ? '' : color)}
@@ -243,7 +245,7 @@ export default function ProductList() {
           {/* Search Bar */}
           <div className="mb-4 hidden lg:block">
             <SearchBar
-              placeholder="Search products, brands, categories..."
+              placeholder={t('cust.searchProducts')}
               initialValue={filters.search}
               onSearch={(q) => handleFilterChange('search', q)}
             />
@@ -261,9 +263,9 @@ export default function ProductList() {
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl gold-border">
-              <p className="text-gray-500 text-lg font-medium">No products found</p>
-              <p className="text-gray-400 text-sm mt-1">Try adjusting your filters</p>
-              <button onClick={clearFilters} className="btn-gold rounded-xl mt-4">Clear All Filters</button>
+              <p className="text-gray-500 text-lg font-medium">{t('cust.noProductsFound')}</p>
+              <p className="text-gray-400 text-sm mt-1">{t('cust.adjustFilters')}</p>
+              <button onClick={clearFilters} className="btn-gold rounded-xl mt-4">{t('cust.clearAllFilters')}</button>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
@@ -273,14 +275,14 @@ export default function ProductList() {
                     {product.images?.[0] ? (
                       <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain" />
                     ) : (
-                      <div className="text-gray-400 text-sm">No Image</div>
+                      <div className="text-gray-400 text-sm">{t('cust.noImage')}</div>
                     )}
                     {product.mrp > product.price && !product.variants?.length && (
                       <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
                       </span>
                     )}
-                    {product.stock <= 0 && !product.variants?.length && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">Out of Stock</span>}
+                    {product.stock <= 0 && !product.variants?.length && <span className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">{t('cust.outOfStock')}</span>}
                   </div>
                   <div className="p-4">
                     <p className="text-xs text-gold-600 font-medium">{product.brand}</p>
@@ -294,13 +296,13 @@ export default function ProductList() {
                         )}
                       </span>
                       {product.variants?.length > 0 ? (
-                        <span className="text-xs text-gray-400">Starting price</span>
+                        <span className="text-xs text-gray-400">{t('cust.startingPrice')}</span>
                       ) : product.mrp > product.price ? (
                         <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>
                       ) : null}
                     </div>
                     {product.variants?.length > 1 && (
-                      <p className="text-xs text-gray-500 mt-1">{product.variants.length} variants available</p>
+                      <p className="text-xs text-gray-500 mt-1">{product.variants.length} {t('cust.variantsAvailable')}</p>
                     )}
                     {product.ratings > 0 && (
                       <div className="flex items-center gap-1 mt-1">
@@ -311,12 +313,12 @@ export default function ProductList() {
                     <div className="flex gap-2 mt-3">
                       {product.variants?.length > 0 ? (
                         <Link to={`/products/${product._id}`} className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1 text-center">
-                          View Options
+                          {t('cust.viewOptions')}
                         </Link>
                       ) : (
                         <button onClick={(e) => handleAddToCart(product, e)} disabled={product.stock <= 0}
                           className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1">
-                          <ShoppingCart size={14} /> Add to Cart
+                          <ShoppingCart size={14} /> {t('cust.addToCart')}
                         </button>
                       )}
                     </div>

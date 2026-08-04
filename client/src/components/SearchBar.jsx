@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 import { Search, X, Package, Tag, Folder } from 'lucide-react';
 
-export default function SearchBar({ placeholder = 'Search products...', className = '', autoFocus = false, initialValue = '', onSearch, size = 'normal' }) {
+export default function SearchBar({ placeholder, className = '', autoFocus = false, initialValue = '', onSearch, size = 'normal' }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [query, setQuery] = useState(initialValue);
   const [suggestions, setSuggestions] = useState({ products: [], brands: [], categories: [] });
   const [showDropdown, setShowDropdown] = useState(false);
@@ -133,7 +135,7 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
             value={query}
             onChange={e => setQuery(e.target.value)}
             onFocus={() => { setIsFocused(true); if (query && hasResults) setShowDropdown(true); }}
-            placeholder={placeholder}
+            placeholder={placeholder || t('comp.searchProducts')}
             autoFocus={autoFocus}
             className={`w-full ${isLarge ? 'pl-12 pr-10 py-4 text-base' : 'pl-10 pr-10 py-2.5 text-sm'} bg-white outline-none ${isLarge ? 'rounded-l-2xl' : 'rounded-l-xl'}`}
           />
@@ -147,7 +149,7 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
         <button type="submit"
           className={`gold-gradient text-white ${isLarge ? 'px-8 rounded-r-2xl' : 'px-5 rounded-r-xl'} hover:opacity-90 transition flex-shrink-0 flex items-center gap-2 font-medium ${isLarge ? 'text-sm' : 'text-xs'}`}>
           <Search size={isLarge ? 18 : 16} />
-          {isLarge && 'Search'}
+          {isLarge && t('comp.search')}
         </button>
       </form>
 
@@ -155,18 +157,18 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
       {showSuggestions && (
         <div className={`absolute z-50 top-full left-0 right-0 mt-2 bg-white ${isLarge ? 'rounded-2xl' : 'rounded-xl'} shadow-2xl overflow-hidden max-h-[70vh] overflow-y-auto border border-gray-100`}>
           {loading && (
-            <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
+              <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-gold-500 border-t-transparent"></div>
-              Searching...
+              {t('comp.searching')}
             </div>
           )}
 
           {!loading && !hasResults && query && (
             <div className="px-4 py-8 text-center">
               <Package size={32} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm text-gray-500 mb-1">No results for "{query}"</p>
+              <p className="text-sm text-gray-500 mb-1">{t('comp.noResultsFor', { query })}</p>
               <button onClick={() => handleSuggestionSearch(query)} className="text-xs text-gold-600 hover:underline font-medium">
-                Search all products →
+                {t('comp.searchAllProducts')}
               </button>
             </div>
           )}
@@ -176,7 +178,7 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
               {suggestions.products.length > 0 && (
                 <div>
                   <div className="px-4 py-2 bg-gold-50 text-xs font-semibold text-gold-700 flex items-center gap-1.5 border-b border-gold-100">
-                    <Package size={12} /> Products
+                    <Package size={12} /> {t('comp.products')}
                   </div>
                   {suggestions.products.map(product => (
                     <button key={product._id} onClick={() => handleProductClick(product)}
@@ -197,7 +199,7 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
                           ₹{(product.lowestVariantPrice || product.price)?.toLocaleString()}
                         </p>
                         {product.variants?.length > 0 && (
-                          <p className="text-[10px] text-gray-400">Starting</p>
+                          <p className="text-[10px] text-gray-400">{t('comp.starting')}</p>
                         )}
                       </div>
                     </button>
@@ -208,14 +210,14 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
               {suggestions.brands.length > 0 && (
                 <div>
                   <div className="px-4 py-2 bg-blue-50 text-xs font-semibold text-blue-700 flex items-center gap-1.5 border-b border-blue-100">
-                    <Tag size={12} /> Brands
+                    <Tag size={12} /> {t('comp.brands')}
                   </div>
                   {suggestions.brands.map(brand => (
                     <button key={brand} onClick={() => handleBrandClick(brand)}
                       className="w-full px-4 py-2.5 flex items-center gap-2.5 hover:bg-blue-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-blue-100">
                       <Tag size={14} className="text-blue-400 flex-shrink-0" />
                       <span className="text-sm text-gray-700 font-medium">{getHighlight(brand, query)}</span>
-                      <span className="text-xs text-gray-400 ml-auto">View all →</span>
+                      <span className="text-xs text-gray-400 ml-auto">{t('comp.viewAll')}</span>
                     </button>
                   ))}
                 </div>
@@ -224,14 +226,14 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
               {suggestions.categories.length > 0 && (
                 <div>
                   <div className="px-4 py-2 bg-green-50 text-xs font-semibold text-green-700 flex items-center gap-1.5 border-b border-green-100">
-                    <Folder size={12} /> Categories
+                    <Folder size={12} /> {t('comp.categories')}
                   </div>
                   {suggestions.categories.map(cat => (
                     <button key={cat} onClick={() => handleCategoryClick(cat)}
                       className="w-full px-4 py-2.5 flex items-center gap-2.5 hover:bg-green-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-green-100">
                       <Folder size={14} className="text-green-400 flex-shrink-0" />
                       <span className="text-sm text-gray-700 font-medium">{getHighlight(cat, query)}</span>
-                      <span className="text-xs text-gray-400 ml-auto">View all →</span>
+                      <span className="text-xs text-gray-400 ml-auto">{t('comp.viewAll')}</span>
                     </button>
                   ))}
                 </div>
@@ -239,7 +241,7 @@ export default function SearchBar({ placeholder = 'Search products...', classNam
 
               <button onClick={() => handleSuggestionSearch(query)}
                 className="w-full px-4 py-3 bg-gray-50 text-sm font-semibold text-gold-600 hover:bg-gold-50 transition-all flex items-center justify-center gap-2 border-t border-gray-200">
-                <Search size={14} /> Search all results for "{query}"
+                <Search size={14} /> {t('comp.searchAllResultsFor', { query })}
               </button>
             </>
           )}

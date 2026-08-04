@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import api from '../../utils/api';
 import { Users, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function AdminCustomers() {
+  const { t } = useLanguage();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -19,10 +21,10 @@ export default function AdminCustomers() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Customers ({customers.length})</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('admin2.customers')} ({customers.length})</h1>
 
       <div className="mb-4">
-        <input type="text" placeholder="Search by name, phone, or email..." value={search} onChange={e => setSearch(e.target.value)}
+        <input type="text" placeholder={t('admin2.searchCustomers')} value={search} onChange={e => setSearch(e.target.value)}
           className="w-full md:w-96 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
       </div>
 
@@ -31,12 +33,12 @@ export default function AdminCustomers() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="text-left py-3 px-4 text-gray-600">Customer</th>
-                <th className="text-left py-3 px-4 text-gray-600">Phone</th>
-                <th className="text-left py-3 px-4 text-gray-600">Email</th>
-                <th className="text-left py-3 px-4 text-gray-600">Address</th>
-                <th className="text-left py-3 px-4 text-gray-600">Points</th>
-                <th className="text-left py-3 px-4 text-gray-600">Joined</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.customer')}</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.phone')}</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.email')}</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.address')}</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.points')}</th>
+                <th className="text-left py-3 px-4 text-gray-600">{t('admin2.joined')}</th>
               </tr>
             </thead>
             <tbody>
@@ -57,7 +59,7 @@ export default function AdminCustomers() {
                   <td className="py-3 px-4 text-gray-500 text-xs">{new Date(customer.createdAt).toLocaleDateString('en-IN')}</td>
                 </tr>
               ))}
-              {filtered.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-gray-400">No customers found</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-gray-400">{t('admin2.noCustomers')}</td></tr>}
             </tbody>
           </table>
         </div>

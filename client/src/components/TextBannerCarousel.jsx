@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
 const fallbackBanners = [
@@ -22,6 +23,7 @@ export default function TextBannerCarousel() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.get('/banners')
@@ -32,7 +34,21 @@ export default function TextBannerCarousel() {
       .catch(() => {});
   }, []);
 
-  const slides = banners.length > 0 ? banners : fallbackBanners;
+  const translatedFallbackBanners = [
+    {
+      _id: 'fallback-festive',
+      type: 'text',
+      highlightedText: t('comp.bannerHighlightedText'),
+      bigText: t('comp.bannerBigText'),
+      smallText: t('comp.bannerSmallText'),
+      buttonText: t('comp.shopOffers'),
+      link: '/products?onOffer=true',
+      bgColor: '#dc2626',
+      textColor: '#ffffff',
+    },
+  ];
+
+  const slides = banners.length > 0 ? banners : translatedFallbackBanners;
 
   const next = useCallback(() => setCurrent(prev => (prev + 1) % slides.length), [slides.length]);
   const prev = useCallback(() => setCurrent(prev => (prev - 1 + slides.length) % slides.length), [slides.length]);
@@ -79,7 +95,7 @@ export default function TextBannerCarousel() {
         <button onClick={() => navigate(slide.link || '/products?onOffer=true')}
           className="flex-shrink-0 animate-slide-up bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold text-sm px-6 py-3 rounded-xl hover:shadow-[0_0_24px_rgba(212,160,23,0.5)] hover:scale-105 transition-all duration-300 shadow-md md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"
           style={{ animationDelay: '0.3s' }}>
-          {slide.buttonText || 'Shop Offers'} <ChevronRight size={16} className="inline" />
+          {slide.buttonText || t('comp.shopOffers')} <ChevronRight size={16} className="inline" />
         </button>
       </div>
 

@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { User, MapPin, Ticket, HelpCircle, Globe, Edit2, Save, Package, ChevronRight, Phone, Mail, MessageCircle, Clock, Plus, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const tabs = [
-  { id: 'personal', label: 'Personal Details', icon: User },
-  { id: 'orders', label: 'My Orders', icon: Package },
-  { id: 'address', label: 'Saved Address', icon: MapPin },
-  { id: 'coupons', label: 'My Coupons', icon: Ticket },
-  { id: 'help', label: 'Help & Support', icon: HelpCircle },
-  { id: 'language', label: 'Preferred Language', icon: Globe },
+  { id: 'personal', label: 'cust.personalDetails', icon: User },
+  { id: 'orders', label: 'cust.myOrders', icon: Package },
+  { id: 'address', label: 'cust.savedAddress', icon: MapPin },
+  { id: 'coupons', label: 'cust.myCoupons', icon: Ticket },
+  { id: 'help', label: 'cust.helpSupport', icon: HelpCircle },
+  { id: 'language', label: 'cust.preferredLanguage', icon: Globe },
 ];
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'personal');
   const [editing, setEditing] = useState(false);
@@ -65,17 +67,17 @@ export default function Profile() {
 
   const handleAddAddress = () => {
     if (!addrForm.street || !addrForm.city || !addrForm.pincode) {
-      toast.error('Please fill all required fields');
+      toast.error(t('cust.fillRequiredFields'));
       return;
     }
     let updated;
     if (editingAddress) {
       updated = addresses.map(a => a.id === editingAddress.id ? { ...a, ...addrForm } : a);
-      toast.success('Address updated!');
+      toast.success(t('cust.addressUpdated'));
     } else {
       const newAddr = { ...addrForm, id: Date.now().toString(), isDefault: addresses.length === 0 };
       updated = [...addresses, newAddr];
-      toast.success('Address added!');
+      toast.success(t('cust.addressAdded'));
     }
     saveAddresses(updated);
     setShowAddressModal(false);
@@ -89,7 +91,7 @@ export default function Profile() {
       updated[0].isDefault = true;
     }
     saveAddresses(updated);
-    toast.success('Address deleted!');
+    toast.success(t('cust.addressDeleted'));
   };
 
   const handleSetDefault = (id) => {
@@ -116,9 +118,19 @@ export default function Profile() {
       });
       updateUser(data);
       setEditing(false);
-      toast.success('Profile updated!');
+      toast.success(t('cust.profileUpdated'));
     } catch (error) {
-      toast.error('Failed to update profile');
+      toast.error(t('cust.failedToUpdateProfile'));
+    }
+  };
+
+  const handleLanguageChange = async (lang) => {
+    setLanguage(lang);
+    try {
+      await api.put('/profile', { language: lang });
+      updateUser({ language: lang });
+    } catch (error) {
+      console.error('Failed to save language preference');
     }
   };
 
@@ -136,7 +148,7 @@ export default function Profile() {
             <p className="text-xs text-gray-500 mt-0.5">{user?.phone}</p>
             {user?.email && <p className="text-xs text-gray-500">{user.email}</p>}
             <div className="mt-3 p-2 bg-yellow-50 rounded-lg">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wide">Loyalty Points</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wide">{t('cust.loyaltyPoints')}</p>
               <p className="text-xl font-bold text-yellow-600">{user?.loyaltyPoints || 0}</p>
             </div>
           </div>
@@ -151,7 +163,7 @@ export default function Profile() {
                     : 'text-gray-600 hover:bg-gold-50'
                 }`}>
                 <tab.icon size={16} />
-                <span className="text-left">{tab.label}</span>
+                <span className="text-left">{t(tab.label)}</span>
               </button>
             ))}
           </div>
@@ -162,25 +174,25 @@ export default function Profile() {
           {activeTab === 'personal' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="font-bold text-lg text-gray-800">Personal Details</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('cust.personalDetails')}</h3>
                 <button onClick={() => editing ? handleSave() : setEditing(true)}
                   className="gold-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:opacity-90 transition shadow-md">
-                  {editing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+                  {editing ? <><Save size={14} /> {t('cust.save')}</> : <><Edit2 size={14} /> {t('cust.edit')}</>}
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Name</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.name')}</label>
                   <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={!editing}
                     className={`w-full border rounded-lg px-4 py-2.5 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none border-gold-300' : 'bg-gray-50 border-gray-200'}`} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.email')}</label>
                   <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} disabled={!editing}
                     className={`w-full border rounded-lg px-4 py-2.5 text-sm ${editing ? 'focus:ring-2 focus:ring-gold-500 outline-none border-gold-300' : 'bg-gray-50 border-gray-200'}`} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone Number</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.phoneNumber')}</label>
                   <input value={user?.phone || ''} disabled
                     className="w-full border rounded-lg px-4 py-2.5 text-sm bg-gray-50 border-gray-200 text-gray-500" />
                 </div>
@@ -191,16 +203,16 @@ export default function Profile() {
           {activeTab === 'orders' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="font-bold text-lg text-gray-800">My Orders ({orders.length})</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('cust.myOrders')} ({orders.length})</h3>
                 <Link to="/orders" className="text-gold-600 text-sm font-semibold hover:underline flex items-center gap-1">
-                  View All <ChevronRight size={14} />
+                  {t('cust.viewAll')} <ChevronRight size={14} />
                 </Link>
               </div>
               {orders.length === 0 ? (
                 <div className="text-center py-12">
                   <Package size={48} className="text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No orders yet</p>
-                  <Link to="/products" className="btn-gold rounded-xl mt-4 inline-block text-sm">Start Shopping</Link>
+                  <p className="text-gray-500">{t('cust.noOrdersYet')}</p>
+                  <Link to="/products" className="btn-gold rounded-xl mt-4 inline-block text-sm">{t('cust.startShopping')}</Link>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -232,7 +244,7 @@ export default function Profile() {
                         <div className="text-right flex items-center gap-3 flex-shrink-0">
                           <div>
                             <p className="font-bold text-sm text-gray-900">₹{order.total.toLocaleString()}</p>
-                            <p className="text-[11px] text-gold-600 font-medium group-hover:underline">View Details</p>
+                            <p className="text-[11px] text-gold-600 font-medium group-hover:underline">{t('cust.viewDetails')}</p>
                           </div>
                           <ChevronRight size={16} className="text-gray-400 group-hover:text-gold-500 transition" />
                         </div>
@@ -247,17 +259,17 @@ export default function Profile() {
           {activeTab === 'address' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="font-bold text-lg text-gray-800">Saved Address</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('cust.savedAddress')}</h3>
                 <button onClick={() => { setEditingAddress(null); setAddrForm({ label: 'Home', street: '', city: '', state: '', pincode: '', phone: '' }); setShowAddressModal(true); }}
                   className="gold-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:opacity-90 transition shadow-md">
-                  <Plus size={14} /> Add Address
+                  <Plus size={14} /> {t('cust.addAddress')}
                 </button>
               </div>
 
               {addresses.length === 0 ? (
                 <div className="text-center py-12">
                   <MapPin size={48} className="text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No saved addresses</p>
+                  <p className="text-gray-500">{t('cust.noSavedAddresses')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -271,7 +283,7 @@ export default function Profile() {
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-semibold text-sm text-gray-800">{addr.label}</p>
-                              {addr.isDefault && <span className="text-[10px] bg-gold-500 text-white px-2 py-0.5 rounded-full font-semibold">Default</span>}
+                              {addr.isDefault && <span className="text-[10px] bg-gold-500 text-white px-2 py-0.5 rounded-full font-semibold">{t('cust.default')}</span>}
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{addr.street}</p>
                             <p className="text-sm text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
@@ -280,7 +292,7 @@ export default function Profile() {
                         </div>
                         <div className="flex items-center gap-2">
                           {!addr.isDefault && (
-                            <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-600 hover:underline font-medium">Set Default</button>
+                            <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-600 hover:underline font-medium">{t('cust.setDefault')}</button>
                           )}
                           <button onClick={() => openEditAddress(addr)} className="p-1.5 hover:bg-gold-100 rounded-lg transition">
                             <Edit2 size={14} className="text-gold-600" />
@@ -301,20 +313,20 @@ export default function Profile() {
 
           {activeTab === 'coupons' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-bold text-lg text-gray-800 mb-5">My Coupons</h3>
+              <h3 className="font-bold text-lg text-gray-800 mb-5">{t('cust.myCoupons')}</h3>
               <div className="text-center py-12">
                 <div className="w-20 h-20 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4">
                   <Ticket size={32} className="text-orange-400" />
                 </div>
-                <p className="text-gray-600 font-medium">No coupons available yet</p>
-                <p className="text-sm text-gray-400 mt-1">Stay tuned for exciting offers and discounts!</p>
+                <p className="text-gray-600 font-medium">{t('cust.noCouponsAvailable')}</p>
+                <p className="text-sm text-gray-400 mt-1">{t('cust.stayTuned')}</p>
               </div>
             </div>
           )}
 
           {activeTab === 'help' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-bold text-lg text-gray-800 mb-5">Help & Support</h3>
+              <h3 className="font-bold text-lg text-gray-800 mb-5">{t('cust.helpSupport')}</h3>
               <div className="space-y-4">
                 <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-green-300 hover:bg-green-50 transition">
@@ -322,8 +334,8 @@ export default function Profile() {
                     <MessageCircle size={22} className="text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-sm text-gray-800">WhatsApp Support</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Chat with us on WhatsApp</p>
+                    <p className="font-semibold text-sm text-gray-800">{t('cust.whatsappSupport')}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('cust.chatOnWhatsapp')}</p>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
                 </a>
@@ -333,7 +345,7 @@ export default function Profile() {
                     <Phone size={22} className="text-blue-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-sm text-gray-800">Call Us</p>
+                    <p className="font-semibold text-sm text-gray-800">{t('cust.callUs')}</p>
                     <p className="text-xs text-gray-500 mt-0.5">+91 88868 88128</p>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
@@ -344,7 +356,7 @@ export default function Profile() {
                     <Mail size={22} className="text-gold-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-sm text-gray-800">Email Us</p>
+                    <p className="font-semibold text-sm text-gray-800">{t('cust.emailUs')}</p>
                     <p className="text-xs text-gray-500 mt-0.5">svlnmobiles12@gmail.com</p>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
@@ -354,8 +366,8 @@ export default function Profile() {
                     <Clock size={22} className="text-purple-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-gray-800">Store Hours</p>
-                    <p className="text-xs text-gray-500 mt-0.5">10:00 AM – 9:00 PM (All days)</p>
+                    <p className="font-semibold text-sm text-gray-800">{t('cust.storeHours')}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('cust.storeHoursTime')}</p>
                   </div>
                 </div>
               </div>
@@ -364,20 +376,20 @@ export default function Profile() {
 
           {activeTab === 'language' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-bold text-lg text-gray-800 mb-5">Preferred Language</h3>
+              <h3 className="font-bold text-lg text-gray-800 mb-5">{t('cust.preferredLanguage')}</h3>
               <div className="space-y-3">
-                <label className="flex items-center gap-4 p-4 border-2 border-gold-300 rounded-xl bg-gold-50 cursor-pointer">
-                  <input type="radio" name="language" defaultChecked className="w-4 h-4 text-gold-600 accent-gold-600" />
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'en' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
+                  <input type="radio" name="language" checked={language === 'en'} onChange={() => handleLanguageChange('en')} className="w-4 h-4 text-gold-600 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>
                       <p className="font-semibold text-sm text-gray-800">English</p>
-                      <p className="text-xs text-gray-500">Default language</p>
+                      <p className="text-xs text-gray-500">{t('cust.defaultLanguage')}</p>
                     </div>
                   </div>
                 </label>
-                <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gold-300 cursor-pointer transition">
-                  <input type="radio" name="language" className="w-4 h-4 text-gold-600 accent-gold-600" />
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'hi' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
+                  <input type="radio" name="language" checked={language === 'hi'} onChange={() => handleLanguageChange('hi')} className="w-4 h-4 text-gold-600 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>
@@ -386,8 +398,8 @@ export default function Profile() {
                     </div>
                   </div>
                 </label>
-                <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gold-300 cursor-pointer transition">
-                  <input type="radio" name="language" className="w-4 h-4 text-gold-600 accent-gold-600" />
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'te' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
+                  <input type="radio" name="language" checked={language === 'te'} onChange={() => handleLanguageChange('te')} className="w-4 h-4 text-gold-600 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>
@@ -407,47 +419,47 @@ export default function Profile() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in-down">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h3 className="font-bold text-lg text-gray-800">{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
+              <h3 className="font-bold text-lg text-gray-800">{editingAddress ? t('cust.editAddress') : t('cust.addNewAddress')}</h3>
               <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }} className="p-1 hover:bg-gray-100 rounded-lg transition">
                 <X size={20} className="text-gray-500" />
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Label</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.label')}</label>
                 <select value={addrForm.label} onChange={e => setAddrForm({...addrForm, label: e.target.value})}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none">
-                  <option>Home</option>
-                  <option>Work</option>
-                  <option>Other</option>
+                  <option>{t('cust.home')}</option>
+                  <option>{t('cust.work')}</option>
+                  <option>{t('cust.other')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Street Address *</label>
-                <input value={addrForm.street} onChange={e => setAddrForm({...addrForm, street: e.target.value})} placeholder="House no., Street, Landmark"
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.streetAddress')} *</label>
+                <input value={addrForm.street} onChange={e => setAddrForm({...addrForm, street: e.target.value})} placeholder={t('cust.streetPlaceholder')}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">City *</label>
-                  <input value={addrForm.city} onChange={e => setAddrForm({...addrForm, city: e.target.value})} placeholder="City"
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.city')} *</label>
+                  <input value={addrForm.city} onChange={e => setAddrForm({...addrForm, city: e.target.value})} placeholder={t('cust.city')}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">State *</label>
-                  <input value={addrForm.state} onChange={e => setAddrForm({...addrForm, state: e.target.value})} placeholder="State"
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.state')} *</label>
+                  <input value={addrForm.state} onChange={e => setAddrForm({...addrForm, state: e.target.value})} placeholder={t('cust.state')}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Pincode *</label>
-                  <input value={addrForm.pincode} onChange={e => setAddrForm({...addrForm, pincode: e.target.value})} placeholder="Pincode" maxLength={6}
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.pincode')} *</label>
+                  <input value={addrForm.pincode} onChange={e => setAddrForm({...addrForm, pincode: e.target.value})} placeholder={t('cust.pincode')} maxLength={6}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone</label>
-                  <input value={addrForm.phone} onChange={e => setAddrForm({...addrForm, phone: e.target.value})} placeholder="Phone number" maxLength={10}
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t('cust.phone')}</label>
+                  <input value={addrForm.phone} onChange={e => setAddrForm({...addrForm, phone: e.target.value})} placeholder={t('cust.phoneNumber')} maxLength={10}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
                 </div>
               </div>
@@ -455,11 +467,11 @@ export default function Profile() {
             <div className="flex items-center gap-3 p-5 border-t border-gray-100">
               <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }}
                 className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
-                Cancel
+                {t('cust.cancel')}
               </button>
               <button onClick={handleAddAddress}
                 className="flex-1 gold-gradient text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition shadow-md">
-                {editingAddress ? 'Update Address' : 'Save Address'}
+                {editingAddress ? t('cust.updateAddress') : t('cust.saveAddress')}
               </button>
             </div>
           </div>

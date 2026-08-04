@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { RotateCcw, Smartphone, IndianRupee } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 const phoneModels = [
   { brand: 'Apple', models: ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14', 'iPhone 13 Pro Max', 'iPhone 13', 'iPhone 12', 'iPhone SE 2022'] },
@@ -25,10 +26,17 @@ const exchangeValues = {
   'Realme GT 5 Pro': 22000, 'Realme 12 Pro': 13000, 'Realme Narzo 70': 7000,
 };
 
+const conditionLabels = {
+  excellent: { label: 'cust.excellent', desc: 'cust.noScratches' },
+  good: { label: 'cust.good', desc: 'cust.minorScratches' },
+  fair: { label: 'cust.fair', desc: 'cust.visibleWear' },
+};
+
 export default function ExchangeCalculator() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [condition, setCondition] = useState('good');
+  const { t } = useLanguage();
 
   const brandModels = phoneModels.find(b => b.brand === selectedBrand)?.models || [];
   const conditionMultiplier = condition === 'excellent' ? 1.0 : condition === 'good' ? 0.85 : 0.65;
@@ -43,14 +51,14 @@ export default function ExchangeCalculator() {
             <RotateCcw size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Exchange Calculator</h1>
-            <p className="text-sm text-gray-500">Get the best value for your old phone</p>
+            <h1 className="text-2xl font-bold text-gray-800">{t('cust.exchangeCalculator')}</h1>
+            <p className="text-sm text-gray-500">{t('cust.getBestValue')}</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Brand</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('cust.phoneBrand')}</label>
             <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
               {phoneModels.map(brand => (
                 <button key={brand.brand} onClick={() => { setSelectedBrand(brand.brand); setSelectedModel(''); }}
@@ -63,10 +71,10 @@ export default function ExchangeCalculator() {
 
           {selectedBrand && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Model</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('cust.phoneModel')}</label>
               <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none">
-                <option value="">Select Model</option>
+                <option value="">{t('cust.selectModel')}</option>
                 {brandModels.map(model => (
                   <option key={model} value={model}>{model}</option>
                 ))}
@@ -76,17 +84,13 @@ export default function ExchangeCalculator() {
 
           {selectedModel && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Condition</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('cust.phoneCondition')}</label>
               <div className="grid grid-cols-3 gap-3">
-                {[
-                  { value: 'excellent', label: 'Excellent', desc: 'No scratches, works perfectly' },
-                  { value: 'good', label: 'Good', desc: 'Minor scratches, works well' },
-                  { value: 'fair', label: 'Fair', desc: 'Visible wear, some issues' },
-                ].map(c => (
-                  <button key={c.value} onClick={() => setCondition(c.value)}
-                    className={`p-4 rounded-xl border-2 text-center transition ${condition === c.value ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <p className="font-medium text-sm">{c.label}</p>
-                    <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
+                {Object.entries(conditionLabels).map(([value, { label, desc }]) => (
+                  <button key={value} onClick={() => setCondition(value)}
+                    className={`p-4 rounded-xl border-2 text-center transition ${condition === value ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <p className="font-medium text-sm">{t(label)}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t(desc)}</p>
                   </button>
                 ))}
               </div>
@@ -96,21 +100,21 @@ export default function ExchangeCalculator() {
           {/* Result */}
           {selectedModel && (
             <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white text-center">
-              <p className="text-orange-100 text-sm mb-1">Estimated Exchange Value</p>
+              <p className="text-orange-100 text-sm mb-1">{t('cust.estimatedExchangeValue')}</p>
               <p className="text-4xl font-bold flex items-center justify-center gap-1">
                 <IndianRupee size={28} />{estimatedValue.toLocaleString()}
               </p>
-              <p className="text-orange-200 text-xs mt-2">* Final value may vary after physical inspection at the store</p>
+              <p className="text-orange-200 text-xs mt-2">{t('cust.finalValueDisclaimer')}</p>
             </div>
           )}
 
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-gold-700 font-medium text-sm">How Exchange Works:</p>
+            <p className="text-gold-700 font-medium text-sm">{t('cust.howExchangeWorks')}</p>
             <ol className="text-gold-600 text-xs mt-2 space-y-1 list-decimal list-inside">
-              <li>Get an estimated value using this calculator</li>
-              <li>Visit our store with your old phone</li>
-              <li>Our team will inspect and verify the condition</li>
-              <li>Get instant discount on your new purchase!</li>
+              <li>{t('cust.exchangeStep1')}</li>
+              <li>{t('cust.exchangeStep2')}</li>
+              <li>{t('cust.exchangeStep3')}</li>
+              <li>{t('cust.exchangeStep4')}</li>
             </ol>
           </div>
         </div>

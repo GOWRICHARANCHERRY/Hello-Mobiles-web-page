@@ -2,16 +2,18 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LayoutDashboard, Package, ShoppingCart, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function EmployeeLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useLanguage();
 
   const links = [
-    { to: '/employee', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/employee/inventory', label: 'Inventory', icon: Package },
-    { to: '/employee/orders', label: 'Orders', icon: ShoppingCart },
+    { to: '/employee', label: t('emp.dashboard'), icon: LayoutDashboard },
+    { to: '/employee/inventory', label: t('emp.inventory'), icon: Package },
+    { to: '/employee/orders', label: t('emp.orders'), icon: ShoppingCart },
   ];
 
   return (
@@ -23,7 +25,7 @@ export default function EmployeeLayout() {
             <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5" />
             <div>
               <h1 className="text-lg font-bold">HELLO MOBILES</h1>
-              <p className="text-blue-200 text-xs">Employee Portal</p>
+              <p className="text-blue-200 text-xs">{t('emp.portal')}</p>
             </div>
           </div>
         </div>
@@ -41,7 +43,7 @@ export default function EmployeeLayout() {
             <p className="text-xs text-blue-200">{user?.phone}</p>
           </div>
           <button onClick={logout} className="flex items-center gap-2 text-blue-200 hover:text-white mt-3 text-sm w-full">
-            <LogOut size={16} /> Logout
+            <LogOut size={16} /> {t('emp.logout')}
           </button>
         </div>
       </aside>
@@ -52,7 +54,7 @@ export default function EmployeeLayout() {
           <button onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <h1 className="font-bold">Employee Portal</h1>
+          <h1 className="font-bold">{t('emp.portal')}</h1>
           <div></div>
         </header>
         <main className="flex-1 p-6">

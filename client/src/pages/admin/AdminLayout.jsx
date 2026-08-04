@@ -1,23 +1,25 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image, Tag, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const links = [
-    { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin/products', label: 'Products', icon: Package },
-    { to: '/admin/banners', label: 'Banners', icon: Image },
-    { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-    { to: '/admin/employees', label: 'Employees', icon: UserCheck },
-    { to: '/admin/customers', label: 'Customers', icon: Users },
-    { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-    { to: '/admin/coupons', label: 'Coupons', icon: Tag },
-    { to: '/admin/leads', label: 'Leads', icon: Mail },
+    { to: '/admin', label: t('admin.dashboard'), icon: LayoutDashboard },
+    { to: '/admin/products', label: t('admin.products'), icon: Package },
+    { to: '/admin/banners', label: t('admin.banners'), icon: Image },
+    { to: '/admin/orders', label: t('admin.orders'), icon: ShoppingCart },
+    { to: '/admin/employees', label: t('admin.employees'), icon: UserCheck },
+    { to: '/admin/customers', label: t('admin.customers'), icon: Users },
+    { to: '/admin/analytics', label: t('admin.analytics'), icon: BarChart3 },
+    { to: '/admin/coupons', label: t('admin.coupons'), icon: Tag },
+    { to: '/admin/leads', label: t('admin.leads'), icon: Mail },
   ];
 
   return (
@@ -29,7 +31,7 @@ export default function AdminLayout() {
             <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5" />
             <div>
               <h1 className="text-lg font-bold">HELLO MOBILES</h1>
-              <p className="text-gray-400 text-xs">Admin Panel</p>
+              <p className="text-gray-400 text-xs">{t('admin.adminPanel')}</p>
             </div>
           </div>
         </div>
@@ -44,10 +46,10 @@ export default function AdminLayout() {
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="bg-white/10 rounded-lg p-3">
             <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-gray-400">Administrator</p>
+            <p className="text-xs text-gray-400">{t('admin.administrator')}</p>
           </div>
           <button onClick={logout} className="flex items-center gap-2 text-gray-400 hover:text-white mt-3 text-sm w-full">
-            <LogOut size={16} /> Logout
+            <LogOut size={16} /> {t('admin.logout')}
           </button>
         </div>
       </aside>
@@ -58,7 +60,7 @@ export default function AdminLayout() {
           <button onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <h1 className="font-bold">Admin Panel</h1>
+          <h1 className="font-bold">{t('admin.adminPanel')}</h1>
           <div></div>
         </header>
         <main className="flex-1 p-6 overflow-auto">
