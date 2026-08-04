@@ -15,6 +15,9 @@ export function buildOrderMessage(order, customer) {
     .map(i => `• ${i.name} × ${i.quantity}`)
     .join('\n');
   const more = order.items.length > 3 ? `\n• +${order.items.length - 3} more` : '';
+  const mapLine = order.shippingAddress?.latitude && order.shippingAddress?.longitude
+    ? `\n📍 Map: https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`
+    : '';
 
   return `🔔 NEW ORDER — Hello Mobiles
 
@@ -28,7 +31,7 @@ Phone: ${customerPhone}
 
 Items:
 ${itemsSummary}${more}
-
+${mapLine}
 Ordered at: ${new Date(order.createdAt || Date.now()).toLocaleString('en-IN')}`;
 }
 

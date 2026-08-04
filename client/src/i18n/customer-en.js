@@ -569,4 +569,5 @@ export default {
   'cust.removedFromWishlist': 'Removed from wishlist',
   'cust.failedToRemove': 'Failed to remove',
   'cust.saveItemsLater': 'Save items you love for later',
+  'cust.viewOnMap': 'View on map',
 };

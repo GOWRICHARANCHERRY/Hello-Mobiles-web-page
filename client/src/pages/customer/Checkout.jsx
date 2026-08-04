@@ -6,8 +6,10 @@ import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import LocationPicker from '../../components/LocationPicker';
 
 const STORE_UPI = 'svlnmobiles12@ybl';
+const HAS_MAPS = !!import.meta.env.VITE_GOOGLE_MAPS_KEY;
 
 export default function Checkout() {
   const { t } = useLanguage();
@@ -25,6 +27,7 @@ export default function Checkout() {
     street: user?.address?.street || '', city: user?.address?.city || '',
     state: user?.address?.state || '', pincode: user?.address?.pincode || '',
   });
+  const [mapLoc, setMapLoc] = useState({ lat: null, lng: null, mapLabel: '' });
   const [paymentMethod, setPaymentMethod] = useState('online');
 
   const deliveryCharge = cartTotal > 5000 ? 0 : 99;
@@ -101,6 +104,18 @@ export default function Checkout() {
     );
   };
 
+  const handleMapLocation = (fields) => {
+    setMapLoc({ lat: fields.lat, lng: fields.lng, mapLabel: fields.mapLabel });
+    setForm(prev => ({
+      ...prev,
+      street: fields.street || prev.street,
+      city: fields.city || prev.city,
+      state: fields.state || prev.state,
+      pincode: fields.pincode || prev.pincode,
+    }));
+    toast.success(t('cust.toastLocationDetected'));
+  };
+
   const handlePlaceOrder = async () => {
     if (!form.name || !form.phone || !form.street || !form.city || !form.pincode) {
       return toast.error(t('cust.toastFillShipping'));
@@ -120,7 +135,13 @@ export default function Checkout() {
             sku: item.variant.sku || '',
           } : undefined,
         })),
-        shippingAddress: { name: form.name, phone: form.phone, street: form.street, city: form.city, state: form.state, pincode: form.pincode },
+        shippingAddress: {
+          name: form.name, phone: form.phone, street: form.street, city: form.city,
+          state: form.state, pincode: form.pincode,
+          latitude: mapLoc.lat || undefined,
+          longitude: mapLoc.lng || undefined,
+          mapLabel: mapLoc.mapLabel || undefined,
+        },
         paymentMethod,
         couponCode: coupon?.code || undefined,
       };
@@ -164,15 +185,26 @@ export default function Checkout() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold">{t('cust.shippingDetails')}</h2>
-                <button onClick={handleGetLocation} disabled={locationLoading}
-                  className="flex items-center gap-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 shadow-md">
-                  {locationLoading ? (
-                    <><Loader size={16} className="animate-spin" /> {t('cust.detecting')}</>
-                  ) : (
-                    <><MapPin size={16} /> {t('cust.useCurrentLocation')}</>
-                  )}
-                </button>
+                {!HAS_MAPS && (
+                  <button onClick={handleGetLocation} disabled={locationLoading}
+                    className="flex items-center gap-2 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 shadow-md">
+                    {locationLoading ? (
+                      <><Loader size={16} className="animate-spin" /> {t('cust.detecting')}</>
+                    ) : (
+                      <><MapPin size={16} /> {t('cust.useCurrentLocation')}</>
+                    )}
+                  </button>
+                )}
               </div>
+              {HAS_MAPS && (
+                <div className="mb-5">
+                  <LocationPicker
+                    initial={{ lat: mapLoc.lat, lng: mapLoc.lng, mapLabel: mapLoc.mapLabel }}
+                    onLocation={handleMapLocation}
+                    onError={(msg) => toast.error(msg)}
+                  />
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.fullName')}</label>

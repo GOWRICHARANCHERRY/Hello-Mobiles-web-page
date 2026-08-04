@@ -82,4 +82,5 @@ export default {
   'emp.shipping': 'शिपिंग:',
   'emp.payment': 'भुगतान: {method}',
   'emp.markAs': '{status} के रूप में चिह्नित करें',
+  'emp.viewOnMap': 'मानचित्र पर देखें',
 };

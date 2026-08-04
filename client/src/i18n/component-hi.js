@@ -204,4 +204,8 @@ export default {
   'comp.newOrderTitle': 'नया ऑर्डर!',
   'comp.newOrderBody': 'ऑर्डर {orderNumber} {total} में प्राप्त हुआ',
   'comp.newOrderStop': 'रोकें',
+  // LocationPicker
+  'comp.searchAddressPlaceholder': 'अपना पता खोजें...',
+  'comp.dragPinHint': 'सटीक डिलीवरी स्थान सेट करने के लिए पिन खींचें या मानचित्र पर टैप करें',
+  'comp.mapsLoadFailed': 'Google Maps लोड नहीं हो पाया। कृपया पुनः प्रयास करें।',
 };

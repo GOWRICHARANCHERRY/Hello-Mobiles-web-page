@@ -204,4 +204,5 @@ export default {
   'admin2.mFull.october': 'October',
   'admin2.mFull.november': 'November',
   'admin2.mFull.december': 'December',
+  'admin2.viewOnMap': 'View on map',
 };

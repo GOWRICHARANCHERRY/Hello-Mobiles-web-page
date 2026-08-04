@@ -204,4 +204,8 @@ export default {
   'comp.newOrderTitle': 'New Order!',
   'comp.newOrderBody': 'Order {orderNumber} placed for {total}',
   'comp.newOrderStop': 'Stop',
+  // LocationPicker
+  'comp.searchAddressPlaceholder': 'Search your address...',
+  'comp.dragPinHint': 'Drag the pin or tap the map to set exact delivery location',
+  'comp.mapsLoadFailed': 'Google Maps failed to load. Please try again.',
 };

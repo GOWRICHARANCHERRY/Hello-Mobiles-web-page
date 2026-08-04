@@ -204,4 +204,5 @@ export default {
   'admin2.mFull.october': 'अक्टूबर',
   'admin2.mFull.november': 'नवंबर',
   'admin2.mFull.december': 'दिसंबर',
+  'admin2.viewOnMap': 'मानचित्र पर देखें',
 };

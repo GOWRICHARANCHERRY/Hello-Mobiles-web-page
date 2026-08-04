@@ -204,4 +204,5 @@ export default {
   'admin2.mFull.october': 'అక్టోబర్',
   'admin2.mFull.november': 'నవంబర్',
   'admin2.mFull.december': 'డిసెంబర్',
+  'admin2.viewOnMap': 'మ్యాప్‌లో చూడండి',
 };

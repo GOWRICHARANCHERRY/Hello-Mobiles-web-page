@@ -552,4 +552,5 @@ export default {
   'cust.removedFromWishlist': 'విష్‌లిస్ట్ నుండి తొలగించబడింది',
   'cust.failedToRemove': 'తొలగించడంలో విఫలమైంది',
   'cust.saveItemsLater': 'మీకు నచ్చిన వస్తువులను తర్వాత కోసం సేవ్ చేయండి',
+  'cust.viewOnMap': 'మ్యాప్‌లో చూడండి',
 };

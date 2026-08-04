@@ -82,4 +82,5 @@ export default {
   'emp.shipping': 'Shipping:',
   'emp.payment': 'Payment: {method}',
   'emp.markAs': 'Mark as {status}',
+  'emp.viewOnMap': 'View on map',
 };

@@ -569,4 +569,5 @@ export default {
   'cust.removedFromWishlist': 'विशलिस्ट से हटाया गया',
   'cust.failedToRemove': 'हटाने में विफल',
   'cust.saveItemsLater': 'अपने पसंदीदा आइटम बाद के लिए सहेजें',
+  'cust.viewOnMap': 'मानचित्र पर देखें',
 };

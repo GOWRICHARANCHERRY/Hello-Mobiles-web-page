@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft } from 'lucide-react';
+import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft, MapPin } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
@@ -214,6 +214,15 @@ export default function OrderDetail() {
           <p className="text-xs text-gray-600 mt-0.5">{order.shippingAddress?.street}, {order.shippingAddress?.city}</p>
           <p className="text-xs text-gray-600">{order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
           <p className="text-xs text-gray-600 mt-0.5">{t('cust.phoneLabel', { phone: order.shippingAddress?.phone })}</p>
+          {order.shippingAddress?.latitude && order.shippingAddress?.longitude && (
+            <a
+              href={`https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}
+              target="_blank" rel="noreferrer"
+              className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 mt-1.5"
+            >
+              <MapPin size={12} /> {t('cust.viewOnMap')}
+            </a>
+          )}
         </div>
 
         {/* Items Table */}

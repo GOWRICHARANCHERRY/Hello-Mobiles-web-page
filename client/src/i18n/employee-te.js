@@ -82,4 +82,5 @@ export default {
   'emp.shipping': 'షిప్పింగ్:',
   'emp.payment': 'చెల్లింపు: {method}',
   'emp.markAs': '{status} గా గుర్తించండి',
+  'emp.viewOnMap': 'మ్యాప్‌లో చూడండి',
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -90,6 +90,15 @@ export default function EmployeeOrders() {
                     <p className="text-sm text-gray-600">{order.shippingAddress?.name}</p>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.street}, {order.shippingAddress?.city}</p>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
+                    {order.shippingAddress?.latitude && order.shippingAddress?.longitude && (
+                      <a
+                        href={`https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}
+                        target="_blank" rel="noreferrer"
+                        className="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 mt-1"
+                      >
+                        <MapPin size={12} /> {t('emp.viewOnMap')}
+                      </a>
+                    )}
                     <p className="text-sm text-gray-600 mt-1">{t('emp.payment', { method: order.paymentMethod })}</p>
                   </div>
                 </div>
