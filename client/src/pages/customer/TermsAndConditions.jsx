@@ -18,7 +18,7 @@ export default function TermsAndConditions() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <SEO
         title="Terms & Conditions"
-        description="Read the terms and conditions, privacy policy, shipping and returns policy for Hello Mobiles, Visakhapatnam."
+        description="Read the terms and conditions, privacy policy, shipping and returns policy for Hello Mobiles, Nellore district."
         path="/terms-and-conditions"
       />
       <div className="text-center mb-10">

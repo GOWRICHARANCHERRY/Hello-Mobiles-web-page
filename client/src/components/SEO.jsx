@@ -13,7 +13,7 @@ export default function SEO({
   structuredData,
   noindex = false,
 }) {
-  const fullTitle = title ? `${title} | Hello Mobiles` : 'Hello Mobiles — Mobile Phones, Electronics & Gadgets in Vizag';
+  const fullTitle = title ? `${title} | Hello Mobiles` : 'Hello Mobiles — Mobile Phones, Electronics & Gadgets in Nellore district';
   const fullUrl = `${SITE}${path}`;
   const ogImage = image || DEFAULT_OG_IMAGE;
 

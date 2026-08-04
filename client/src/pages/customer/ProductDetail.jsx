@@ -243,7 +243,7 @@ export default function ProductDetail() {
     <div className="animate-fade-in">
       <SEO
         title={product.name}
-        description={`${product.name} — ${product.brand || ''} ${product.category || ''} at best price ₹${product.price?.toLocaleString()}. Buy now with EMI options and home delivery in Visakhapatnam.`}
+        description={`${product.name} — ${product.brand || ''} ${product.category || ''} at best price ₹${product.price?.toLocaleString()}. Buy now with EMI options and home delivery in Allur and Buchireddypalem, Nellore district.`}
         path={`/products/${product._id}`}
         image={product.images?.[0]}
         product={true}

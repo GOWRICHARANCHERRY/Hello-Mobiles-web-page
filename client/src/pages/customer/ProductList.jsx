@@ -116,7 +116,7 @@ export default function ProductList() {
     <div className="animate-fade-in">
       <SEO
         title={pageTitle}
-        description={`Browse ${pageTitle} at Hello Mobiles, Visakhapatnam. Best prices, EMI options, and fast delivery on mobiles, electronics, and gadgets.`}
+        description={`Browse ${pageTitle} at Hello Mobiles, Nellore district. Best prices, EMI options, and fast delivery on mobiles, electronics, and gadgets.`}
         path={`/products${activeCategory ? `?category=${encodeURIComponent(activeCategory)}` : ''}`}
       />
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">

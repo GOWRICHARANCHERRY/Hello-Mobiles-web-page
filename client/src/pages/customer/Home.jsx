@@ -114,22 +114,23 @@ export default function Home() {
     <div className="space-y-10 animate-fade-in">
       <SEO
         title="Home"
-        description="Hello Mobiles — Your one-stop shop for mobile phones, electronics, laptops, TVs, and gadgets in Visakhapatnam. Best prices, EMI options, and home delivery."
+        description="Hello Mobiles — Your one-stop shop for mobile phones, electronics, laptops, TVs, and gadgets in Allur & Buchireddypalem, Nellore district. Best prices, EMI options, and home delivery."
         path="/"
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'LocalBusiness',
           name: 'Hello Mobiles',
-          description: 'Mobile phones, electronics, laptops, TVs, and gadgets store in Visakhapatnam',
+          description: 'Mobile phones, electronics, laptops, TVs, and gadgets store in Allur and Buchireddypalem, Nellore district',
           url: 'https://hello-mobiles.com',
           telephone: '+91-88868-88128',
           address: {
             '@type': 'PostalAddress',
-            addressLocality: 'Visakhapatnam',
+            streetAddress: 'Allur and Buchireddypalem',
+            addressLocality: 'Nellore',
             addressRegion: 'Andhra Pradesh',
             addressCountry: 'IN',
           },
-          areaServed: 'Visakhapatnam',
+          areaServed: ['Allur', 'Buchireddypalem', 'Nellore district'],
           priceRange: '₹',
           image: 'https://hello-mobiles.com/logo.png',
         }}
@@ -313,7 +314,7 @@ export default function Home() {
           <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
             <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Allur</h3>
-            <p className="text-gray-600 text-sm">📍 Allur, Andhra Pradesh</p>
+            <p className="text-gray-600 text-sm">📍 Allur, Nellore District, Andhra Pradesh</p>
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -322,8 +323,8 @@ export default function Home() {
           </a>
           <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer"
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
-            <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Buchi</h3>
-            <p className="text-gray-600 text-sm">📍 Buchi, Andhra Pradesh</p>
+            <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Buchi Reddy Palem</h3>
+            <p className="text-gray-600 text-sm">📍 Buchireddypalem, Nellore District, Andhra Pradesh</p>
             <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
             <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">

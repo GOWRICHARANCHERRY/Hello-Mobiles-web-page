@@ -16,7 +16,7 @@ export default function EMICalculator() {
     <div className="animate-fade-in max-w-2xl mx-auto">
       <SEO
         title="EMI Calculator"
-        description="Calculate your monthly EMI on mobile phones and electronics at Hello Mobiles, Visakhapatnam. Zero-interest EMI options available."
+        description="Calculate your monthly EMI on mobile phones and electronics at Hello Mobiles, Nellore district. Zero-interest EMI options available."
         path="/emi-calculator"
       />
       <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">

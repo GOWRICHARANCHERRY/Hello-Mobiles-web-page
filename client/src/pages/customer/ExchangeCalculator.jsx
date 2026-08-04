@@ -48,7 +48,7 @@ export default function ExchangeCalculator() {
     <div className="animate-fade-in max-w-2xl mx-auto">
       <SEO
         title="Exchange Calculator"
-        description="Check the exchange value of your old phone at Hello Mobiles, Visakhapatnam. Get instant estimates for Apple, Samsung, OnePlus, Xiaomi, and more."
+        description="Check the exchange value of your old phone at Hello Mobiles, Nellore district. Get instant estimates for Apple, Samsung, OnePlus, Xiaomi, and more."
         path="/exchange-calculator"
       />
       <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
