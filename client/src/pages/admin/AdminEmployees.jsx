@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../utils/api';
-import { Plus, Trash2, UserCheck, Pencil } from 'lucide-react';
+import { Plus, Trash2, UserCheck, Pencil, Bike } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const emptyForm = { name: '', phone: '', email: '', password: '' };
+const emptyForm = { name: '', phone: '', email: '', password: '', role: 'employee' };
 
 export default function AdminEmployees() {
   const { t } = useLanguage();
@@ -19,7 +19,7 @@ export default function AdminEmployees() {
   const openAdd = () => { setForm(emptyForm); setEditingId(null); setShowForm(true); };
 
   const openEdit = (emp) => {
-    setForm({ name: emp.name || '', phone: emp.phone || '', email: emp.email || '', password: '' });
+    setForm({ name: emp.name || '', phone: emp.phone || '', email: emp.email || '', password: '', role: emp.role || 'employee' });
     setEditingId(emp._id);
     setShowForm(true);
   };
@@ -75,6 +75,14 @@ export default function AdminEmployees() {
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
             <input type="password" placeholder={editingId ? t('admin2.newPasswordKeep') : t('admin2.password')} value={form.password} onChange={e => setForm({...form, password: e.target.value})} required={!editingId}
               className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-gold-500 outline-none" />
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">{t('admin2.role')}</label>
+              <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}
+                className="border rounded-lg px-3 py-2 text-sm w-full focus:ring-2 focus:ring-gold-500 outline-none">
+                <option value="employee">{t('admin2.roleEmployee')}</option>
+                <option value="delivery">{t('admin2.roleDelivery')}</option>
+              </select>
+            </div>
             <div className="md:col-span-2 flex gap-2">
               <button type="submit" className="bg-gold-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-700">{editingId ? t('admin2.updateEmployee') : t('admin2.addEmployee')}</button>
               <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }} className="border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">{t('admin2.cancel')}</button>
@@ -88,6 +96,7 @@ export default function AdminEmployees() {
           <thead className="bg-gray-50">
             <tr>
               <th className="text-left py-3 px-4 text-gray-600">{t('admin2.employee')}</th>
+              <th className="text-left py-3 px-4 text-gray-600">{t('admin2.role')}</th>
               <th className="text-left py-3 px-4 text-gray-600">{t('admin2.phone')}</th>
               <th className="text-left py-3 px-4 text-gray-600">{t('admin2.email')}</th>
               <th className="text-left py-3 px-4 text-gray-600">{t('admin2.joined')}</th>
@@ -99,9 +108,16 @@ export default function AdminEmployees() {
               <tr key={emp._id} className="border-b last:border-0 hover:bg-gray-50">
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center"><UserCheck size={14} className="text-gold-700" /></div>
+                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center">
+                      {emp.role === 'delivery' ? <Bike size={14} className="text-gold-700" /> : <UserCheck size={14} className="text-gold-700" />}
+                    </div>
                     <span className="font-medium">{emp.name}</span>
                   </div>
+                </td>
+                <td className="py-3 px-4">
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${emp.role === 'delivery' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>
+                    {emp.role === 'delivery' ? t('admin2.deliveryStaff') : t('admin2.roleEmployee')}
+                  </span>
                 </td>
                 <td className="py-3 px-4 text-gray-600">{emp.phone}</td>
                 <td className="py-3 px-4 text-gray-600">{emp.email || '-'}</td>
@@ -114,7 +130,7 @@ export default function AdminEmployees() {
                 </td>
               </tr>
             ))}
-            {employees.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-gray-400">{t('admin2.noEmployees')}</td></tr>}
+            {employees.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-gray-400">{t('admin2.noEmployees')}</td></tr>}
           </tbody>
         </table>
       </div>

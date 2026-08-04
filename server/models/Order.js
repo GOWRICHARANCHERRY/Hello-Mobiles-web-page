@@ -60,6 +60,12 @@ const orderSchema = new mongoose.Schema({
     exchangeValue: { type: Number, default: 0 },
   },
   trackingId: String,
+  assignedDelivery: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  deliveryStatus: {
+    type: String,
+    enum: ['unassigned', 'assigned', 'out_for_delivery', 'delivered', 'cancelled'],
+    default: 'unassigned',
+  },
   deliveredAt: Date,
   invoiceUrl: String,
   notes: String,

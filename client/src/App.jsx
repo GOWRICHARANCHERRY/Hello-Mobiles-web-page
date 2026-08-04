@@ -30,6 +30,9 @@ const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'
 const EmployeeInventory = lazy(() => import('./pages/employee/EmployeeInventory'));
 const EmployeeOrders = lazy(() => import('./pages/employee/EmployeeOrders'));
 
+const DeliveryLayout = lazy(() => import('./pages/delivery/DeliveryLayout'));
+const DeliveryOrders = lazy(() => import('./pages/delivery/DeliveryOrders'));
+
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
@@ -70,6 +73,7 @@ function AppRoutes() {
     if (!user) return '/';
     if (user.role === 'admin') return '/admin';
     if (user.role === 'employee') return '/employee';
+    if (user.role === 'delivery') return '/delivery';
     return '/';
   };
 
@@ -101,6 +105,10 @@ function AppRoutes() {
         <Route index element={<SuspenseRoute><EmployeeDashboard /></SuspenseRoute>} />
         <Route path="inventory" element={<SuspenseRoute><EmployeeInventory /></SuspenseRoute>} />
         <Route path="orders" element={<SuspenseRoute><EmployeeOrders /></SuspenseRoute>} />
+      </Route>
+
+      <Route path="/delivery" element={<ProtectedRoute roles={['delivery', 'admin']}><SuspenseRoute><DeliveryLayout /></SuspenseRoute></ProtectedRoute>}>
+        <Route index element={<SuspenseRoute><DeliveryOrders /></SuspenseRoute>} />
       </Route>
 
       <Route path="/admin" element={<ProtectedRoute roles={['admin']}><SuspenseRoute><AdminLayout /></SuspenseRoute></ProtectedRoute>}>

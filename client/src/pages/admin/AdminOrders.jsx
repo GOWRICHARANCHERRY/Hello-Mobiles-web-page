@@ -7,11 +7,25 @@ import toast from 'react-hot-toast';
 export default function AdminOrders() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState([]);
+  const [deliveryStaff, setDeliveryStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => { api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => {
+    api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false));
+    api.get('/admin/employees').then(r => {
+      setDeliveryStaff((r.data || []).filter(u => u.role === 'delivery'));
+    }).catch(() => {});
+  }, []);
+
+  const assignDelivery = async (orderId, deliveryId) => {
+    try {
+      await api.put(`/orders/${orderId}/assign`, { deliveryId });
+      setOrders(prev => prev.map(o => o._id === orderId ? { ...o, assignedDelivery: deliveryId ? { _id: deliveryId, name: deliveryStaff.find(d => d._id === deliveryId)?.name } : null, deliveryStatus: deliveryId ? 'assigned' : 'unassigned' } : o));
+      toast.success(deliveryId ? t('admin2.deliveryAssigned') : t('admin2.deliveryUnassigned'));
+    } catch (error) { toast.error(t('admin2.failed')); }
+  };
 
   const updateStatus = async (orderId, status) => {
     try {
@@ -33,6 +47,18 @@ export default function AdminOrders() {
     confirmed: 'bg-blue-100 text-blue-700', processing: 'bg-yellow-100 text-yellow-700',
     packed: 'bg-purple-100 text-purple-700', shipped: 'bg-indigo-100 text-indigo-700',
     delivered: 'bg-green-100 text-green-700', cancelled: 'bg-red-100 text-red-700',
+  };
+
+  const deliveryColors = {
+    unassigned: 'bg-gray-100 text-gray-600', assigned: 'bg-blue-100 text-blue-700',
+    out_for_delivery: 'bg-yellow-100 text-yellow-700', delivered: 'bg-green-100 text-green-700',
+    cancelled: 'bg-red-100 text-red-700',
+  };
+
+  const deliveryLabel = {
+    unassigned: t('admin2.deliveryStatus.unassigned'), assigned: t('admin2.deliveryStatus.assigned'),
+    out_for_delivery: t('admin2.deliveryStatus.out_for_delivery'), delivered: t('admin2.deliveryStatus.delivered'),
+    cancelled: t('admin2.deliveryStatus.cancelled'),
   };
 
   const statusLabel = {
@@ -80,6 +106,7 @@ export default function AdminOrders() {
               </div>
               <div className="flex items-center gap-3 mt-2 md:mt-0">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${statusColors[order.orderStatus]}`}>{statusLabel[order.orderStatus] || order.orderStatus}</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${deliveryColors[order.deliveryStatus] || 'bg-gray-100'}`}>{deliveryLabel[order.deliveryStatus] || order.deliveryStatus}</span>
                 <span className={`text-xs font-medium ${order.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>{paymentLabel[order.paymentStatus] || order.paymentStatus}</span>
                 <span className="font-bold text-sm">₹{order.total.toLocaleString()}</span>
                 {expanded === order._id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -140,6 +167,35 @@ export default function AdminOrders() {
                         <option value="pending">{t('admin2.payStatus.pending')}</option>
                         <option value="refunded">{t('admin2.payStatus.refunded')}</option>
                       </select>
+                    </div>
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-gray-600 mb-1.5 font-medium">
+                        {order.assignedDelivery?.name
+                          ? t('admin2.assignedTo', { name: order.assignedDelivery.name })
+                          : t('admin2.notAssigned')}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <select
+                          onChange={e => {
+                            if (!e.target.value) return;
+                            assignDelivery(order._id, e.target.value);
+                            e.target.value = '';
+                          }}
+                          value=""
+                          className="border rounded-lg px-2 py-1 text-xs"
+                        >
+                          <option value="">{t('admin2.selectDeliveryStaff')}</option>
+                          {deliveryStaff.map(d => (
+                            <option key={d._id} value={d._id}>{d.name} ({d.phone})</option>
+                          ))}
+                        </select>
+                        {order.assignedDelivery && (
+                          <button onClick={() => assignDelivery(order._id, null)}
+                            className="border border-gray-300 text-gray-600 px-2 py-1 rounded-lg text-xs hover:bg-gray-50">
+                            {t('admin2.unassign')}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

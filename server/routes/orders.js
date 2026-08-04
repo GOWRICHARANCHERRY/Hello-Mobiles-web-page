@@ -1,6 +1,7 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import User from '../models/User.js';
 import { auth, roleAuth } from '../middleware/auth.js';
 import { sendOrderWhatsApp } from '../utils/whatsapp.js';
 
@@ -12,7 +13,7 @@ router.get('/', auth, async (req, res) => {
     if (req.user.role === 'customer') {
       query.customer = req.user.id;
     }
-    const orders = await Order.find(query).populate('customer', 'name phone email').populate('items.product', 'name images').sort({ createdAt: -1 });
+    const orders = await Order.find(query).populate('customer', 'name phone email').populate('assignedDelivery', 'name phone').populate('items.product', 'name images').sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -32,9 +33,69 @@ router.get('/latest', auth, roleAuth('admin', 'employee'), async (req, res) => {
   }
 });
 
+// Delivery boy: list assigned orders (admin/employee see all with delivery info)
+router.get('/delivery', auth, roleAuth('delivery', 'admin', 'employee'), async (req, res) => {
+  try {
+    const query = {};
+    if (req.user.role === 'delivery') query.assignedDelivery = req.user.id;
+    const orders = await Order.find(query)
+      .populate('customer', 'name phone')
+      .populate('assignedDelivery', 'name phone')
+      .populate('items.product', 'name images')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin/Employee: assign or unassign an order to a delivery boy
+router.put('/:id/assign', auth, roleAuth('admin', 'employee'), async (req, res) => {
+  try {
+    const { deliveryId } = req.body;
+    if (deliveryId) {
+      const delivery = await User.findOne({ _id: deliveryId, role: 'delivery' });
+      if (!delivery) return res.status(400).json({ message: 'Delivery staff not found' });
+    }
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { assignedDelivery: deliveryId || null, deliveryStatus: deliveryId ? 'assigned' : 'unassigned' },
+      { new: true }
+    ).populate('assignedDelivery', 'name phone');
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delivery boy: update delivery progress
+router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee'), async (req, res) => {
+  try {
+    const { deliveryStatus } = req.body;
+    if (!['assigned', 'out_for_delivery', 'delivered', 'cancelled'].includes(deliveryStatus)) {
+      return res.status(400).json({ message: 'Invalid delivery status' });
+    }
+    const update = { deliveryStatus };
+    if (deliveryStatus === 'delivered') {
+      update.deliveredAt = new Date();
+      update.orderStatus = 'delivered';
+      update.paymentStatus = 'paid';
+    }
+    if (deliveryStatus === 'cancelled') {
+      update.orderStatus = 'cancelled';
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get('/:id', auth, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('customer', 'name phone email address').populate('items.product', 'name images brand');
+    const order = await Order.findById(req.params.id).populate('customer', 'name phone email address').populate('assignedDelivery', 'name phone').populate('items.product', 'name images brand');
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (req.user.role === 'customer' && order.customer._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
@@ -193,7 +254,11 @@ router.put('/:id/status', auth, roleAuth('admin', 'employee'), async (req, res) 
     const { orderStatus, trackingId } = req.body;
     const update = { orderStatus };
     if (trackingId) update.trackingId = trackingId;
-    if (orderStatus === 'delivered') update.deliveredAt = new Date();
+    if (orderStatus === 'delivered') {
+      update.deliveredAt = new Date();
+      update.deliveryStatus = 'delivered';
+    }
+    if (orderStatus === 'cancelled') update.deliveryStatus = 'cancelled';
     const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!order) return res.status(404).json({ message: 'Order not found' });
     res.json(order);
@@ -257,6 +322,7 @@ router.post('/:id/cancel', auth, async (req, res) => {
     order.orderStatus = 'cancelled';
     order.cancelReason = req.body.reason || 'Cancelled by customer';
     order.cancelledAt = new Date();
+    order.deliveryStatus = 'cancelled';
     if (order.paymentStatus === 'paid') order.paymentStatus = 'refunded';
     await order.save();
     res.json(order);

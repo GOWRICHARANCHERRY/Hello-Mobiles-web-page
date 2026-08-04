@@ -13,9 +13,12 @@ import admin2Te from './admin2-te';
 import employeeEn from './employee-en';
 import employeeHi from './employee-hi';
 import employeeTe from './employee-te';
+import deliveryEn from './delivery-en';
+import deliveryHi from './delivery-hi';
+import deliveryTe from './delivery-te';
 
 export default {
-  en: { ...customerEn, ...componentEn, ...adminEn, ...admin2En, ...employeeEn },
-  hi: { ...customerHi, ...componentHi, ...adminHi, ...admin2Hi, ...employeeHi },
-  te: { ...customerTe, ...componentTe, ...adminTe, ...admin2Te, ...employeeTe },
+  en: { ...customerEn, ...componentEn, ...adminEn, ...admin2En, ...employeeEn, ...deliveryEn },
+  hi: { ...customerHi, ...componentHi, ...adminHi, ...admin2Hi, ...employeeHi, ...deliveryHi },
+  te: { ...customerTe, ...componentTe, ...adminTe, ...admin2Te, ...employeeTe, ...deliveryTe },
 };

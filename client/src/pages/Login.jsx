@@ -24,6 +24,7 @@ export default function Login() {
       toast.success(t('comp.welcomeBack', { name: user.name }));
       if (user.role === 'admin') navigate('/admin');
       else if (user.role === 'employee') navigate('/employee');
+      else if (user.role === 'delivery') navigate('/delivery');
       else navigate('/');
     } catch (error) {
       toast.error(error.response?.data?.message || t('comp.loginFailed'));

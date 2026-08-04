@@ -82,7 +82,7 @@ router.get('/dashboard', auth, roleAuth('admin'), async (req, res) => {
 
 router.get('/employees', auth, roleAuth('admin'), async (req, res) => {
   try {
-    const employees = await User.find({ role: 'employee' }).select('-password');
+    const employees = await User.find({ role: { $in: ['employee', 'delivery'] } }).select('-password').sort({ createdAt: -1 });
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -91,8 +91,9 @@ router.get('/employees', auth, roleAuth('admin'), async (req, res) => {
 
 router.post('/employees', auth, roleAuth('admin'), async (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
-    const employee = new User({ name, phone, email, password, role: 'employee' });
+    const { name, phone, email, password, role = 'employee' } = req.body;
+    if (!['employee', 'delivery'].includes(role)) return res.status(400).json({ message: 'Invalid role' });
+    const employee = new User({ name, phone, email, password, role });
     await employee.save();
     res.status(201).json({ id: employee._id, name: employee.name, phone: employee.phone, email: employee.email, role: employee.role });
   } catch (error) {
@@ -111,14 +112,15 @@ router.delete('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
 
 router.put('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
+    const { name, phone, email, password, role } = req.body;
     const employee = await User.findById(req.params.id);
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
-    if (employee.role !== 'employee') return res.status(400).json({ message: 'Not an employee account' });
+    if (!['employee', 'delivery'].includes(employee.role)) return res.status(400).json({ message: 'Not an employee account' });
     if (name) employee.name = name;
     if (phone) employee.phone = phone;
     if (email !== undefined) employee.email = email;
     if (password) employee.password = password;
+    if (role && ['employee', 'delivery'].includes(role)) employee.role = role;
     await employee.save();
     res.json({ id: employee._id, name: employee.name, phone: employee.phone, email: employee.email, role: employee.role });
   } catch (error) {
