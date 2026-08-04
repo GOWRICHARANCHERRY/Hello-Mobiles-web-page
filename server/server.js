@@ -60,7 +60,6 @@ app.use(helmet({
         'https://www.gstatic.com',
         'https://*.firebaseapp.com',
       ],
-      scriptSrcAttr: ["'sha256-1jAmyYXcRq6zFldLe/GCgIDJBiOONdXjTLgEFMDnDSM='"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://www.gstatic.com'],
       fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       imgSrc: [
@@ -69,6 +68,9 @@ app.use(helmet({
         'https://fdn2.gsmarena.com',
         'https://*.googleusercontent.com',
         'https://lh3.googleusercontent.com',
+        'https://maps.googleapis.com',
+        'https://maps.gstatic.com',
+        'https://*.gstatic.com',
         'https://www.gstatic.com',
         'https://cdn.simpleicons.org',
         'https://upload.wikimedia.org',
