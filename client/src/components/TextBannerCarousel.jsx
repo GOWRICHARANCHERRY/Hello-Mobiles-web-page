@@ -116,7 +116,7 @@ export default function TextBannerCarousel() {
         <div className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto transition-opacity duration-300">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
-              className={`transition-all duration-300 rounded-full ${i === current ? 'w-6 h-2 bg-gold-400' : 'w-2 h-2 bg-white/40 hover:bg-white/60'}`} />
+              className={`transition-all duration-300 rounded-full p-1 ${i === current ? 'w-8 h-4 bg-gold-400' : 'w-3 h-3 bg-white/40 hover:bg-white/60'}`} />
           ))}
         </div>
       )}

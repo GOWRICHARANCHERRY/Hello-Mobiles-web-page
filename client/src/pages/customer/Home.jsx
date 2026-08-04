@@ -368,7 +368,7 @@ function ProductCard({ product, delay = 0 }) {
         <h3 className="font-semibold text-gray-800 text-sm mt-1 line-clamp-2">{product.name}</h3>
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5 sm:mt-2">
           <span className="text-base sm:text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-          {product.mrp > product.price && <span className="text-xs sm:text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>}
+          {product.mrp > product.price && <span className="text-xs sm:text-sm text-gray-500 line-through">₹{product.mrp.toLocaleString()}</span>}
         </div>
         {product.emiAvailable && <p className="text-xs text-gold-600 mt-1 font-medium">EMI from ₹{Math.round(product.price / 12).toLocaleString()}/mo</p>}
         {product.ratings > 0 && (

@@ -376,7 +376,7 @@ export default function ProductDetail() {
                 <span className="text-3xl font-bold text-gray-900">₹{currentPrice?.toLocaleString()}</span>
                 {currentMrp > currentPrice && (
                   <>
-                    <span className="text-lg text-gray-400 line-through">₹{currentMrp?.toLocaleString()}</span>
+                    <span className="text-lg text-gray-500 line-through">₹{currentMrp?.toLocaleString()}</span>
                     <span className="text-green-600 font-semibold">{discount}% off</span>
                   </>
                 )}
@@ -472,7 +472,7 @@ export default function ProductDetail() {
                         <td className="py-2 px-3">{v.ram || '-'}</td>
                         <td className="py-2 px-3">{v.storage || '-'}</td>
                         <td className="py-2 px-3 font-semibold text-gold-600">₹{v.price?.toLocaleString()}</td>
-                        <td className="py-2 px-3 text-gray-400 line-through">₹{v.mrp?.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-gray-500 line-through">₹{v.mrp?.toLocaleString()}</td>
                         <td className="py-2 px-3">
                           <div className="flex flex-wrap gap-1">
                             {v.colors?.map((c, ci) => (

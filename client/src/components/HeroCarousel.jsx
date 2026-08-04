@@ -209,7 +209,7 @@ export default function HeroCarousel() {
         <div className="absolute z-20 bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
-              className={`transition-all duration-300 rounded-full ${i === current ? 'w-8 h-3 bg-gold-400' : 'w-3 h-3 bg-white/40 hover:bg-white/60'}`} />
+              className={`transition-all duration-300 rounded-full p-1 ${i === current ? 'w-10 h-5 bg-gold-400' : 'w-4 h-4 bg-white/40 hover:bg-white/60'}`} />
           ))}
         </div>
       )}

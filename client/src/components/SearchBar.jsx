@@ -146,7 +146,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
             </button>
           )}
         </div>
-        <button type="submit"
+        <button type="submit" aria-label="Search"
           className={`gold-gradient text-white ${isLarge ? 'px-8 rounded-r-2xl' : 'px-5 rounded-r-xl'} hover:opacity-90 transition flex-shrink-0 flex items-center gap-2 font-medium ${isLarge ? 'text-sm' : 'text-xs'}`}>
           <Search size={isLarge ? 18 : 16} />
           {isLarge && t('comp.search')}

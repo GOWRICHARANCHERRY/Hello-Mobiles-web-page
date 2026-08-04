@@ -307,7 +307,7 @@ export default function ProductList() {
                       {product.variants?.length > 0 ? (
                         <span className="text-xs text-gray-400">{t('cust.startingPrice')}</span>
                       ) : product.mrp > product.price ? (
-                        <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 line-through">₹{product.mrp.toLocaleString()}</span>
                       ) : null}
                     </div>
                     {product.variants?.length > 1 && (
