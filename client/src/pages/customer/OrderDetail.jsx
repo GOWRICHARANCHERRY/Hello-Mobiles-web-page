@@ -9,7 +9,7 @@ const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'
 
 const STORE = {
   name: 'Hello Mobiles & Electronics',
-  phone: '+91 88868 88128',
+  phone: '+91 97157 36736',
   email: 'svlnmobiles12@gmail.com',
   upi: 'svlnmobiles12@ybl',
 };

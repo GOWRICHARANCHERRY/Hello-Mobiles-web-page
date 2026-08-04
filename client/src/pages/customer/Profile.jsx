@@ -339,14 +339,14 @@ export default function Profile() {
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
                 </a>
-                <a href="tel:+918886888128"
+                <a href="tel:+919715736736"
                   className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition">
                   <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                     <Phone size={22} className="text-blue-600" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-gray-800">{t('cust.callUs')}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">+91 88868 88128</p>
+                    <p className="text-xs text-gray-500 mt-0.5">+91 97157 36736</p>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
                 </a>

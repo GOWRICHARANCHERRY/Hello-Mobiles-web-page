@@ -373,9 +373,10 @@ export default function CustomerLayout() {
                   <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
                 </a>
                 <div className="pt-2 space-y-1.5 text-sm text-gray-300">
-                  <p className="flex items-center gap-2">📞 <span>+91 88868 88128</span></p>
+                  <p className="flex items-center gap-2">📞 <span>+91 97157 36736</span></p>
+                  <p className="flex items-center gap-2">💬 <span>+91 88868 88128 (WhatsApp)</span></p>
                   <p className="flex items-center gap-2">✉️ <span>svlnmobiles12@gmail.com</span></p>
-                  <p className="flex items-center gap-2">⏰ <span>10:00 AM – 9:00 PM</span></p>
+                  <p className="flex items-center gap-2">⏰ <span>09:00 AM – 10:00 PM</span></p>
                 </div>
               </div>
             </div>

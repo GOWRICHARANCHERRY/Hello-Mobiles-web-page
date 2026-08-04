@@ -122,7 +122,7 @@ export default function Home() {
           name: 'Hello Mobiles',
           description: 'Mobile phones, electronics, laptops, TVs, and gadgets store in Allur and Buchireddypalem, Nellore district',
           url: 'https://hello-mobiles.com',
-          telephone: '+91-88868-88128',
+          telephone: '+91-97157-36736',
           address: {
             '@type': 'PostalAddress',
             streetAddress: 'Allur and Buchireddypalem',
@@ -315,8 +315,9 @@ export default function Home() {
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
             <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Allur</h3>
             <p className="text-gray-600 text-sm">📍 Allur, Nellore District, Andhra Pradesh</p>
-            <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
-            <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
+            <p className="text-gray-600 text-sm">📞 +91 97157 36736</p>
+            <p className="text-gray-600 text-sm">💬 +91 88868 88128 (WhatsApp)</p>
+            <p className="text-gray-600 text-sm">⏰ 09:00 AM - 10:00 PM (All days)</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
@@ -325,11 +326,31 @@ export default function Home() {
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
             <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Buchi Reddy Palem</h3>
             <p className="text-gray-600 text-sm">📍 Buchireddypalem, Nellore District, Andhra Pradesh</p>
-            <p className="text-gray-600 text-sm">📞 +91 88868 88128</p>
-            <p className="text-gray-600 text-sm">⏰ 10:00 AM - 9:00 PM (All days)</p>
+            <p className="text-gray-600 text-sm">📞 +91 97157 36736</p>
+            <p className="text-gray-600 text-sm">💬 +91 88868 88128 (WhatsApp)</p>
+            <p className="text-gray-600 text-sm">⏰ 09:00 AM - 10:00 PM (All days)</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
+          </a>
+        </div>
+      </div>
+
+      {/* Reviews CTA */}
+      <div className="bg-gradient-to-br from-gold-50 to-amber-50 rounded-2xl p-6 sm:p-8 text-center gold-border">
+        <div className="flex items-center justify-center gap-1 mb-3">
+          {[...Array(5)].map((_, i) => <Star key={i} size={22} className="text-gold-500 fill-gold-500" />)}
+        </div>
+        <h2 className="section-title">{t('cust.reviewsTitle')}</h2>
+        <p className="text-gray-600 text-sm sm:text-base max-w-xl mx-auto mb-6">{t('cust.reviewsText')}</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
+            className="btn-gold inline-flex items-center gap-2">
+            <Star size={16} /> {t('cust.reviewOnGoogle')}
+          </a>
+          <a href="https://www.instagram.com/hellomobilesandelectronics" target="_blank" rel="noopener noreferrer"
+            className="btn-outline-gold inline-flex items-center gap-2">
+            {t('cust.followOnInstagram')}
           </a>
         </div>
       </div>
