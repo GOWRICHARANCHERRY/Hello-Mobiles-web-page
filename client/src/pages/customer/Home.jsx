@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
@@ -111,6 +112,28 @@ export default function Home() {
 
   return (
     <div className="space-y-10 animate-fade-in">
+      <SEO
+        title="Home"
+        description="Hello Mobiles — Your one-stop shop for mobile phones, electronics, laptops, TVs, and gadgets in Visakhapatnam. Best prices, EMI options, and home delivery."
+        path="/"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'LocalBusiness',
+          name: 'Hello Mobiles',
+          description: 'Mobile phones, electronics, laptops, TVs, and gadgets store in Visakhapatnam',
+          url: 'https://hello-mobiles.com',
+          telephone: '+91-88868-88128',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Visakhapatnam',
+            addressRegion: 'Andhra Pradesh',
+            addressCountry: 'IN',
+          },
+          areaServed: 'Visakhapatnam',
+          priceRange: '₹',
+          image: 'https://hello-mobiles.com/logo.png',
+        }}
+      />
       {/* Hero Carousel */}
       <HeroCarousel />
 

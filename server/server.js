@@ -16,6 +16,7 @@ import uploadRoutes from './routes/upload.js';
 import bannerRoutes from './routes/banners.js';
 import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
+import Product from './models/Product.js';
 import { initFirebase } from './config/firebase.js';
 
 dotenv.config();
@@ -115,6 +116,52 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/leads', leadRoutes);
+
+let sitemapCache = null;
+let sitemapCacheTime = 0;
+const SITE = 'https://hello-mobiles.com';
+
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    if (sitemapCache && Date.now() - sitemapCacheTime < 3600000) {
+      res.header('Content-Type', 'application/xml');
+      return res.send(sitemapCache);
+    }
+    const products = await Product.find({}).select('_id updatedAt createdAt').lean();
+    const now = new Date().toISOString();
+    const staticPages = [
+      { loc: '/', priority: '1.0', changefreq: 'daily' },
+      { loc: '/products', priority: '0.9', changefreq: 'daily' },
+      { loc: '/about', priority: '0.5', changefreq: 'monthly' },
+      { loc: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly' },
+      { loc: '/emi-calculator', priority: '0.5', changefreq: 'monthly' },
+      { loc: '/exchange-calculator', priority: '0.5', changefreq: 'monthly' },
+    ];
+    const productPages = products.map(p => ({
+      loc: `/products/${p._id}`,
+      lastmod: (p.updatedAt || p.createdAt || new Date()).toISOString(),
+      priority: '0.7',
+      changefreq: 'weekly',
+    }));
+    const urls = [...staticPages, ...productPages];
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${SITE}${u.loc}</loc>
+    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : `<lastmod>${now}</lastmod>`}
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+    sitemapCache = xml;
+    sitemapCacheTime = Date.now();
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (err) {
+    console.error('Sitemap error:', err);
+    res.status(500).send('Error generating sitemap');
+  }
+});
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import SEO from '../components/SEO';
 import { auth, sendFirebaseOTP } from '../utils/firebase';
 import { ArrowLeft, Check, Smartphone, Shield, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -74,6 +75,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gold-100 via-amber-50 to-gold-200 flex items-center justify-center p-4 relative overflow-hidden">
+      <SEO title="Sign Up" description="Create a Hello Mobiles account for exclusive deals and fast checkout." path="/signup" noindex />
       <div className="absolute top-0 right-0 w-96 h-96 bg-gold-300/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-gold-400/15 rounded-full translate-y-1/2 -translate-x-1/2"></div>
 

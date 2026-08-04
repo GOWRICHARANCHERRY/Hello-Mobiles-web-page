@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 
 const sections = [
   { id: 'privacy', label: 'cust.privacyPolicy' },
@@ -15,6 +16,11 @@ export default function TermsAndConditions() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
+      <SEO
+        title="Terms & Conditions"
+        description="Read the terms and conditions, privacy policy, shipping and returns policy for Hello Mobiles, Visakhapatnam."
+        path="/terms-and-conditions"
+      />
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>{t('cust.policies')}</h1>
         <p className="text-gray-500 mt-2">{t('cust.policiesSubtitle')}</p>

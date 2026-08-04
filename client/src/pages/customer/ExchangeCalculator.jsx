@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RotateCcw, Smartphone, IndianRupee } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 
 const phoneModels = [
   { brand: 'Apple', models: ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14', 'iPhone 13 Pro Max', 'iPhone 13', 'iPhone 12', 'iPhone SE 2022'] },
@@ -45,6 +46,11 @@ export default function ExchangeCalculator() {
 
   return (
     <div className="animate-fade-in max-w-2xl mx-auto">
+      <SEO
+        title="Exchange Calculator"
+        description="Check the exchange value of your old phone at Hello Mobiles, Visakhapatnam. Get instant estimates for Apple, Samsung, OnePlus, Xiaomi, and more."
+        path="/exchange-calculator"
+      />
       <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-orange-100 text-orange-600 w-12 h-12 rounded-xl flex items-center justify-center">

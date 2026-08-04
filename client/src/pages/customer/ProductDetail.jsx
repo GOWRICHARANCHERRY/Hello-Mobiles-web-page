@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 import LoginPopup from '../../components/LoginPopup';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -240,6 +241,33 @@ export default function ProductDetail() {
 
   return (
     <div className="animate-fade-in">
+      <SEO
+        title={product.name}
+        description={`${product.name} — ${product.brand || ''} ${product.category || ''} at best price ₹${product.price?.toLocaleString()}. Buy now with EMI options and home delivery in Visakhapatnam.`}
+        path={`/products/${product._id}`}
+        image={product.images?.[0]}
+        product={true}
+        structuredData={product ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: product.description || product.name,
+          image: product.images?.[0],
+          brand: { '@type': 'Brand', name: product.brand || 'Hello Mobiles' },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'INR',
+            price: product.price,
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: `https://hello-mobiles.com/products/${product._id}`,
+          },
+          aggregateRating: product.rating ? {
+            '@type': 'AggregateRating',
+            ratingValue: product.rating,
+            reviewCount: product.numReviews || 1,
+          } : undefined,
+        } : undefined}
+      />
       <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-600 hover:text-gold-600 mb-4 text-sm">
         <ChevronLeft size={18} /> Back
       </button>

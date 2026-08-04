@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Suspense, lazy } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import ScrollToTop from './components/ScrollToTop';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -121,6 +122,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
+    <HelmetProvider>
     <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
       <BrowserRouter>
         <ScrollToTop />
@@ -134,5 +136,6 @@ export default function App() {
         </AuthProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
+    </HelmetProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Calculator, IndianRupee } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 
 export default function EMICalculator() {
   const [price, setPrice] = useState(44999);
@@ -13,6 +14,11 @@ export default function EMICalculator() {
 
   return (
     <div className="animate-fade-in max-w-2xl mx-auto">
+      <SEO
+        title="EMI Calculator"
+        description="Calculate your monthly EMI on mobile phones and electronics at Hello Mobiles, Visakhapatnam. Zero-interest EMI options available."
+        path="/emi-calculator"
+      />
       <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-gold-100 text-gold-600 w-12 h-12 rounded-xl flex items-center justify-center">

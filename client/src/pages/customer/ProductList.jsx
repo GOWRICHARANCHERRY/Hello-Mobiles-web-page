@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import SEO from '../../components/SEO';
 import LoginPopup from '../../components/LoginPopup';
 import SearchBar from '../../components/SearchBar';
 import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
@@ -108,8 +109,16 @@ export default function ProductList() {
   const screenSizes = ['5.5 inch', '6.1 inch', '6.5 inch', '6.7 inch', '6.8 inch', '15.6 inch', '32 inch', '43 inch', '50 inch', '55 inch', '65 inch'];
   const colors = ['Black', 'White', 'Blue', 'Silver', 'Gold', 'Purple', 'Green', 'Red', 'Gray', 'Titanium', 'Natural Titanium', 'Natural Silver'];
 
+  const activeCategory = filters.category || '';
+  const pageTitle = filters.search ? `Search: ${filters.search}` : activeCategory || 'All Products';
+
   return (
     <div className="animate-fade-in">
+      <SEO
+        title={pageTitle}
+        description={`Browse ${pageTitle} at Hello Mobiles, Visakhapatnam. Best prices, EMI options, and fast delivery on mobiles, electronics, and gadgets.`}
+        path={`/products${activeCategory ? `?category=${encodeURIComponent(activeCategory)}` : ''}`}
+      />
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
