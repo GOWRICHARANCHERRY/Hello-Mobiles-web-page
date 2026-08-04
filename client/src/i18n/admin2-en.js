@@ -132,6 +132,8 @@ export default {
   'admin2.status.cancelled': 'Cancelled',
   'admin2.items': 'Items:',
   'admin2.shipping': 'Shipping:',
+  'admin2.landmark': 'Landmark:',
+  'admin2.altPhone': 'Alt Phone:',
   'admin2.payment': 'Payment: {method}',
   'admin2.selectStatus': 'Update Status...',
   'admin2.selectPaymentStatus': 'Payment Status...',

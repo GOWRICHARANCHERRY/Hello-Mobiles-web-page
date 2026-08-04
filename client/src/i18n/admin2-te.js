@@ -132,6 +132,8 @@ export default {
   'admin2.status.cancelled': 'రద్దు చేయబడింది',
   'admin2.items': 'వస్తువులు:',
   'admin2.shipping': 'షిప్పింగ్:',
+  'admin2.landmark': 'ల్యాండ్మార్క్:',
+  'admin2.altPhone': 'ప్రత్యామ్నాయ ఫోన్:',
   'admin2.payment': 'చెల్లింపు: {method}',
   'admin2.selectStatus': 'స్థితిని నవీకరించండి...',
   'admin2.selectPaymentStatus': 'చెల్లింపు స్థితి...',

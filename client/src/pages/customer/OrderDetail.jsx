@@ -212,8 +212,10 @@ export default function OrderDetail() {
           <h3 className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1">{t('cust.billedTo')}</h3>
           <p className="text-sm font-semibold text-gray-900">{order.shippingAddress?.name}</p>
           <p className="text-xs text-gray-600 mt-0.5">{order.shippingAddress?.street}, {order.shippingAddress?.city}</p>
+          {order.shippingAddress?.landmark && <p className="text-xs text-gray-600">{t('cust.landmark')}: {order.shippingAddress.landmark}</p>}
           <p className="text-xs text-gray-600">{order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
           <p className="text-xs text-gray-600 mt-0.5">{t('cust.phoneLabel', { phone: order.shippingAddress?.phone })}</p>
+          {order.shippingAddress?.altPhone && <p className="text-xs text-gray-600">{t('cust.altPhone')}: {order.shippingAddress.altPhone}</p>}
           {order.shippingAddress?.latitude && order.shippingAddress?.longitude && (
             <a
               href={`https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}

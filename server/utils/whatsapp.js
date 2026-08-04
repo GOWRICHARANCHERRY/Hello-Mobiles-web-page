@@ -10,6 +10,8 @@ function formatINR(n) {
 export function buildOrderMessage(order, customer) {
   const customerName = order.shippingAddress?.name || customer?.name || 'Customer';
   const customerPhone = order.shippingAddress?.phone || customer?.phone || '';
+  const altPhoneLine = order.shippingAddress?.altPhone ? `\nAlt Phone: ${order.shippingAddress.altPhone}` : '';
+  const landmarkLine = order.shippingAddress?.landmark ? `\nLandmark: ${order.shippingAddress.landmark}` : '';
   const itemsSummary = order.items
     .slice(0, 3)
     .map(i => `• ${i.name} × ${i.quantity}`)
@@ -27,7 +29,7 @@ Payment: ${order.paymentMethod.toUpperCase()}
 Status: ${order.orderStatus.toUpperCase()}
 
 Customer: ${customerName}
-Phone: ${customerPhone}
+Phone: ${customerPhone}${altPhoneLine}${landmarkLine}
 
 Items:
 ${itemsSummary}${more}

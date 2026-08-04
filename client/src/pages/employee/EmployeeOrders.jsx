@@ -89,7 +89,10 @@ export default function EmployeeOrders() {
                     <h4 className="font-medium text-sm mb-2">{t('emp.shipping')}</h4>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.name}</p>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.street}, {order.shippingAddress?.city}</p>
+                    {order.shippingAddress?.landmark && <p className="text-sm text-gray-600">{t('emp.landmark')} {order.shippingAddress.landmark}</p>}
                     <p className="text-sm text-gray-600">{order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
+                    <p className="text-sm text-gray-600">{order.shippingAddress?.phone}</p>
+                    {order.shippingAddress?.altPhone && <p className="text-sm text-gray-600">{t('emp.altPhone')} {order.shippingAddress.altPhone}</p>}
                     {order.shippingAddress?.latitude && order.shippingAddress?.longitude && (
                       <a
                         href={`https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}

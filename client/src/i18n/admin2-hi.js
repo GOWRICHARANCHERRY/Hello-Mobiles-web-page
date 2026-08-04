@@ -132,6 +132,8 @@ export default {
   'admin2.status.cancelled': 'रद्द हो गया',
   'admin2.items': 'आइटम:',
   'admin2.shipping': 'शिपिंग:',
+  'admin2.landmark': 'लैंडमार्क:',
+  'admin2.altPhone': 'अल्ट फ़ोन:',
   'admin2.payment': 'भुगतान: {method}',
   'admin2.selectStatus': 'स्थिति अपडेट करें...',
   'admin2.selectPaymentStatus': 'भुगतान स्थिति...',

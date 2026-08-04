@@ -24,6 +24,9 @@ export default {
   'cust.city': 'शहर',
   'cust.state': 'राज्य',
   'cust.pincode': 'पिनकोड',
+  'cust.landmark': 'लैंडमार्क',
+  'cust.altPhone': 'वैकल्पिक फ़ोन',
+  'cust.optional': 'वैकल्पिक',
   'cust.toastAddedToCart': 'कार्ट में जोड़ दिया गया!',
 
   'cust.noCostEmi': 'नो कॉस्ट EMI',

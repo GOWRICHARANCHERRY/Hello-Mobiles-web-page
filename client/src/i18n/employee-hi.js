@@ -80,6 +80,8 @@ export default {
   'emp.statusCancelled': 'रद्द किया गया',
   'emp.items': 'आइटम:',
   'emp.shipping': 'शिपिंग:',
+  'emp.landmark': 'लैंडमार्क:',
+  'emp.altPhone': 'अल्ट फ़ोन:',
   'emp.payment': 'भुगतान: {method}',
   'emp.markAs': '{status} के रूप में चिह्नित करें',
   'emp.viewOnMap': 'मानचित्र पर देखें',

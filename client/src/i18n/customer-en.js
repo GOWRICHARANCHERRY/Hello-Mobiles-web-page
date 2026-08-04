@@ -24,6 +24,9 @@ export default {
   'cust.city': 'City',
   'cust.state': 'State',
   'cust.pincode': 'Pincode',
+  'cust.landmark': 'Landmark',
+  'cust.altPhone': 'Alternate Phone',
+  'cust.optional': 'Optional',
   'cust.toastAddedToCart': 'Added to cart!',
 
   'cust.noCostEmi': 'No Cost EMI',

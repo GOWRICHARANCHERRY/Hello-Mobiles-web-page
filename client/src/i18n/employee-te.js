@@ -80,6 +80,8 @@ export default {
   'emp.statusCancelled': 'రద్దు చేయబడింది',
   'emp.items': 'వస్తువులు:',
   'emp.shipping': 'షిప్పింగ్:',
+  'emp.landmark': 'ల్యాండ్మార్క్:',
+  'emp.altPhone': 'ప్రత్యామ్నాయ ఫోన్:',
   'emp.payment': 'చెల్లింపు: {method}',
   'emp.markAs': '{status} గా గుర్తించండి',
   'emp.viewOnMap': 'మ్యాప్‌లో చూడండి',

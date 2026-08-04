@@ -24,7 +24,8 @@ export default function Checkout() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '', phone: user?.phone || '',
-    street: user?.address?.street || '', city: user?.address?.city || '',
+    street: user?.address?.street || '', landmark: '', altPhone: '',
+    city: user?.address?.city || '',
     state: user?.address?.state || '', pincode: user?.address?.pincode || '',
   });
   const [mapLoc, setMapLoc] = useState({ lat: null, lng: null, mapLabel: '' });
@@ -138,6 +139,8 @@ export default function Checkout() {
         shippingAddress: {
           name: form.name, phone: form.phone, street: form.street, city: form.city,
           state: form.state, pincode: form.pincode,
+          landmark: form.landmark || undefined,
+          altPhone: form.altPhone || undefined,
           latitude: mapLoc.lat || undefined,
           longitude: mapLoc.lng || undefined,
           mapLabel: mapLoc.mapLabel || undefined,
@@ -216,9 +219,19 @@ export default function Checkout() {
                   <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.altPhone')} <span className="text-xs text-gray-400 font-normal">({t('cust.optional')})</span></label>
+                  <input value={form.altPhone} onChange={e => setForm({...form, altPhone: e.target.value})}
+                    className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
+                </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.address')}</label>
                   <input value={form.street} onChange={e => setForm({...form, street: e.target.value})}
+                    className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.landmark')} <span className="text-xs text-gray-400 font-normal">({t('cust.optional')})</span></label>
+                  <input value={form.landmark} onChange={e => setForm({...form, landmark: e.target.value})}
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
                 <div>
@@ -297,7 +310,9 @@ export default function Checkout() {
                 <div className="border-b pb-4">
                   <h3 className="font-medium text-gray-700 mb-1">{t('cust.shippingTo')}</h3>
                   <p className="text-sm text-gray-600">{form.name}, {form.street}, {form.city}, {form.state} - {form.pincode}</p>
+                  {form.landmark && <p className="text-sm text-gray-600">{t('cust.landmark')}: {form.landmark}</p>}
                   <p className="text-sm text-gray-600">{t('cust.phoneLabel', { phone: form.phone })}</p>
+                  {form.altPhone && <p className="text-sm text-gray-600">{t('cust.altPhone')}: {form.altPhone}</p>}
                 </div>
                 <div className="border-b pb-4">
                   <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>

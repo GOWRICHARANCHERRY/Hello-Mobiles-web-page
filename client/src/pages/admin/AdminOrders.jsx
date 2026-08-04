@@ -104,7 +104,10 @@ export default function AdminOrders() {
                     <h4 className="font-medium text-sm mb-2">{t('admin2.shipping')}</h4>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.name}</p>
                     <p className="text-sm text-gray-600">{order.shippingAddress?.street}</p>
+                    {order.shippingAddress?.landmark && <p className="text-sm text-gray-600">{t('admin2.landmark')} {order.shippingAddress.landmark}</p>}
                     <p className="text-sm text-gray-600">{order.shippingAddress?.city}, {order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
+                    <p className="text-sm text-gray-600">{order.shippingAddress?.phone}</p>
+                    {order.shippingAddress?.altPhone && <p className="text-sm text-gray-600">{t('admin2.altPhone')} {order.shippingAddress.altPhone}</p>}
                     {order.shippingAddress?.latitude && order.shippingAddress?.longitude && (
                       <a
                         href={`https://www.google.com/maps?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}

@@ -80,6 +80,8 @@ export default {
   'emp.statusCancelled': 'Cancelled',
   'emp.items': 'Items:',
   'emp.shipping': 'Shipping:',
+  'emp.landmark': 'Landmark:',
+  'emp.altPhone': 'Alt Phone:',
   'emp.payment': 'Payment: {method}',
   'emp.markAs': 'Mark as {status}',
   'emp.viewOnMap': 'View on map',
