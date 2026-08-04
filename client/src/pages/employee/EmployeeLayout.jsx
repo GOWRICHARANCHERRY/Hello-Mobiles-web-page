@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { LayoutDashboard, Package, ShoppingCart, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import NewOrderNotifier from '../../components/NewOrderNotifier';
 
 export default function EmployeeLayout() {
   const { user, logout } = useAuth();
@@ -18,6 +19,7 @@ export default function EmployeeLayout() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+      <NewOrderNotifier />
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
         <div className="p-6">

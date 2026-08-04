@@ -200,4 +200,8 @@ export default {
   'comp.min6Characters': 'కనీసం 6 అక్షరాలు',
   'comp.confirmPasswordRequired': 'పాస్వర్డ్ నిర్ధారించండి *',
   'comp.reenterPassword': 'పాస్వర్డ్ మళ్లీ నమోదు చేయండి',
+  // NewOrderNotifier
+  'comp.newOrderTitle': 'కొత్త ఆర్డర్!',
+  'comp.newOrderBody': 'ఆర్డర్ {orderNumber} {total} కోసం వచ్చింది',
+  'comp.newOrderStop': 'ఆపండి',
 };

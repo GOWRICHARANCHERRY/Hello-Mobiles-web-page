@@ -200,4 +200,8 @@ export default {
   'comp.min6Characters': 'Min 6 characters',
   'comp.confirmPasswordRequired': 'Confirm Password *',
   'comp.reenterPassword': 'Re-enter password',
+  // NewOrderNotifier
+  'comp.newOrderTitle': 'New Order!',
+  'comp.newOrderBody': 'Order {orderNumber} placed for {total}',
+  'comp.newOrderStop': 'Stop',
 };

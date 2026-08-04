@@ -2,6 +2,7 @@ import express from 'express';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import { auth, roleAuth } from '../middleware/auth.js';
+import { sendOrderWhatsApp } from '../utils/whatsapp.js';
 
 const router = express.Router();
 
@@ -13,6 +14,19 @@ router.get('/', auth, async (req, res) => {
     }
     const orders = await Order.find(query).populate('customer', 'name phone email').populate('items.product', 'name images').sort({ createdAt: -1 });
     res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Lightweight endpoint for the new-order alarm (admin/employee)
+router.get('/latest', auth, roleAuth('admin', 'employee'), async (req, res) => {
+  try {
+    const order = await Order.findOne({})
+      .populate('customer', 'name phone')
+      .sort({ createdAt: -1 })
+      .select('orderNumber total paymentMethod orderStatus shippingAddress customer createdAt');
+    res.json(order || null);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -165,6 +179,8 @@ router.post('/', auth, async (req, res) => {
         await p.save();
       }
     }
+
+    sendOrderWhatsApp(order, req.user);
 
     res.status(201).json(order);
   } catch (error) {

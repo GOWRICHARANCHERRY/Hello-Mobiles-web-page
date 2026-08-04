@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image, Tag, Mail } from 'lucide-react';
 import { useState } from 'react';
+import NewOrderNotifier from '../../components/NewOrderNotifier';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -24,6 +25,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+      <NewOrderNotifier />
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
         <div className="p-6 border-b border-gray-800">

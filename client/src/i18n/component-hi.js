@@ -200,4 +200,8 @@ export default {
   'comp.min6Characters': 'न्यूनतम 6 अक्षर',
   'comp.confirmPasswordRequired': 'पासवर्ड की पुष्टि करें *',
   'comp.reenterPassword': 'पासवर्ड दोबारा दर्ज करें',
+  // NewOrderNotifier
+  'comp.newOrderTitle': 'नया ऑर्डर!',
+  'comp.newOrderBody': 'ऑर्डर {orderNumber} {total} में प्राप्त हुआ',
+  'comp.newOrderStop': 'रोकें',
 };
