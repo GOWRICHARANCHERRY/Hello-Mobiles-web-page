@@ -117,10 +117,23 @@ export default function Checkout() {
     toast.success(t('cust.toastLocationDetected'));
   };
 
+  const validateShipping = () => {
+    if (!form.name.trim()) return t('cust.toastEnterName');
+    let phone = form.phone.replace(/[\s-]/g, '');
+    phone = phone.replace(/^(\+?91)/, '');
+    if (!phone) return t('cust.toastEnterPhone');
+    if (!/^[6-9]\d{9}$/.test(phone)) return t('cust.toastValidPhone');
+    if (!form.street.trim()) return t('cust.toastEnterAddress');
+    if (!form.city.trim()) return t('cust.toastEnterCity');
+    if (!form.state.trim()) return t('cust.toastEnterState');
+    if (!form.pincode.trim()) return t('cust.toastEnterPincode');
+    if (!/^\d{6}$/.test(form.pincode.trim())) return t('cust.toastValidPincode');
+    return null;
+  };
+
   const handlePlaceOrder = async () => {
-    if (!form.name || !form.phone || !form.street || !form.city || !form.pincode) {
-      return toast.error(t('cust.toastFillShipping'));
-    }
+    const err = validateShipping();
+    if (err) return toast.error(err);
     setLoading(true);
     try {
       const orderData = {
@@ -250,7 +263,11 @@ export default function Checkout() {
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
               </div>
-              <button onClick={() => setStep(2)} className="mt-6 btn-gold rounded-xl">
+              <button onClick={() => {
+                const err = validateShipping();
+                if (err) return toast.error(err);
+                setStep(2);
+              }} className="mt-6 btn-gold rounded-xl">
                 {t('cust.continueToPayment')}
               </button>
             </div>

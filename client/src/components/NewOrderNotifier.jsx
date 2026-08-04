@@ -13,7 +13,7 @@ function beep(ctx, freq, start, duration) {
   osc.type = 'square';
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.exponentialRampToValueAtTime(0.25, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.4, start + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -24,6 +24,26 @@ function beep(ctx, freq, start, duration) {
 function playAlarmCycle(ctx) {
   const now = ctx.currentTime;
   [880, 880, 880, 1175].forEach((freq, i) => beep(ctx, freq, now + i * 0.18, 0.12));
+}
+
+// iOS Safari only truly unlocks Web Audio if real audio output happens inside the
+// user gesture. Play a near-silent pulse during the unlock tap to arm the pipe.
+function playUnlockPulse(ctx) {
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 440;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch (e) {
+    // ignore
+  }
 }
 
 export default function NewOrderNotifier() {
@@ -73,9 +93,14 @@ export default function NewOrderNotifier() {
     // new order arrives — even if the context wasn't created inside a gesture.
     const unlockAudio = () => {
       const ctx = getAudioCtx();
-      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(() => playUnlockPulse(ctx)).catch(() => {});
+      } else {
+        playUnlockPulse(ctx);
+      }
     };
-    const gestureEvents = ['pointerdown', 'touchstart', 'click', 'keydown'];
+    const gestureEvents = ['pointerdown', 'touchstart', 'mousedown', 'click', 'keydown'];
     gestureEvents.forEach(evt => document.addEventListener(evt, unlockAudio, true));
     document.addEventListener('visibilitychange', unlockAudio);
 
