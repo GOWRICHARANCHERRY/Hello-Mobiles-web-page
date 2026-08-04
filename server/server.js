@@ -59,6 +59,7 @@ app.use(helmet({
         'https://www.gstatic.com',
         'https://*.firebaseapp.com',
       ],
+      scriptSrcAttr: ["'sha256-1jAmyYXcRq6zFldLe/GCgIDJBiOONdXjTLgEFMDnDSM='"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://www.gstatic.com'],
       fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       imgSrc: [

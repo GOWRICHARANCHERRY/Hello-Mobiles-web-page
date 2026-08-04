@@ -78,7 +78,7 @@ function Autocomplete({ label, value, onChange, fetchUrl, required }) {
       {show && !isAdding && (
         <div className="absolute z-20 w-full bg-white border-2 border-gold-200 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg">
           <button onClick={handleAddNew}
-            className="w-full text-left px-3 py-2 text-sm text-gold-600 font-semibold hover:bg-gold-50 border-b border-gold-100 flex items-center gap-2">
+            className="w-full text-left px-3 py-2 text-sm text-gold-700 font-semibold hover:bg-gold-50 border-b border-gold-100 flex items-center gap-2">
             <Plus size={14} /> {t('admin2.autocomplete.addNew', { query })}
           </button>
           {loading && <div className="px-3 py-2 text-sm text-gray-400">Searching...</div>}
@@ -169,9 +169,9 @@ function ImageUploader({ images, onChange }) {
       >
         <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden"
           onChange={e => uploadFiles(e.target.files)} />
-        <Upload size={32} className={`mx-auto mb-2 ${dragging ? 'text-gold-600' : 'text-gray-400'}`} />
+        <Upload size={32} className={`mx-auto mb-2 ${dragging ? 'text-gold-700' : 'text-gray-400'}`} />
         {uploading ? (
-          <p className="text-sm text-gold-600 font-medium">Uploading...</p>
+          <p className="text-sm text-gold-700 font-medium">Uploading...</p>
         ) : (
           <>
             <p className="text-sm font-medium text-gray-600">Drag & drop images here, click to browse, or Ctrl+V to paste</p>
@@ -191,7 +191,7 @@ function ImageUploader({ images, onChange }) {
             </div>
           ))}
           <button onClick={handleUrlAdd}
-            className="w-20 h-20 rounded-lg border-2 border-dashed border-gold-300 flex flex-col items-center justify-center text-gold-600 hover:bg-gold-50 transition">
+            className="w-20 h-20 rounded-lg border-2 border-dashed border-gold-300 flex flex-col items-center justify-center text-gold-700 hover:bg-gold-50 transition">
             <Plus size={20} />
             <span className="text-[9px] mt-1">Add URL</span>
           </button>
@@ -238,7 +238,7 @@ function SpecKeyDropdown({ value, onChange }) {
           onFocus={() => { setOpen(true); setFilter(''); }}
           placeholder="Select spec..."
           className="flex-1 px-3 py-1.5 text-sm bg-transparent outline-none" />
-        <button type="button" onClick={() => setOpen(!open)} className="px-2 text-gray-400 hover:text-gold-600">
+        <button type="button" onClick={() => setOpen(!open)} className="px-2 text-gray-400 hover:text-gold-700">
           <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
       </div>
@@ -246,7 +246,7 @@ function SpecKeyDropdown({ value, onChange }) {
         <div className="absolute z-30 w-full bg-white border-2 border-gold-200 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg">
           {filtered.length === 0 && filter && (
             <button onClick={() => { onChange(filter); setOpen(false); setFilter(''); }}
-              className="w-full text-left px-3 py-2 text-sm text-gold-600 font-semibold hover:bg-gold-50 border-b border-gold-100">
+              className="w-full text-left px-3 py-2 text-sm text-gold-700 font-semibold hover:bg-gold-50 border-b border-gold-100">
               Add Custom: "{filter}"
             </button>
           )}
@@ -277,7 +277,7 @@ function SpecValueDropdown({ specKey, value, onChange }) {
           onFocus={() => { setOpen(true); setFilter(''); }}
           placeholder={options.length ? "Select value..." : "Type value..."}
           className="flex-1 px-3 py-1.5 text-sm bg-transparent outline-none" />
-        <button type="button" onClick={() => setOpen(!open)} className="px-2 text-gray-400 hover:text-gold-600">
+        <button type="button" onClick={() => setOpen(!open)} className="px-2 text-gray-400 hover:text-gold-700">
           <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
       </div>
@@ -285,7 +285,7 @@ function SpecValueDropdown({ specKey, value, onChange }) {
         <div className="absolute z-30 w-full bg-white border-2 border-gold-200 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg">
           {filtered.length === 0 && filter && (
             <button onClick={() => { onChange(filter); setOpen(false); setFilter(''); }}
-              className="w-full text-left px-3 py-2 text-sm text-gold-600 font-semibold hover:bg-gold-50 border-b border-gold-100">
+              className="w-full text-left px-3 py-2 text-sm text-gold-700 font-semibold hover:bg-gold-50 border-b border-gold-100">
               Add Custom: "{filter}"
             </button>
           )}
@@ -313,7 +313,7 @@ function DynamicSpecs({ specs, onChange }) {
     <div>
       <div className="flex items-center justify-between mb-2">
         <label className="text-sm font-medium text-gray-700">Specifications</label>
-        <button type="button" onClick={addSpec} className="text-gold-600 text-xs flex items-center gap-1 hover:underline">
+        <button type="button" onClick={addSpec} className="text-gold-700 text-xs flex items-center gap-1 hover:underline">
           <Plus size={12} /> Add Spec
         </button>
       </div>
@@ -621,7 +621,7 @@ function VariantManager({ variants, onChange, basePrice, baseMrp, baseStock, cat
         <label className="text-sm font-medium text-gray-700">
           Variants {variants.length > 0 && <span className="text-gray-400 font-normal">({variants.length})</span>}
         </label>
-        <button type="button" onClick={addVariant} className="text-gold-600 text-xs flex items-center gap-1 hover:underline">
+        <button type="button" onClick={addVariant} className="text-gold-700 text-xs flex items-center gap-1 hover:underline">
           <Plus size={12} /> Add Variant
         </button>
       </div>
@@ -632,7 +632,7 @@ function VariantManager({ variants, onChange, basePrice, baseMrp, baseStock, cat
           <Package size={24} className="mx-auto text-gray-300 mb-2" />
           <p className="text-sm text-gray-400">No variants added yet</p>
           <p className="text-xs text-gray-400 mt-1">If this product comes in different RAM/storage options, add variants</p>
-          <button type="button" onClick={addVariant} className="mt-3 text-gold-600 text-sm font-medium hover:underline">+ Add First Variant</button>
+          <button type="button" onClick={addVariant} className="mt-3 text-gold-700 text-sm font-medium hover:underline">+ Add First Variant</button>
         </div>
       )}
 
@@ -680,7 +680,7 @@ function VariantManager({ variants, onChange, basePrice, baseMrp, baseStock, cat
                         <button type="button" onClick={() => addAllColorsToVariant(i)} className="text-[10px] text-blue-600 hover:text-blue-700 border border-blue-200 rounded px-1.5 py-0.5 hover:bg-blue-50">
                           + All Preset Colors
                         </button>
-                        <button type="button" onClick={() => addColorToVariant(i)} className="text-[10px] text-gold-600 hover:text-gold-700 border border-gold-200 rounded px-1.5 py-0.5 hover:bg-gold-50">
+                        <button type="button" onClick={() => addColorToVariant(i)} className="text-[10px] text-gold-700 hover:text-gold-700 border border-gold-200 rounded px-1.5 py-0.5 hover:bg-gold-50">
                           + Custom Color
                         </button>
                       </div>
@@ -924,7 +924,7 @@ export default function AdminProducts() {
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4 gold-border">
         <div className="flex items-center gap-2 mb-3">
-          <Filter size={16} className="text-gold-600" />
+          <Filter size={16} className="text-gold-700" />
           <span className="text-sm font-semibold text-gray-700">Filters</span>
           {hasFilters && (
             <button onClick={() => { setSearch(''); setFilterCategory(''); setFilterBrand(''); setFilterStatus(''); setFilterStock(''); }}
@@ -989,12 +989,12 @@ export default function AdminProducts() {
                       {product.images?.[0] ? <img src={product.images[0]} alt="" className="w-10 h-10 rounded-lg object-contain bg-gray-100 border border-gold-200 flex-shrink-0" /> : <div className="w-10 h-10 bg-gold-100 rounded-lg flex items-center justify-center flex-shrink-0"><Package size={16} className="text-gold-500" /></div>}
                       <div className="min-w-0">
                         <p className="font-medium text-gray-800 truncate">{product.name}</p>
-                        <p className="text-xs text-gold-600 truncate">{product.brand}</p>
+                        <p className="text-xs text-gold-700 truncate">{product.brand}</p>
                       </div>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-gray-500">{product.category}</td>
-                  <td className="py-3 px-4 font-semibold text-gold-600">₹{product.price?.toLocaleString()}</td>
+                  <td className="py-3 px-4 font-semibold text-gold-700">₹{product.price?.toLocaleString()}</td>
                   <td className="py-3 px-4 text-gray-500 line-through">₹{product.mrp?.toLocaleString()}</td>
                   <td className="py-3 px-4">
                     {product.variants?.length > 0 ? (() => {
@@ -1023,7 +1023,7 @@ export default function AdminProducts() {
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
-                      <button onClick={() => handleEdit(product)} className="text-gold-600 hover:text-gold-700 p-1 hover:bg-gold-50 rounded-lg transition"><Edit2 size={16} /></button>
+                      <button onClick={() => handleEdit(product)} className="text-gold-700 hover:text-gold-700 p-1 hover:bg-gold-50 rounded-lg transition"><Edit2 size={16} /></button>
                       <button onClick={() => handleDelete(product._id)} className="text-red-500 hover:text-red-600 p-1 hover:bg-red-50 rounded-lg transition"><Trash2 size={16} /></button>
                     </div>
                   </td>
@@ -1123,7 +1123,7 @@ export default function AdminProducts() {
                     { key: 'isOnOffer', label: 'On Offer' },
                   ].map(opt => (
                     <label key={opt.key} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input type="checkbox" checked={form[opt.key]} onChange={e => setForm({ ...form, [opt.key]: e.target.checked })} className="text-gold-600 rounded" />
+                      <input type="checkbox" checked={form[opt.key]} onChange={e => setForm({ ...form, [opt.key]: e.target.checked })} className="text-gold-700 rounded" />
                       {opt.label}
                     </label>
                   ))}

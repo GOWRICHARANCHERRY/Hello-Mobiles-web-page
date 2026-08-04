@@ -21,7 +21,7 @@ export default function EMICalculator() {
       />
       <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gold-100 text-gold-600 w-12 h-12 rounded-xl flex items-center justify-center">
+          <div className="bg-gold-100 text-gold-700 w-12 h-12 rounded-xl flex items-center justify-center">
             <Calculator size={24} />
           </div>
           <div>
@@ -34,7 +34,7 @@ export default function EMICalculator() {
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
               <span>{t('cust.productPrice')}</span>
-              <span className="text-gold-600">₹{price.toLocaleString()}</span>
+              <span className="text-gold-700">₹{price.toLocaleString()}</span>
             </label>
             <input type="range" min="1000" max="200000" step="500" value={price}
               onChange={e => setPrice(Number(e.target.value))}
@@ -47,7 +47,7 @@ export default function EMICalculator() {
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-2">
               <span>{t('cust.tenureMonths')}</span>
-              <span className="text-gold-600">{t('cust.months', { count: tenure })}</span>
+              <span className="text-gold-700">{t('cust.months', { count: tenure })}</span>
             </label>
             <div className="flex gap-2 flex-wrap">
               {[3, 6, 9, 12, 18, 24].map(months => (

@@ -102,10 +102,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-gold {
-  @apply bg-gradient-to-r from-gold-600 to-gold-400 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300;
+  @apply bg-gradient-to-r from-gold-700 to-gold-800 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300;
 }
 .btn-gold:hover {
-  @apply from-gold-700 to-gold-500 shadow-lg;
+  @apply from-gold-800 to-gold-900 shadow-lg;
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(184, 134, 11, 0.3);
 }
@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   @apply border-2 border-gold-500 text-gold-700 font-semibold py-3 px-8 rounded-xl transition-all duration-300;
 }
 .btn-outline-gold:hover {
-  @apply bg-gold-500 text-white;
+  @apply bg-gold-700 text-white;
   transform: translateY(-2px);
 }
 

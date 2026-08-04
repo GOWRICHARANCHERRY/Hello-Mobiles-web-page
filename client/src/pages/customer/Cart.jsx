@@ -40,7 +40,7 @@ export default function Cart() {
                   <div>
                     <p className="text-xs text-gray-500">{item.brand}</p>
                     <h3 className="font-semibold text-gray-800 text-sm">{item.name}</h3>
-                    {item.variantLabel && <p className="text-xs text-gold-600 font-medium mt-0.5">{item.variantLabel}</p>}
+                    {item.variantLabel && <p className="text-xs text-gold-700 font-medium mt-0.5">{item.variantLabel}</p>}
                   </div>
                   <button onClick={() => { removeFromCart(item.cartKey); toast.success(t('cust.removedFromCart')); }}
                     aria-label="Remove from cart" className="text-gray-400 hover:text-red-500 transition">
@@ -60,7 +60,7 @@ export default function Cart() {
             </div>
           ))}
           <div className="flex gap-3">
-            <Link to="/products" className="border border-gold-600 text-gold-600 px-6 py-2 rounded-xl font-medium hover:bg-gold-50 transition text-sm">
+            <Link to="/products" className="border border-gold-600 text-gold-700 px-6 py-2 rounded-xl font-medium hover:bg-gold-50 transition text-sm">
               {t('cust.continueShopping')}
             </Link>
             <button onClick={() => { clearCart(); toast.success(t('cust.cartCleared')); }}

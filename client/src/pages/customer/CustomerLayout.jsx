@@ -91,8 +91,8 @@ export default function CustomerLayout() {
               const needsAuth = link.requiresAuth && !user;
               const Tag = needsAuth ? 'button' : Link;
               const props = needsAuth
-                ? { onClick: () => setShowLoginPopup(true), className: `relative flex flex-col items-center text-xs transition-all duration-300 text-gray-600 hover:text-gold-600 cursor-pointer` }
-                : { to: link.to, className: `relative flex flex-col items-center text-xs transition-all duration-300 ${location.pathname === link.to ? 'text-gold-600 scale-110' : 'text-gray-600 hover:text-gold-600'}` };
+                ? { onClick: () => setShowLoginPopup(true), className: `relative flex flex-col items-center text-xs transition-all duration-300 text-gray-600 hover:text-gold-700 cursor-pointer` }
+                : { to: link.to, className: `relative flex flex-col items-center text-xs transition-all duration-300 ${location.pathname === link.to ? 'text-gold-700 scale-110' : 'text-gray-600 hover:text-gold-700'}` };
               return (
                 <Tag key={link.to} {...props}>
                   <div className="relative">
@@ -109,7 +109,7 @@ export default function CustomerLayout() {
             {user ? (
               <div className="relative" ref={profileRef}>
                 <button onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-1.5 text-sm text-gray-700 hover:text-gold-600 transition font-medium">
+                  className="flex items-center gap-1.5 text-sm text-gray-700 hover:text-gold-700 transition font-medium">
                   <div className="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-white text-xs font-bold">
                     {user?.name?.[0]?.toUpperCase() || 'U'}
                   </div>
@@ -241,7 +241,7 @@ export default function CustomerLayout() {
             }
             return (
               <Link key={link.to} to={link.to} onClick={() => setMenuOpen(false)}
-                className={`flex items-center gap-3 px-6 py-3 border-b transition ${location.pathname === link.to ? 'bg-gold-50 text-gold-600 font-semibold' : 'text-gray-700 hover:bg-gold-50'}`}>
+                className={`flex items-center gap-3 px-6 py-3 border-b transition ${location.pathname === link.to ? 'bg-gold-50 text-gold-700 font-semibold' : 'text-gray-700 hover:bg-gold-50'}`}>
                 <link.icon size={18} /> {link.label}
                 {link.badge > 0 && <span className="ml-auto bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">{link.badge}</span>}
               </Link>
@@ -259,7 +259,7 @@ export default function CustomerLayout() {
               <button onClick={() => { logout(); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-red-500 w-full hover:bg-red-50"><LogOut size={18} /> {t('comp.logout')}</button>
             </>
           ) : (
-            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-600 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> {t('comp.login')}</button>
+            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-700 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> {t('comp.login')}</button>
           )}
         </div>
       )}

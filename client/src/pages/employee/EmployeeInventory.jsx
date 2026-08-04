@@ -151,7 +151,7 @@ export default function EmployeeInventory() {
 
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4 gold-border">
         <div className="flex items-center gap-2 mb-3">
-          <Filter size={16} className="text-gold-600" />
+          <Filter size={16} className="text-gold-700" />
           <span className="text-sm font-semibold text-gray-700">{t('emp.filters')}</span>
           {hasFilters && (
             <button onClick={() => { setSearch(''); setFilterCategory(''); setFilterBrand(''); setFilterStock(''); }}
@@ -210,7 +210,7 @@ export default function EmployeeInventory() {
                     <tr className={`border-b ${!hasVariants && product.stock <= product.lowStockThreshold ? 'bg-yellow-50' : ''}`}>
                       <td className="py-3 px-4">
                         {hasVariants ? (
-                          <button onClick={() => toggleExpand(product._id)} className="text-gray-400 hover:text-gold-600">
+                          <button onClick={() => toggleExpand(product._id)} className="text-gray-400 hover:text-gold-700">
                             {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                           </button>
                         ) : null}
@@ -247,10 +247,10 @@ export default function EmployeeInventory() {
                           editingId === `base-${product._id}` ? (
                             <button onClick={() => handleUpdateStock(product._id)} className="text-green-600 hover:text-green-700"><Save size={16} /></button>
                           ) : (
-                            <button onClick={() => { setEditingId(`base-${product._id}`); setNewStock(product.stock); }} className="text-gold-600 hover:text-gold-700"><Edit2 size={16} /></button>
+                            <button onClick={() => { setEditingId(`base-${product._id}`); setNewStock(product.stock); }} className="text-gold-700 hover:text-gold-700"><Edit2 size={16} /></button>
                           )
                         ) : (
-                          <button onClick={() => toggleExpand(product._id)} className="text-gold-600 hover:text-gold-700 text-xs font-medium">
+                          <button onClick={() => toggleExpand(product._id)} className="text-gold-700 hover:text-gold-700 text-xs font-medium">
                             {isExpanded ? t('emp.hide') : t('emp.manage')}
                           </button>
                         )}
@@ -312,7 +312,7 @@ export default function EmployeeInventory() {
                               {editingId === `color-${product._id}-${variant._id}-${color._id}` ? (
                                 <button onClick={() => handleUpdateStock(product._id, variant._id, color._id)} className="text-green-600 hover:text-green-700"><Save size={12} /></button>
                               ) : (
-                                <button onClick={() => { setEditingId(`color-${product._id}-${variant._id}-${color._id}`); setNewStock(color.stock); }} className="text-gold-600 hover:text-gold-700"><Edit2 size={12} /></button>
+                                <button onClick={() => { setEditingId(`color-${product._id}-${variant._id}-${color._id}`); setNewStock(color.stock); }} className="text-gold-700 hover:text-gold-700"><Edit2 size={12} /></button>
                               )}
                             </td>
                           </tr>
@@ -339,7 +339,7 @@ export default function EmployeeInventory() {
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600">{t('emp.uploadCsvPart1')} <span className="font-semibold font-mono">name,stock</span> {t('emp.uploadCsvPart2')}</p>
-                <button onClick={downloadTemplate} className="flex items-center gap-1 text-xs text-gold-600 hover:text-gold-700 font-semibold flex-shrink-0">
+                <button onClick={downloadTemplate} className="flex items-center gap-1 text-xs text-gold-700 hover:text-gold-700 font-semibold flex-shrink-0">
                   <Download size={14} /> {t('emp.template')}
                 </button>
               </div>
@@ -374,7 +374,7 @@ export default function EmployeeInventory() {
                         {bulkRows.map((row, i) => (
                           <tr key={i} className="border-t">
                             <td className="py-2 px-3 text-gray-700">{row.name}</td>
-                            <td className="py-2 px-3 font-semibold text-gold-600">{row.stock}</td>
+                            <td className="py-2 px-3 font-semibold text-gold-700">{row.stock}</td>
                           </tr>
                         ))}
                       </tbody>

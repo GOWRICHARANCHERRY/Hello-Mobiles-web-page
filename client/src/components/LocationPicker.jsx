@@ -147,17 +147,17 @@ export default function LocationPicker({ initial, onLocation, onError }) {
           onClick={useMyLocation}
           className="absolute bottom-3 right-3 bg-white text-gray-800 shadow-lg rounded-full px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 hover:bg-gray-50 transition"
         >
-          {geocoding ? <Loader size={14} className="animate-spin" /> : <LocateFixed size={14} className="text-gold-600" />}
+          {geocoding ? <Loader size={14} className="animate-spin" /> : <LocateFixed size={14} className="text-gold-700" />}
           {t('cust.useCurrentLocation')}
         </button>
         <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur rounded-full px-3 py-1 text-[11px] font-medium text-gray-600 shadow flex items-center gap-1 pointer-events-none">
-          <MapPin size={12} className="text-gold-600" />
+          <MapPin size={12} className="text-gold-700" />
           {geocoding ? t('cust.detecting') : t('comp.dragPinHint')}
         </div>
       </div>
       {label && (
         <div className="flex items-start gap-2 bg-gold-50/60 border border-gold-200 rounded-lg px-3 py-2.5 text-xs text-gray-600">
-          <MapPin size={14} className="text-gold-600 mt-0.5 flex-shrink-0" />
+          <MapPin size={14} className="text-gold-700 mt-0.5 flex-shrink-0" />
           <span className="leading-relaxed">{label}</span>
         </div>
       )}

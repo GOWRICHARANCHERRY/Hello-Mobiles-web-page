@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: t('admin.totalProducts'), value: data?.totalProducts || 0, color: 'text-gold-600' },
+          { label: t('admin.totalProducts'), value: data?.totalProducts || 0, color: 'text-gold-700' },
           { label: t('admin.totalCustomers'), value: data?.totalCustomers || 0, color: 'text-accent-600' },
           { label: t('admin.employees'), value: data?.totalEmployees || 0, color: 'text-purple-600' },
           { label: t('admin.lowStockAlerts'), value: data?.lowStockProducts || 0, color: 'text-red-500' },

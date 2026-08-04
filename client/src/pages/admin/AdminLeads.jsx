@@ -75,7 +75,7 @@ export default function AdminLeads() {
                 {lead.read ? (
                   <span className="flex items-center gap-1.5 text-xs text-green-600 font-medium"><Check size={14} /> {t('admin.readBadge')}</span>
                 ) : (
-                  <button onClick={() => markRead(lead._id)} className="flex items-center gap-1.5 text-xs text-gold-600 hover:text-gold-700 font-medium px-3 py-1.5 bg-gold-50 border border-gold-200 rounded-lg transition">
+                  <button onClick={() => markRead(lead._id)} className="flex items-center gap-1.5 text-xs text-gold-700 hover:text-gold-700 font-medium px-3 py-1.5 bg-gold-50 border border-gold-200 rounded-lg transition">
                     <MailOpen size={14} /> {t('admin.markAsRead')}
                   </button>
                 )}

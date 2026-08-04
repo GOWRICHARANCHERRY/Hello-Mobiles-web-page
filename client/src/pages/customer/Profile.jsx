@@ -204,7 +204,7 @@ export default function Profile() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold text-lg text-gray-800">{t('cust.myOrders')} ({orders.length})</h3>
-                <Link to="/orders" className="text-gold-600 text-sm font-semibold hover:underline flex items-center gap-1">
+                <Link to="/orders" className="text-gold-700 text-sm font-semibold hover:underline flex items-center gap-1">
                   {t('cust.viewAll')} <ChevronRight size={14} />
                 </Link>
               </div>
@@ -229,7 +229,7 @@ export default function Profile() {
                             {order.items?.[0]?.product?.images?.[0] ? (
                               <img src={order.items[0].product.images[0]} alt="" loading="lazy" width="60" height="60" className="w-full h-full object-contain p-0.5" />
                             ) : (
-                              <Package size={22} className="text-gold-600" />
+                              <Package size={22} className="text-gold-700" />
                             )}
                           </div>
                           <div className="min-w-0">
@@ -244,7 +244,7 @@ export default function Profile() {
                         <div className="text-right flex items-center gap-3 flex-shrink-0">
                           <div>
                             <p className="font-bold text-sm text-gray-900">₹{order.total.toLocaleString()}</p>
-                            <p className="text-[11px] text-gold-600 font-medium group-hover:underline">{t('cust.viewDetails')}</p>
+                            <p className="text-[11px] text-gold-700 font-medium group-hover:underline">{t('cust.viewDetails')}</p>
                           </div>
                           <ChevronRight size={16} className="text-gray-400 group-hover:text-gold-500 transition" />
                         </div>
@@ -278,12 +278,12 @@ export default function Profile() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${addr.isDefault ? 'bg-gold-100' : 'bg-gray-100'}`}>
-                            <MapPin size={18} className={addr.isDefault ? 'text-gold-600' : 'text-gray-500'} />
+                            <MapPin size={18} className={addr.isDefault ? 'text-gold-700' : 'text-gray-500'} />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-semibold text-sm text-gray-800">{addr.label}</p>
-                              {addr.isDefault && <span className="text-[10px] bg-gold-500 text-white px-2 py-0.5 rounded-full font-semibold">{t('cust.default')}</span>}
+                              {addr.isDefault && <span className="text-[10px] bg-gold-700 text-white px-2 py-0.5 rounded-full font-semibold">{t('cust.default')}</span>}
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{addr.street}</p>
                             <p className="text-sm text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
@@ -292,10 +292,10 @@ export default function Profile() {
                         </div>
                         <div className="flex items-center gap-2">
                           {!addr.isDefault && (
-                            <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-600 hover:underline font-medium">{t('cust.setDefault')}</button>
+                            <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-700 hover:underline font-medium">{t('cust.setDefault')}</button>
                           )}
                           <button onClick={() => openEditAddress(addr)} aria-label="Edit address" className="p-1.5 hover:bg-gold-100 rounded-lg transition">
-                            <Edit2 size={14} className="text-gold-600" />
+                            <Edit2 size={14} className="text-gold-700" />
                           </button>
                           {!addr.isDefault && (
                             <button onClick={() => handleDeleteAddress(addr.id)} aria-label="Delete address" className="p-1.5 hover:bg-red-100 rounded-lg transition">
@@ -353,7 +353,7 @@ export default function Profile() {
                 <a href="mailto:svlnmobiles12@gmail.com"
                   className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-gold-300 hover:bg-gold-50 transition">
                   <div className="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center flex-shrink-0">
-                    <Mail size={22} className="text-gold-600" />
+                    <Mail size={22} className="text-gold-700" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm text-gray-800">{t('cust.emailUs')}</p>
@@ -379,7 +379,7 @@ export default function Profile() {
               <h3 className="font-bold text-lg text-gray-800 mb-5">{t('cust.preferredLanguage')}</h3>
               <div className="space-y-3">
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'en' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                  <input type="radio" name="language" checked={language === 'en'} onChange={() => handleLanguageChange('en')} className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <input type="radio" name="language" checked={language === 'en'} onChange={() => handleLanguageChange('en')} className="w-4 h-4 text-gold-700 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>
@@ -389,7 +389,7 @@ export default function Profile() {
                   </div>
                 </label>
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'hi' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                  <input type="radio" name="language" checked={language === 'hi'} onChange={() => handleLanguageChange('hi')} className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <input type="radio" name="language" checked={language === 'hi'} onChange={() => handleLanguageChange('hi')} className="w-4 h-4 text-gold-700 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>
@@ -399,7 +399,7 @@ export default function Profile() {
                   </div>
                 </label>
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${language === 'te' ? 'border-gold-300 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                  <input type="radio" name="language" checked={language === 'te'} onChange={() => handleLanguageChange('te')} className="w-4 h-4 text-gold-600 accent-gold-600" />
+                  <input type="radio" name="language" checked={language === 'te'} onChange={() => handleLanguageChange('te')} className="w-4 h-4 text-gold-700 accent-gold-600" />
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🇮🇳</span>
                     <div>

@@ -268,7 +268,7 @@ export default function ProductDetail() {
           } : undefined,
         } : undefined}
       />
-      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-600 hover:text-gold-600 mb-4 text-sm">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-600 hover:text-gold-700 mb-4 text-sm">
         <ChevronLeft size={18} /> Back
       </button>
 

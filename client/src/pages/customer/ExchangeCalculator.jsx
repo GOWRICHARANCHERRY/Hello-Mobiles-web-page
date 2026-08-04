@@ -116,7 +116,7 @@ export default function ExchangeCalculator() {
 
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
             <p className="text-gold-700 font-medium text-sm">{t('cust.howExchangeWorks')}</p>
-            <ol className="text-gold-600 text-xs mt-2 space-y-1 list-decimal list-inside">
+            <ol className="text-gold-700 text-xs mt-2 space-y-1 list-decimal list-inside">
               <li>{t('cust.exchangeStep1')}</li>
               <li>{t('cust.exchangeStep2')}</li>
               <li>{t('cust.exchangeStep3')}</li>

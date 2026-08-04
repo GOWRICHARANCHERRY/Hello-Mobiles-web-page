@@ -173,7 +173,7 @@ export default function Checkout() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= s ? 'bg-gold-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
               {step > s ? <Check size={16} /> : s}
             </div>
-            <span className={`ml-2 text-sm ${step >= s ? 'text-gold-600 font-medium' : 'text-gray-500'}`}>
+            <span className={`ml-2 text-sm ${step >= s ? 'text-gold-700 font-medium' : 'text-gray-500'}`}>
               {s === 1 ? t('cust.stepShipping') : s === 2 ? t('cust.stepPayment') : t('cust.stepReview')}
             </span>
             {s < 3 && <div className={`w-12 h-0.5 mx-2 ${step > s ? 'bg-gold-600' : 'bg-gray-200'}`}></div>}
@@ -267,8 +267,8 @@ export default function Checkout() {
                   { id: 'store_pickup', label: 'cust.storePickup', icon: Store, desc: 'cust.payAtStore' },
                 ].map(method => (
                   <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${paymentMethod === method.id ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                    <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={e => setPaymentMethod(e.target.value)} className="text-gold-600" />
-                    <method.icon size={22} className={paymentMethod === method.id ? 'text-gold-600' : 'text-gray-400'} />
+                    <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={e => setPaymentMethod(e.target.value)} className="text-gold-700" />
+                    <method.icon size={22} className={paymentMethod === method.id ? 'text-gold-700' : 'text-gray-400'} />
                     <div>
                       <p className="font-medium">{t(method.label)}</p>
                       <p className="text-sm text-gray-500">{t(method.desc)}</p>
@@ -323,7 +323,7 @@ export default function Checkout() {
                     <div key={item.cartKey} className="flex justify-between text-sm py-1">
                       <div>
                         <span>{item.name} x {item.quantity}</span>
-                        {item.variantLabel && <span className="text-xs text-gold-600 block">{item.variantLabel}</span>}
+                        {item.variantLabel && <span className="text-xs text-gold-700 block">{item.variantLabel}</span>}
                       </div>
                       <span className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</span>
                     </div>
@@ -364,7 +364,7 @@ export default function Checkout() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
-                  {item.variantLabel && <p className="text-[11px] text-gold-600 truncate">{item.variantLabel}</p>}
+                  {item.variantLabel && <p className="text-[11px] text-gold-700 truncate">{item.variantLabel}</p>}
                   <p className="text-[11px] text-gray-400 mt-0.5">{item.quantity} × ₹{item.price.toLocaleString()}</p>
                 </div>
                 <p className="text-sm font-bold text-gray-800 flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
@@ -374,7 +374,7 @@ export default function Checkout() {
 
           {/* Coupon */}
           <div className="px-6 py-4 border-t border-gray-100">
-            <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700"><Ticket size={16} className="text-gold-600 flex-shrink-0" /> {t('cust.applyCoupon')}</div>
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700"><Ticket size={16} className="text-gold-700 flex-shrink-0" /> {t('cust.applyCoupon')}</div>
             {coupon ? (
               <div className="flex items-center justify-between gap-3 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5 w-full overflow-hidden">
                 <div className="min-w-0">

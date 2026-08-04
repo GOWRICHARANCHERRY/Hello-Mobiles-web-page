@@ -98,7 +98,7 @@ export default function Signup() {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${step >= s ? 'gold-gradient text-white shadow-md' : 'bg-gold-100 text-gold-400'}`}>
                 {step > s ? <Check size={14} /> : s}
               </div>
-              <span className={`ml-1 text-xs ${step >= s ? 'text-gold-600 font-semibold' : 'text-gray-400'}`}>
+              <span className={`ml-1 text-xs ${step >= s ? 'text-gold-700 font-semibold' : 'text-gray-400'}`}>
                 {s === 1 ? t('comp.stepPhone') : s === 2 ? t('comp.stepOtp') : t('comp.stepDetails')}
               </span>
               {s < 3 && <div className={`w-8 h-0.5 mx-1 transition-all duration-300 ${step > s ? 'bg-gold-500' : 'bg-gold-200'}`}></div>}
@@ -111,7 +111,7 @@ export default function Signup() {
             <div className="space-y-4">
               <div className="text-center mb-4">
                 <div className="bg-gold-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 animate-float">
-                  <Smartphone size={28} className="text-gold-600" />
+                  <Smartphone size={28} className="text-gold-700" />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-800">{t('comp.enterYourPhoneNumber')}</h2>
                 <p className="text-sm text-gray-500 mt-1">{t('comp.verificationViaSms')}</p>
@@ -144,7 +144,7 @@ export default function Signup() {
                 </button>
                 <h2 className="text-lg font-semibold text-gray-800">{t('comp.enterVerificationCode')}</h2>
                 <p className="text-sm text-gray-500 mt-1">{t('comp.otpSentTo', { phone })}</p>
-                <p className="text-xs text-gold-600 mt-1 font-medium">{t('comp.testModeCode')}</p>
+                <p className="text-xs text-gold-700 mt-1 font-medium">{t('comp.testModeCode')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('comp.otpLabel')}</label>
@@ -155,7 +155,7 @@ export default function Signup() {
               {otpTimer > 0 ? (
                 <p className="text-sm text-gray-500 text-center">{t('comp.resendOtpIn', { seconds: otpTimer })}</p>
               ) : (
-                <button onClick={handleSendOTP} disabled={loading} className="text-gold-600 text-sm font-medium hover:underline w-full text-center">
+                <button onClick={handleSendOTP} disabled={loading} className="text-gold-700 text-sm font-medium hover:underline w-full text-center">
                   {t('comp.resendOtp')}
                 </button>
               )}
@@ -206,7 +206,7 @@ export default function Signup() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 text-sm">{t('comp.alreadyHaveAccount')}{' '}
-              <Link to="/login" className="text-gold-600 font-semibold hover:underline">{t('comp.signIn')}</Link>
+              <Link to="/login" className="text-gold-700 font-semibold hover:underline">{t('comp.signIn')}</Link>
             </p>
           </div>
         </div>

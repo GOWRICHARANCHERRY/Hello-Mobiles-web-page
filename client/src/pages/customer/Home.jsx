@@ -196,7 +196,7 @@ export default function Home() {
                 <img src={brand.img} alt={brand.name} width="48" height="48" loading="lazy"
                   className="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform duration-300" />
               )}
-              <span className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-gold-600 transition">{brand.name}</span>
+              <span className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-gold-700 transition">{brand.name}</span>
             </Link>
           ))}
         </div>
@@ -265,7 +265,7 @@ export default function Home() {
             <h3 className="text-xl font-bold">{t('cust.exchangeYourOldPhone')}</h3>
           </div>
           <p className="text-gray-300 text-sm mb-4">{t('cust.exchangeDesc')}</p>
-          <span className="bg-gold-500 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">{t('cust.checkValue')} →</span>
+          <span className="bg-gold-700 text-white px-5 py-2 rounded-lg text-sm font-semibold inline-block group-hover:shadow-lg transition">{t('cust.checkValue')} →</span>
         </Link>
       </div>
 
@@ -301,7 +301,7 @@ export default function Home() {
             </div>
             <h3 className="font-bold text-gray-800 text-lg">Chola Finance</h3>
             <p className="text-gray-500 text-xs mt-1">Low EMI · Flexible Tenure · 6-24 months</p>
-            <span className="mt-3 bg-orange-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full">Available ✓</span>
+            <span className="mt-3 bg-orange-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full">Available ✓</span>
           </div>
         </div>
       </div>

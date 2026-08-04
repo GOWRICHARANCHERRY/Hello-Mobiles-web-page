@@ -136,7 +136,7 @@ export default function ProductList() {
             <option value="rating">{t('cust.rating')}</option>
           </select>
           <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl flex items-center gap-1 text-sm font-medium shadow-lg">
-            <Filter size={16} /> {t('cust.filter')} {activeCount > 0 && <span className="bg-white text-gold-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">{activeCount}</span>}
+            <Filter size={16} /> {t('cust.filter')} {activeCount > 0 && <span className="bg-white text-gold-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">{activeCount}</span>}
           </button>
         </div>
       </div>

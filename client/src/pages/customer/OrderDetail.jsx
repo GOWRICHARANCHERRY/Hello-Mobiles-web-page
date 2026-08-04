@@ -70,7 +70,7 @@ export default function OrderDetail() {
     confirmed: { label: t('cust.statusOrderConfirmed'), icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
     processing: { label: t('cust.statusProcessing'), icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100' },
     packed: { label: t('cust.statusPacked'), icon: Package, color: 'text-blue-600', bg: 'bg-blue-100' },
-    shipped: { label: t('cust.statusShipped'), icon: Truck, color: 'text-gold-600', bg: 'bg-gold-100' },
+    shipped: { label: t('cust.statusShipped'), icon: Truck, color: 'text-gold-700', bg: 'bg-gold-100' },
     delivered: { label: t('cust.statusDelivered'), icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
     cancelled: { label: t('cust.statusCancelled'), icon: XCircle, color: 'text-red-500', bg: 'bg-red-100' },
   };
@@ -115,7 +115,7 @@ export default function OrderDetail() {
 
   return (
     <div className="animate-fade-in max-w-4xl mx-auto">
-      <Link to="/orders" className="flex items-center gap-1 text-gray-600 hover:text-gold-600 mb-4 text-sm print:hidden"><ChevronLeft size={18} /> {t('cust.backToOrders')}</Link>
+      <Link to="/orders" className="flex items-center gap-1 text-gray-600 hover:text-gold-700 mb-4 text-sm print:hidden"><ChevronLeft size={18} /> {t('cust.backToOrders')}</Link>
 
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 print:hidden">
@@ -123,7 +123,7 @@ export default function OrderDetail() {
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{t('cust.orderNumber', { number: order.orderNumber })}</h1>
             <p className="text-sm text-gray-500 mt-1">{new Date(order.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
-            {order.trackingId && <p className="text-xs text-gold-600 mt-1">{t('cust.trackingId', { id: order.trackingId })}</p>}
+            {order.trackingId && <p className="text-xs text-gold-700 mt-1">{t('cust.trackingId', { id: order.trackingId })}</p>}
           </div>
           <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${meta.bg} ${meta.color}`}>
             <meta.icon size={20} />

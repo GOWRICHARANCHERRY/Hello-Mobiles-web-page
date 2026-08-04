@@ -237,7 +237,7 @@ export default function AdminBanners() {
                       </span>
                     </div>
                     <div className="space-y-1 text-sm">
-                      {banner.highlightedText && <p><span className="text-gray-400">{t('admin.highlightLabel')}</span> <span className="font-medium text-gold-600">{banner.highlightedText}</span></p>}
+                      {banner.highlightedText && <p><span className="text-gray-400">{t('admin.highlightLabel')}</span> <span className="font-medium text-gold-700">{banner.highlightedText}</span></p>}
                       {banner.bigText && <p><span className="text-gray-400">{t('admin.bigTextLabel')}</span> <span className="font-medium">{banner.bigText}</span></p>}
                       {banner.smallText && <p><span className="text-gray-400">{t('admin.smallTextLabel')}</span> {banner.smallText}</p>}
                       {banner.product && <p><span className="text-gray-400">{t('admin.linksToLabel')}</span> <span className="font-medium text-blue-600">{banner.product.name}</span></p>}
@@ -261,7 +261,7 @@ export default function AdminBanners() {
                       className={`p-2 rounded-lg transition ${banner.isActive ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}>
                       {banner.isActive ? <Eye size={16} /> : <EyeOff size={16} />}
                     </button>
-                    <button onClick={() => handleEdit(banner)} className="p-2 text-gold-600 hover:bg-gold-50 rounded-lg transition">
+                    <button onClick={() => handleEdit(banner)} className="p-2 text-gold-700 hover:bg-gold-50 rounded-lg transition">
                       <Edit2 size={16} />
                     </button>
                     <button onClick={() => handleDelete(banner._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
@@ -348,7 +348,7 @@ export default function AdminBanners() {
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                     onChange={e => uploadImage(e.target.files[0])} />
                   {uploading ? (
-                    <p className="text-sm text-gold-600 font-medium">{t('admin.uploading')}</p>
+                    <p className="text-sm text-gold-700 font-medium">{t('admin.uploading')}</p>
                   ) : (
                     <>
                       <Upload size={32} className="mx-auto mb-2 text-gray-400" />
@@ -473,7 +473,7 @@ export default function AdminBanners() {
               </div>
 
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="text-gold-600 rounded" />
+                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="text-gold-700 rounded" />
                 {t('admin.activeVisible')}
               </label>
             </div>

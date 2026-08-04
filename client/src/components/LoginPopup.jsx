@@ -172,7 +172,7 @@ export default function LoginPopup({ onClose }) {
 
               <div className="mt-3 text-center">
                 <p className="text-gray-500 text-xs">{t('comp.newHere')}{' '}
-                  <button onClick={() => setMode('signup')} className="text-gold-600 font-semibold hover:underline">{t('comp.createAccount')}</button>
+                  <button onClick={() => setMode('signup')} className="text-gold-700 font-semibold hover:underline">{t('comp.createAccount')}</button>
                 </p>
               </div>
             </>
@@ -192,7 +192,7 @@ export default function LoginPopup({ onClose }) {
               </button>
 
               <p className="text-center text-gray-500 text-xs">{t('comp.alreadyHaveAccount')}{' '}
-                <button type="button" onClick={() => setMode('login')} className="text-gold-600 font-semibold hover:underline">{t('comp.signIn')}</button>
+                <button type="button" onClick={() => setMode('login')} className="text-gold-700 font-semibold hover:underline">{t('comp.signIn')}</button>
               </p>
             </form>
           )}
@@ -218,12 +218,12 @@ export default function LoginPopup({ onClose }) {
                     className="w-full btn-gold text-white font-semibold py-2.5 rounded-lg text-sm disabled:opacity-50">
                     {otpLoading ? t('comp.verifying') : t('comp.verifyLogin')}
                   </button>
-                  <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }} className="w-full text-xs text-gray-500 hover:text-gold-600">{t('comp.changeNumberResend')}</button>
+                  <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }} className="w-full text-xs text-gray-500 hover:text-gold-700">{t('comp.changeNumberResend')}</button>
                 </>
               )}
               <p className="text-center text-gray-500 text-xs">
                 {t('comp.backTo')}{' '}
-                <button type="button" onClick={() => switchMode('login')} className="text-gold-600 font-semibold hover:underline">{t('comp.signIn')}</button>
+                <button type="button" onClick={() => switchMode('login')} className="text-gold-700 font-semibold hover:underline">{t('comp.signIn')}</button>
               </p>
             </div>
           )}

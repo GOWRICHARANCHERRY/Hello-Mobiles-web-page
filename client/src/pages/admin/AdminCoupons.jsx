@@ -194,7 +194,7 @@ export default function AdminCoupons() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <button onClick={() => handleEdit(coupon)} className="flex-1 p-2 text-gold-600 hover:bg-gold-50 rounded-lg transition text-sm font-medium">{t('admin.edit')}</button>
+                  <button onClick={() => handleEdit(coupon)} className="flex-1 p-2 text-gold-700 hover:bg-gold-50 rounded-lg transition text-sm font-medium">{t('admin.edit')}</button>
                   <button onClick={() => handleDelete(coupon._id)} className="flex-1 p-2 text-red-500 hover:bg-red-50 rounded-lg transition text-sm font-medium">{t('admin.delete')}</button>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function AdminCoupons() {
               {form.appliesTo === 'selected' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-sm font-medium text-gray-700">{t('admin.selectProductsLabel')} <span className="text-gold-600 font-bold">{t('admin.selectedCount', { count: form.applicableProductIds.length })}</span></label>
+                    <label className="block text-sm font-medium text-gray-700">{t('admin.selectProductsLabel')} <span className="text-gold-700 font-bold">{t('admin.selectedCount', { count: form.applicableProductIds.length })}</span></label>
                   </div>
                   <div className="relative mb-2">
                     <Search size={14} className="absolute left-3 top-2.5 text-gray-400" />
@@ -269,7 +269,7 @@ export default function AdminCoupons() {
                           return (
                             <label key={p._id} className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-gold-50/50 transition ${checked ? 'bg-gold-50/70' : ''}`}>
                               <input type="checkbox" checked={checked} onChange={() => toggleProduct(p._id)}
-                                className="mt-0.5 text-gold-600 rounded focus:ring-gold-400" />
+                                className="mt-0.5 text-gold-700 rounded focus:ring-gold-400" />
                               <span className="min-w-0">
                                 <span className="block text-sm font-medium text-gray-800 truncate">{p.name}</span>
                                 <span className="block text-[11px] text-gray-400">{p.brand} · {p.category}</span>
@@ -324,7 +324,7 @@ export default function AdminCoupons() {
               </div>
 
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="text-gold-600 rounded" />
+                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} className="text-gold-700 rounded" />
                 {t('admin.activeRedeemable')}
               </label>
             </div>

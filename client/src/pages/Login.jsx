@@ -107,7 +107,7 @@ export default function Login() {
 
           <div className="mt-4 text-center">
             <p className="text-gray-600 text-sm">{t('comp.newCustomer')}{' '}
-              <Link to="/signup" className="text-gold-600 font-semibold hover:underline">{t('comp.signUp')}</Link>
+              <Link to="/signup" className="text-gold-700 font-semibold hover:underline">{t('comp.signUp')}</Link>
             </p>
           </div>
 

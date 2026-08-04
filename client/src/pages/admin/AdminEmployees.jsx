@@ -99,7 +99,7 @@ export default function AdminEmployees() {
               <tr key={emp._id} className="border-b last:border-0 hover:bg-gray-50">
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center"><UserCheck size={14} className="text-gold-600" /></div>
+                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center"><UserCheck size={14} className="text-gold-700" /></div>
                     <span className="font-medium">{emp.name}</span>
                   </div>
                 </td>
@@ -108,7 +108,7 @@ export default function AdminEmployees() {
                 <td className="py-3 px-4 text-gray-500 text-xs">{new Date(emp.createdAt).toLocaleDateString('en-IN')}</td>
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => openEdit(emp)} className="text-gold-600 hover:text-gold-700" title={t('admin2.editEmployeeTitle')}><Pencil size={16} /></button>
+                    <button onClick={() => openEdit(emp)} className="text-gold-700 hover:text-gold-700" title={t('admin2.editEmployeeTitle')}><Pencil size={16} /></button>
                     <button onClick={() => handleDelete(emp._id)} className="text-red-500 hover:text-red-600" title={t('admin2.removeEmployeeTitle')}><Trash2 size={16} /></button>
                   </div>
                 </td>

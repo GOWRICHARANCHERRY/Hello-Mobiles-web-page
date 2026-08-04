@@ -203,7 +203,7 @@ export default function ImeiScanModal({ open, onClose }) {
                           </div>
                         )}
                         <div className="flex-1">
-                          <p className="text-xs text-gold-600 font-medium">{result.product?.brand}</p>
+                          <p className="text-xs text-gold-700 font-medium">{result.product?.brand}</p>
                           <h3 className="font-bold text-gray-800">{result.product?.name}</h3>
                           <p className="text-xs text-gray-500 mt-1">{result.product?.category}</p>
                         </div>

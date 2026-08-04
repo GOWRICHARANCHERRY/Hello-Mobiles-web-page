@@ -120,7 +120,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
     const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'i');
     const parts = text.split(regex);
     return parts.map((part, i) =>
-      regex.test(part) ? <span key={i} className="font-bold text-gold-600">{part}</span> : part
+      regex.test(part) ? <span key={i} className="font-bold text-gold-700">{part}</span> : part
     );
   };
 
@@ -167,7 +167,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
             <div className="px-4 py-8 text-center">
               <Package size={32} className="mx-auto text-gray-300 mb-2" />
               <p className="text-sm text-gray-500 mb-1">{t('comp.noResultsFor', { query })}</p>
-              <button onClick={() => handleSuggestionSearch(query)} className="text-xs text-gold-600 hover:underline font-medium">
+              <button onClick={() => handleSuggestionSearch(query)} className="text-xs text-gold-700 hover:underline font-medium">
                 {t('comp.searchAllProducts')}
               </button>
             </div>
@@ -240,7 +240,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
               )}
 
               <button onClick={() => handleSuggestionSearch(query)}
-                className="w-full px-4 py-3 bg-gray-50 text-sm font-semibold text-gold-600 hover:bg-gold-50 transition-all flex items-center justify-center gap-2 border-t border-gray-200">
+                className="w-full px-4 py-3 bg-gray-50 text-sm font-semibold text-gold-700 hover:bg-gold-50 transition-all flex items-center justify-center gap-2 border-t border-gray-200">
                 <Search size={14} /> {t('comp.searchAllResultsFor', { query })}
               </button>
             </>
