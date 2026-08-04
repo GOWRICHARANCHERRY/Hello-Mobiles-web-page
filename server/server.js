@@ -16,6 +16,7 @@ import uploadRoutes from './routes/upload.js';
 import bannerRoutes from './routes/banners.js';
 import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
+import instagramRoutes from './routes/instagram.js';
 import Product from './models/Product.js';
 import { initFirebase } from './config/firebase.js';
 
@@ -71,6 +72,7 @@ app.use(helmet({
         'https://www.gstatic.com',
         'https://cdn.simpleicons.org',
         'https://upload.wikimedia.org',
+        'https://*.cdninstagram.com',
       ],
       connectSrc: [
         "'self'",
@@ -117,6 +119,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/instagram', instagramRoutes);
 
 let sitemapCache = null;
 let sitemapCacheTime = 0;

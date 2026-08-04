@@ -6,6 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
 import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
+import InstagramReels from '../../components/InstagramReels';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
@@ -354,6 +355,9 @@ export default function Home() {
           </a>
         </div>
       </div>
+
+      {/* Instagram Reels */}
+      <InstagramReels />
 
       {/* Login CTA for guests */}
       {!user && (
