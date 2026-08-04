@@ -285,6 +285,7 @@ export default {
   'cust.submitRequest': 'అభ్యర్థన సమర్పించండి',
   'cust.personalDetails': 'వ్యక్తిగత వివరాలు',
   'cust.savedAddress': 'సేవ్ చేసిన చిరునామా',
+  'cust.manageAddresses': 'చిరునామాలను నిర్వహించండి',
   'cust.myCoupons': 'నా కూపన్లు',
   'cust.helpSupport': 'సహాయం & మద్దతు',
   'cust.preferredLanguage': 'ఇష్టపడే భాష',

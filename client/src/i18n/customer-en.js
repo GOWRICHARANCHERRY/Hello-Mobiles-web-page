@@ -293,6 +293,7 @@ export default {
 
   'cust.personalDetails': 'Personal Details',
   'cust.savedAddress': 'Saved Address',
+  'cust.manageAddresses': 'Manage addresses',
   'cust.myCoupons': 'My Coupons',
   'cust.helpSupport': 'Help & Support',
   'cust.preferredLanguage': 'Preferred Language',

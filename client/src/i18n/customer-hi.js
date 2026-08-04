@@ -293,6 +293,7 @@ export default {
 
   'cust.personalDetails': 'व्यक्तिगत विवरण',
   'cust.savedAddress': 'सहेजा गया पता',
+  'cust.manageAddresses': 'पते प्रबंधित करें',
   'cust.myCoupons': 'मेरे कूपन',
   'cust.helpSupport': 'सहायता और सपोर्ट',
   'cust.preferredLanguage': 'पसंदीदा भाषा',

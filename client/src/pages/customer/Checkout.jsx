@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
@@ -30,6 +30,41 @@ export default function Checkout() {
   });
   const [mapLoc, setMapLoc] = useState({ lat: null, lng: null, mapLabel: '' });
   const [paymentMethod, setPaymentMethod] = useState('online');
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('hm_addresses') || '[]');
+      setSavedAddresses(saved);
+      const def = saved.find(a => a.isDefault);
+      if (def) {
+        setSelectedAddressId(def.id);
+        setForm(prev => ({
+          ...prev,
+          phone: prev.phone || def.phone || '',
+          street: prev.street || def.street || '',
+          city: prev.city || def.city || '',
+          state: prev.state || def.state || '',
+          pincode: prev.pincode || def.pincode || '',
+        }));
+      }
+    } catch (e) {
+      // ignore malformed localStorage
+    }
+  }, []);
+
+  const handleSelectAddress = (addr) => {
+    setSelectedAddressId(addr.id);
+    setForm(prev => ({
+      ...prev,
+      phone: addr.phone || prev.phone,
+      street: addr.street || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      pincode: addr.pincode || '',
+    }));
+  };
 
   const deliveryCharge = cartTotal > 5000 ? 0 : 99;
   const couponDiscount = coupon?.discount || 0;
@@ -212,6 +247,34 @@ export default function Checkout() {
                   </button>
                 )}
               </div>
+              {savedAddresses.length > 0 && (
+                <div className="mb-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <MapPin size={15} className="text-gold-700" /> {t('cust.savedAddress')}
+                    </h3>
+                    <Link to="/profile?tab=address" className="text-xs font-medium text-gold-700 hover:underline">
+                      {t('cust.manageAddresses')}
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {savedAddresses.map(addr => (
+                      <button key={addr.id} type="button" onClick={() => handleSelectAddress(addr)}
+                        className={`text-left p-3 rounded-xl border-2 transition ${selectedAddressId === addr.id ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300 bg-white'}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[11px] font-bold text-gold-700 uppercase tracking-wide">{addr.label}</span>
+                          {addr.isDefault && (
+                            <span className="text-[10px] bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded-full">{t('cust.default')}</span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-gray-800 truncate">{addr.street}</p>
+                        <p className="text-xs text-gray-500">{addr.city}, {addr.state} - {addr.pincode}</p>
+                        {addr.phone && <p className="text-xs text-gray-500 mt-0.5">{addr.phone}</p>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {HAS_MAPS && (
                 <div className="mb-5">
                   <LocationPicker
