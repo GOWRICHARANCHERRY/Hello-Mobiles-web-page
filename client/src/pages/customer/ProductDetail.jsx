@@ -278,9 +278,9 @@ export default function ProductDetail() {
           <div>
             <div className="bg-gray-100 rounded-xl p-8 h-80 flex items-center justify-center mb-4">
               {currentImage ? (
-                <img src={currentImage} alt={product.name} loading="lazy" className="max-h-full object-contain" />
+                <img src={currentImage} alt={product.name} loading="lazy" width="400" height="400" className="max-h-full object-contain" />
               ) : allImages[selectedImage] ? (
-                <img src={allImages[selectedImage]} alt={product.name} loading="lazy" className="max-h-full object-contain" />
+                <img src={allImages[selectedImage]} alt={product.name} loading="lazy" width="400" height="400" className="max-h-full object-contain" />
               ) : (
                 <div className="text-gray-400 text-lg">No Image Available</div>
               )}
@@ -290,7 +290,7 @@ export default function ProductDetail() {
                 {allImages.map((img, i) => (
                   <button key={i} onClick={() => setSelectedImage(i)}
                     className={`w-16 h-16 rounded-lg border-2 flex-shrink-0 overflow-hidden ${selectedImage === i ? 'border-gold-500' : 'border-gray-200'}`}>
-                    <img src={img} alt="" loading="lazy" className="w-full h-full object-contain" />
+                    <img src={img} alt="" loading="lazy" width="64" height="64" className="w-full h-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -396,9 +396,9 @@ export default function ProductDetail() {
             <div className="mt-4 flex items-center gap-3">
               <span className="text-sm font-medium text-gray-700">Quantity:</span>
               <div className="flex items-center border rounded-lg">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-2 hover:bg-gray-100"><Minus size={16} /></button>
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity" className="px-3 py-2 hover:bg-gray-100"><Minus size={16} /></button>
                 <span className="px-4 py-2 font-medium">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 hover:bg-gray-100"><Plus size={16} /></button>
+                <button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity" className="px-3 py-2 hover:bg-gray-100"><Plus size={16} /></button>
               </div>
               {currentStock > 0 ? (
                 <span className="text-green-600 text-sm flex items-center gap-1"><Check size={14} /> In Stock ({currentStock} available)</span>
@@ -532,6 +532,7 @@ export default function ProductDetail() {
             <div className="flex gap-1 mb-3">
               {[1, 2, 3, 4, 5].map(n => (
                 <button key={n} onClick={() => setReviewForm(prev => ({ ...prev, rating: n }))}
+                  aria-label={`Rate ${n} stars`}
                   className={n <= reviewForm.rating ? 'text-gold-500' : 'text-gray-300'}>
                   <Star size={24} className={n <= reviewForm.rating ? 'fill-gold-500' : ''} />
                 </button>
@@ -579,7 +580,7 @@ export default function ProductDetail() {
                       </div>
                     </div>
                     {(user?.role === 'admin' || user?._id === review.user?._id) && (
-                      <button onClick={() => deleteReview(review._id)} className="text-red-400 hover:text-red-600 p-1 rounded-lg transition" title="Delete review">
+                      <button onClick={() => deleteReview(review._id)} className="text-red-400 hover:text-red-600 p-1 rounded-lg transition" title="Delete review" aria-label="Delete review">
                         <Trash2 size={15} />
                       </button>
                     )}

@@ -115,7 +115,7 @@ export default function LoginPopup({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative animate-scale-in" onClick={e => e.stopPropagation()}>
-        <button onClick={onClose}
+        <button onClick={onClose} aria-label="Close login popup"
           className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm text-gray-500 hover:text-gray-800 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer">
           <X size={18} />
         </button>
@@ -124,7 +124,7 @@ export default function LoginPopup({ onClose }) {
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
             <div className="flex justify-center mb-2">
-              <img src="/logo.png" alt="Hello Mobiles" className="w-12 h-12 rounded-xl shadow-lg object-contain bg-white/20 p-1" />
+              <img src="/logo.png" alt="Hello Mobiles" width="48" height="48" className="w-12 h-12 rounded-xl shadow-lg object-contain bg-white/20 p-1" />
             </div>
             <h2 className="text-xl font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h2>
             <p className="text-gold-100 text-xs mt-1">{mode === 'login' ? t('comp.signInToContinue') : t('comp.createAccount')}</p>

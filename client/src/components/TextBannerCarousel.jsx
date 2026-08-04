@@ -101,11 +101,11 @@ export default function TextBannerCarousel() {
 
       {slides.length > 1 && (
         <>
-          <button onClick={prev}
+          <button onClick={prev} aria-label="Previous slide"
             className="absolute z-20 left-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronLeft size={18} />
           </button>
-          <button onClick={next}
+          <button onClick={next} aria-label="Next slide"
             className="absolute z-20 right-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronRight size={18} />
           </button>
@@ -115,7 +115,7 @@ export default function TextBannerCarousel() {
       {slides.length > 1 && (
         <div className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto transition-opacity duration-300">
           {slides.map((_, i) => (
-            <button key={i} onClick={() => setCurrent(i)}
+            <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
               className={`transition-all duration-300 rounded-full ${i === current ? 'w-6 h-2 bg-gold-400' : 'w-2 h-2 bg-white/40 hover:bg-white/60'}`} />
           ))}
         </div>

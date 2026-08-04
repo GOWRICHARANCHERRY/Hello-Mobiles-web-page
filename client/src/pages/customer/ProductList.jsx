@@ -152,7 +152,7 @@ export default function ProductList() {
                   <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">{activeCount} {t('cust.active')}</span>
                 )}
                 <button onClick={clearFilters} className="text-sm text-gold-600 hover:underline font-medium">{t('cust.clearAll')}</button>
-                {showFilters && <button onClick={() => setShowFilters(false)} className="lg:hidden p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>}
+                {showFilters && <button onClick={() => setShowFilters(false)} aria-label="Close filters" className="lg:hidden p-1 hover:bg-gray-100 rounded-lg"><X size={20} /></button>}
               </div>
             </div>
 
@@ -282,7 +282,7 @@ export default function ProductList() {
                 <Link key={product._id} to={`/products/${product._id}`} className="bg-white rounded-2xl shadow-sm overflow-hidden card-hover block gold-border">
                   <div className="bg-gray-100 p-4 h-36 sm:h-48 flex items-center justify-center relative">
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} loading="lazy" className="h-full object-contain" />
+                      <img src={product.images[0]} alt={product.name} loading="lazy" width="200" height="200" className="h-full object-contain" />
                     ) : (
                       <div className="text-gray-400 text-sm">{t('cust.noImage')}</div>
                     )}

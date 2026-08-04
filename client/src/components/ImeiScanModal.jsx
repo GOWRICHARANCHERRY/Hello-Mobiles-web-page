@@ -66,7 +66,7 @@ function CameraScanModal({ open, onClose, onDetected }) {
       <div className="bg-white rounded-2xl overflow-hidden max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
           <h3 className="font-bold text-sm flex items-center gap-2"><Camera size={16} /> {t('comp.scanImeiBarcode')}</h3>
-          <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full"><X size={16} /></button>
+          <button onClick={onClose} aria-label="Close scanner" className="p-1 hover:bg-white/20 rounded-full"><X size={16} /></button>
         </div>
         <div className="relative bg-black aspect-video">
           <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
@@ -143,7 +143,7 @@ export default function ImeiScanModal({ open, onClose }) {
                 <p className="text-white/80 text-xs">{t('comp.imeiLookupSub')}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full"><X size={18} /></button>
+            <button onClick={onClose} aria-label="Close IMEI lookup" className="p-2 hover:bg-white/20 rounded-full"><X size={18} /></button>
           </div>
 
           <div className="p-5">
@@ -199,7 +199,7 @@ export default function ImeiScanModal({ open, onClose }) {
                       <div className="flex items-start gap-4">
                         {result.product?.images?.[0] && (
                           <div className="w-20 h-20 rounded-xl bg-white border border-gold-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            <img src={result.product.images[0]} alt="" className="w-full h-full object-contain p-1" />
+                            <img src={result.product.images[0]} alt="" width="80" height="80" loading="lazy" className="w-full h-full object-contain p-1" />
                           </div>
                         )}
                         <div className="flex-1">

@@ -140,7 +140,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
             className={`w-full ${isLarge ? 'pl-12 pr-10 py-4 text-base' : 'pl-10 pr-10 py-2.5 text-sm'} bg-white outline-none ${isLarge ? 'rounded-l-2xl' : 'rounded-l-xl'}`}
           />
           {query && (
-            <button type="button" onClick={handleClear}
+            <button type="button" onClick={handleClear} aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-full transition">
               <X size={16} />
             </button>
@@ -184,7 +184,7 @@ export default function SearchBar({ placeholder, className = '', autoFocus = fal
                     <button key={product._id} onClick={() => handleProductClick(product)}
                       className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gold-50/70 transition-all text-left border-b border-gray-50 last:border-0 active:bg-gold-100">
                       {product.images?.[0] ? (
-                        <img src={product.images[0]} alt="" className="w-11 h-11 rounded-xl object-contain bg-gray-50 flex-shrink-0 border border-gray-100" />
+                        <img src={product.images[0]} alt="" width="44" height="44" loading="lazy" className="w-11 h-11 rounded-xl object-contain bg-gray-50 flex-shrink-0 border border-gray-100" />
                       ) : (
                         <div className="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                           <Package size={16} className="text-gray-400" />

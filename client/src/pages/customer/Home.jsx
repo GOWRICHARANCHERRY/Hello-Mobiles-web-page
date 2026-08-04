@@ -190,10 +190,10 @@ export default function Home() {
             <Link key={brand.name} to={`/products?brand=${brand.name}`}
               className="bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm border border-gray-100 hover:border-gold-300 hover:shadow-md card-hover group animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
               {brand.slug ? (
-                <img src={`https://cdn.simpleicons.org/${brand.slug}/${brand.color}`} alt={brand.name}
+                <img src={`https://cdn.simpleicons.org/${brand.slug}/${brand.color}`} alt={brand.name} width="48" height="48" loading="lazy"
                   className="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform duration-300" />
               ) : (
-                <img src={brand.img} alt={brand.name}
+                <img src={brand.img} alt={brand.name} width="48" height="48" loading="lazy"
                   className="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform duration-300" />
               )}
               <span className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-gold-600 transition">{brand.name}</span>
@@ -279,7 +279,7 @@ export default function Home() {
           <a href="https://www.bajajfinserv.in/qr-code-rural-web-page?xc=wZJcF8vPcfuCf8IpnelpO2wo91ynp9JJsM12UNYH40AFzOXsNG4aQX+fjLXg47b9TPaQyWA9RzzmbFi7op12aw==&utm_source=RURAL_ARU&utm_medium=OFFERMART_QR_GEN" target="_blank" rel="noopener noreferrer"
             className="bg-gradient-to-br from-blue-50 to-blue-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-blue-200 hover:border-blue-400 transition group block">
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center group-hover:shadow-md transition">
-              <img src="/bajaj-finserv.png" alt="Bajaj Finserv" className="h-12 object-contain" />
+              <img src="/bajaj-finserv.png" alt="Bajaj Finserv" width="192" height="48" loading="lazy" className="h-12 object-contain" />
             </div>
             <h3 className="font-bold text-gray-800 text-lg">Bajaj Finserv</h3>
             <p className="text-gray-500 text-xs mt-1">No Cost EMI · 0% Interest · 3-24 months</p>
@@ -288,7 +288,7 @@ export default function Home() {
 
           <div className="bg-gradient-to-br from-red-50 to-orange-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-red-200 hover:border-red-400 transition">
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center">
-              <img src="/tvs-credit.svg" alt="TVS Credit" className="h-12 object-contain" />
+              <img src="/tvs-credit.svg" alt="TVS Credit" width="192" height="48" loading="lazy" className="h-12 object-contain" />
             </div>
             <h3 className="font-bold text-gray-800 text-lg">TVS Credit</h3>
             <p className="text-gray-500 text-xs mt-1">Easy EMI · Quick Approval · 6-18 months</p>
@@ -297,7 +297,7 @@ export default function Home() {
 
           <div className="bg-gradient-to-br from-orange-50 to-yellow-100/80 rounded-2xl p-6 flex flex-col items-center text-center card-hover border-2 border-orange-200 hover:border-orange-400 transition">
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 w-full flex items-center justify-center">
-              <img src="/chola-finance.svg" alt="Chola Finance" className="h-12 object-contain" />
+              <img src="/chola-finance.svg" alt="Chola Finance" width="192" height="48" loading="lazy" className="h-12 object-contain" />
             </div>
             <h3 className="font-bold text-gray-800 text-lg">Chola Finance</h3>
             <p className="text-gray-500 text-xs mt-1">Low EMI · Flexible Tenure · 6-24 months</p>

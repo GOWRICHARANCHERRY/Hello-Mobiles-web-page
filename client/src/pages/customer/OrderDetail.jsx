@@ -186,7 +186,7 @@ export default function OrderDetail() {
         <div className="px-6 md:px-10 pt-8 pb-6 flex flex-col md:flex-row justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <img src="/logo.png" alt="Hello Mobile Electronics & Furniture" className="w-12 h-12 rounded-xl object-contain border-2 border-gold-500/30 shadow-md" />
+              <img src="/logo.png" alt="Hello Mobile Electronics & Furniture" width="48" height="48" className="w-12 h-12 rounded-xl object-contain border-2 border-gold-500/30 shadow-md" />
               <div>
                 <h2 className="text-xl font-bold gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>{t('cust.helloMobileElectronics')}</h2>
                 <p className="text-[11px] text-gray-400 tracking-widest">{t('cust.tagline')}</p>

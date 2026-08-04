@@ -227,7 +227,7 @@ export default function Profile() {
                         <div className="flex items-center gap-4 min-w-0">
                           <div className="w-14 h-14 rounded-xl bg-gold-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {order.items?.[0]?.product?.images?.[0] ? (
-                              <img src={order.items[0].product.images[0]} alt="" loading="lazy" className="w-full h-full object-contain p-0.5" />
+                              <img src={order.items[0].product.images[0]} alt="" loading="lazy" width="60" height="60" className="w-full h-full object-contain p-0.5" />
                             ) : (
                               <Package size={22} className="text-gold-600" />
                             )}
@@ -294,11 +294,11 @@ export default function Profile() {
                           {!addr.isDefault && (
                             <button onClick={() => handleSetDefault(addr.id)} className="text-xs text-gold-600 hover:underline font-medium">{t('cust.setDefault')}</button>
                           )}
-                          <button onClick={() => openEditAddress(addr)} className="p-1.5 hover:bg-gold-100 rounded-lg transition">
+                          <button onClick={() => openEditAddress(addr)} aria-label="Edit address" className="p-1.5 hover:bg-gold-100 rounded-lg transition">
                             <Edit2 size={14} className="text-gold-600" />
                           </button>
                           {!addr.isDefault && (
-                            <button onClick={() => handleDeleteAddress(addr.id)} className="p-1.5 hover:bg-red-100 rounded-lg transition">
+                            <button onClick={() => handleDeleteAddress(addr.id)} aria-label="Delete address" className="p-1.5 hover:bg-red-100 rounded-lg transition">
                               <Trash2 size={14} className="text-red-500" />
                             </button>
                           )}
@@ -420,7 +420,7 @@ export default function Profile() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in-down">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h3 className="font-bold text-lg text-gray-800">{editingAddress ? t('cust.editAddress') : t('cust.addNewAddress')}</h3>
-              <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }} className="p-1 hover:bg-gray-100 rounded-lg transition">
+              <button onClick={() => { setShowAddressModal(false); setEditingAddress(null); }} aria-label="Close dialog" className="p-1 hover:bg-gray-100 rounded-lg transition">
                 <X size={20} className="text-gray-500" />
               </button>
             </div>

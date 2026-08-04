@@ -66,7 +66,7 @@ export default function CustomerLayout() {
       <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-gold-100">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="Hello Mobiles" className="w-10 h-10 rounded-xl shadow-md group-hover:scale-110 transition-transform object-contain" />
+            <img src="/logo.png" alt="Hello Mobiles" width="40" height="40" className="w-10 h-10 rounded-xl shadow-md group-hover:scale-110 transition-transform object-contain" />
             <div className="text-center">
               <h1 className="text-lg font-bold gold-text leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h1>
               <p className="hidden sm:block text-[10px] text-gray-500 whitespace-nowrap">{t('comp.headerTagline')}</p>
@@ -206,7 +206,7 @@ export default function CustomerLayout() {
             )}
           </div>
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden" aria-label={menuOpen ? 'Close menu' : 'Open menu'}>
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -279,7 +279,7 @@ export default function CustomerLayout() {
               <Mail className="w-8 h-8 text-gold-500 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-bold text-white">{t('comp.latestOffers')}</h3>
-                <p className="text-sm text-gray-400">{t('comp.newsletterSub')}</p>
+                <p className="text-sm text-gray-300">{t('comp.newsletterSub')}</p>
               </div>
             </div>
             <form onSubmit={handleNewsletter} className="flex w-full md:w-auto gap-2">
@@ -300,31 +300,31 @@ export default function CustomerLayout() {
             {/* Brand */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.png" alt="Hello Mobiles" className="w-12 h-12 rounded-xl shadow-lg object-contain border-2 border-gold-500/30" />
+                <img src="/logo.png" alt="Hello Mobiles" width="48" height="48" loading="lazy" className="w-12 h-12 rounded-xl shadow-lg object-contain border-2 border-gold-500/30" />
                 <div>
                   <h3 className="text-xl font-bold gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>HELLO MOBILES</h3>
                   <p className="text-[11px] text-gold-500/70 tracking-wider">{t('comp.footerBrandTagline')}</p>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-5 max-w-sm">{t('comp.aboutDescription')}</p>
+              <p className="text-gray-300 text-sm leading-relaxed mb-5 max-w-sm">{t('comp.aboutDescription')}</p>
               <div className="flex items-center gap-3">
-                <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
                   className="w-10 h-10 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400 hover:bg-green-500 hover:text-white hover:scale-110 transition-all duration-300">
                   <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 </a>
-                <a href="https://www.instagram.com/hellomobilesandelectronics?igsh=MW1wY3JhOTh3ZW81MA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.instagram.com/hellomobilesandelectronics?igsh=MW1wY3JhOTh3ZW81MA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
                   className="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:bg-pink-500 hover:text-white hover:scale-110 transition-all duration-300">
                   <Instagram size={18} />
                 </a>
-                <a href="https://www.youtube.com/@HelloMobilesElectronics" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.youtube.com/@HelloMobilesElectronics" target="_blank" rel="noopener noreferrer" aria-label="YouTube"
                   className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white hover:scale-110 transition-all duration-300">
                   <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </a>
-                <a href="https://www.facebook.com/hellomobilesandelectronics" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.facebook.com/hellomobilesandelectronics" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
                   className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 hover:bg-blue-500 hover:text-white hover:scale-110 transition-all duration-300">
                   <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.73-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="mailto:svlnmobiles12@gmail.com"
+                <a href="mailto:svlnmobiles12@gmail.com" aria-label="Email us"
                   className="w-10 h-10 rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400 hover:bg-gold-500 hover:text-white hover:scale-110 transition-all duration-300">
                   <Mail size={18} />
                 </a>
@@ -335,11 +335,11 @@ export default function CustomerLayout() {
             <div>
               <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.quickLinks')}</h4>
               <ul className="space-y-2.5">
-                <li><Link to="/" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.navHome')}</Link></li>
-                <li><Link to="/products" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.allProducts')}</Link></li>
-                <li><Link to="/emi-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.emiCalculator')}</Link></li>
-                <li><Link to="/exchange-calculator" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.exchangeCalculator')}</Link></li>
-                <li><a href={BAJAJ_CHECK_LIMIT_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.checkBajajLimit')}</a></li>
+                <li><Link to="/" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.navHome')}</Link></li>
+                <li><Link to="/products" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.allProducts')}</Link></li>
+                <li><Link to="/emi-calculator" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.emiCalculator')}</Link></li>
+                <li><Link to="/exchange-calculator" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.exchangeCalculator')}</Link></li>
+                <li><a href={BAJAJ_CHECK_LIMIT_URL} target="_blank" rel="noopener noreferrer" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.checkBajajLimit')}</a></li>
               </ul>
             </div>
 
@@ -347,10 +347,10 @@ export default function CustomerLayout() {
             <div>
               <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.categories')}</h4>
               <ul className="space-y-2.5">
-              <li><Link to="/products?category=Mobiles" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryMobiles')}</Link></li>
-              <li><Link to="/products?category=Electronics" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryElectronics')}</Link></li>
-              <li><Link to="/products?category=Home%20Appliances" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryHomeAppliances')}</Link></li>
-              <li><Link to="/products?category=Furniture" className="text-gray-400 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryFurniture')}</Link></li>
+              <li><Link to="/products?category=Mobiles" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryMobiles')}</Link></li>
+              <li><Link to="/products?category=Electronics" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryElectronics')}</Link></li>
+              <li><Link to="/products?category=Home%20Appliances" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryHomeAppliances')}</Link></li>
+              <li><Link to="/products?category=Furniture" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.categoryFurniture')}</Link></li>
               </ul>
             </div>
 
@@ -372,7 +372,7 @@ export default function CustomerLayout() {
                   </p>
                   <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
                 </a>
-                <div className="pt-2 space-y-1.5 text-sm text-gray-400">
+                <div className="pt-2 space-y-1.5 text-sm text-gray-300">
                   <p className="flex items-center gap-2">📞 <span>+91 88868 88128</span></p>
                   <p className="flex items-center gap-2">✉️ <span>svlnmobiles12@gmail.com</span></p>
                   <p className="flex items-center gap-2">⏰ <span>10:00 AM – 9:00 PM</span></p>
@@ -397,7 +397,7 @@ export default function CustomerLayout() {
       </footer>
 
       {/* WhatsApp Floating Button */}
-      <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer"
+      <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"
         className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse">
         <svg viewBox="0 0 24 24" className="w-7 h-7 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </a>

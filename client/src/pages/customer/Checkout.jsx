@@ -357,7 +357,7 @@ export default function Checkout() {
               <div key={item.cartKey} className="flex items-center gap-3 py-3">
                 <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-contain p-0.5" />
+                    <img src={item.image} alt={item.name} loading="lazy" width="60" height="60" className="w-full h-full object-contain p-0.5" />
                   ) : (
                     <span className="text-lg font-bold text-gold-400">{item.name?.[0]}</span>
                   )}
@@ -381,7 +381,7 @@ export default function Checkout() {
                   <p className="text-sm font-bold text-green-700 truncate">{coupon.code}</p>
                   <p className="text-xs text-green-600 truncate">{t('cust.youSave', { amount: coupon.discount.toLocaleString() })}</p>
                 </div>
-                <button onClick={removeCoupon} className="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><X size={16} /></button>
+                <button onClick={removeCoupon} aria-label="Remove coupon" className="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><X size={16} /></button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">

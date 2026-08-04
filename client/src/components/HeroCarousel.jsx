@@ -193,11 +193,11 @@ export default function HeroCarousel() {
       {/* Navigation Arrows */}
       {slides.length > 1 && (
         <>
-          <button onClick={prev}
+          <button onClick={prev} aria-label="Previous slide"
             className="absolute z-20 left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={next}
+          <button onClick={next} aria-label="Next slide"
             className="absolute z-20 right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronRight size={20} />
           </button>
@@ -208,7 +208,7 @@ export default function HeroCarousel() {
       {slides.length > 1 && (
         <div className="absolute z-20 bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
           {slides.map((_, i) => (
-            <button key={i} onClick={() => setCurrent(i)}
+            <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
               className={`transition-all duration-300 rounded-full ${i === current ? 'w-8 h-3 bg-gold-400' : 'w-3 h-3 bg-white/40 hover:bg-white/60'}`} />
           ))}
         </div>
