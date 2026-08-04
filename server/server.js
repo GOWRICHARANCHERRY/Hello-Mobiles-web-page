@@ -1,5 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -23,8 +26,83 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://hello-mobiles.com',
+  'https://www.hello-mobiles.com',
+  'https://hello-mobiles.onrender.com',
+];
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('Not allowed by CORS'));
+  },
+}));
+
+app.use(helmet({
+  crossOriginOpenerPolicy: false,
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        'https://accounts.google.com',
+        'https://apis.google.com',
+        'https://maps.googleapis.com',
+        'https://www.google.com',
+        'https://www.gstatic.com',
+        'https://*.firebaseapp.com',
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://www.gstatic.com'],
+      fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+      imgSrc: [
+        "'self'", 'data:', 'blob:',
+        'https://images.unsplash.com',
+        'https://fdn2.gsmarena.com',
+        'https://*.googleusercontent.com',
+        'https://lh3.googleusercontent.com',
+        'https://www.gstatic.com',
+        'https://cdn.simpleicons.org',
+        'https://upload.wikimedia.org',
+      ],
+      connectSrc: [
+        "'self'",
+        'https://maps.googleapis.com',
+        'https://nominatim.openstreetmap.org',
+        'https://identitytoolkit.googleapis.com',
+        'https://securetoken.googleapis.com',
+        'https://www.googleapis.com',
+        'https://oauth2.googleapis.com',
+        'https://*.firebaseio.com',
+        'wss://*.firebaseio.com',
+      ],
+      frameSrc: ["'self'", 'https://accounts.google.com', 'https://www.google.com'],
+      workerSrc: ["'self'", 'blob:'],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'self'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+}));
+
+app.use(mongoSanitize());
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 600,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later.' },
+});
+app.use('/api', apiLimiter);
+
+app.use(express.json({ limit: '2mb' }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

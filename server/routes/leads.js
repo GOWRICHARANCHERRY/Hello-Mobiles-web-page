@@ -1,9 +1,18 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import Lead from '../models/Lead.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+const leadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { message: 'Too many submissions, please try again later.' },
+});
+
+router.post('/', leadLimiter, async (req, res) => {
   try {
     const { name, email, phone, message, source } = req.body;
     if (!email && !phone) return res.status(400).json({ message: 'Email or phone is required' });

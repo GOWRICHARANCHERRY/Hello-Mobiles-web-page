@@ -1,11 +1,26 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
 import { auth } from '../middleware/auth.js';
 import { verifyFirebaseToken } from '../config/firebase.js';
 import { sendOTP, generateOTP } from '../utils/otp.js';
 
 const router = express.Router();
+
+const limit = (max, windowMs = 15 * 60 * 1000) => rateLimit({
+  windowMs,
+  limit: max,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { message: 'Too many attempts, please try again later.' },
+});
+
+const loginLimiter = limit(10);
+const otpLimiter = limit(5, 60 * 60 * 1000);
+const verifyLimiter = limit(10);
+
+const isValidPhone = (phone) => /^[6-9]\d{9}$/.test(phone);
 
 // Firebase Phone Auth - verify token and login/signup
 router.post('/firebase-auth', async (req, res) => {
@@ -66,10 +81,10 @@ router.post('/firebase-auth', async (req, res) => {
 });
 
 // Send OTP (fallback for non-Firebase)
-router.post('/send-otp', async (req, res) => {
+router.post('/send-otp', otpLimiter, async (req, res) => {
   try {
     const { phone } = req.body;
-    if (!phone) return res.status(400).json({ message: 'Phone number required' });
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
 
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
@@ -99,9 +114,10 @@ router.post('/send-otp', async (req, res) => {
 });
 
 // Verify OTP (fallback)
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', verifyLimiter, async (req, res) => {
   try {
     const { phone, otp } = req.body;
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
     const user = await User.findOne({ phone });
 
     if (!user) return res.status(400).json({ message: 'User not found' });
@@ -188,9 +204,12 @@ router.post('/google', async (req, res) => {
 });
 
 // Phone + Password Login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { phone, password } = req.body;
+    if (!isValidPhone(phone) || !password || typeof password !== 'string') {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     const user = await User.findOne({ phone });
     if (!user) return res.status(400).json({ message: 'User not found' });
     if (user.name === 'Temp') return res.status(400).json({ message: 'Please complete your registration first' });
