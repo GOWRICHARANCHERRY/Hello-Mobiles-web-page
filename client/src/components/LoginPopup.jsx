@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { X } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +21,14 @@ export default function LoginPopup({ onClose }) {
   const [otpLoading, setOtpLoading] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const googleWrapRef = useRef(null);
+  const [googleWidth, setGoogleWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    if (googleWrapRef.current) {
+      setGoogleWidth(googleWrapRef.current.clientWidth);
+    }
+  }, [mode]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -126,17 +134,17 @@ export default function LoginPopup({ onClose }) {
         <div className="p-5">
           {mode === 'login' && (
             <>
-              <div className="mb-4">
+              <div className="mb-4" ref={googleWrapRef}>
                 <GoogleLogin
                   clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com"
                   onSuccess={handleGoogleSuccess}
                   onError={() => toast.error(t('comp.googleLoginFailed'))}
-                  useOneTap
                   theme="outline"
                   size="large"
-                  width="100%"
+                  width={googleWidth || 340}
                   text="continue_with"
                   shape="rectangular"
+                  ux_mode="popup"
                 />
               </div>
 
