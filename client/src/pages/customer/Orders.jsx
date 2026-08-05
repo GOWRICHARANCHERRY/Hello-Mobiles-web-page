@@ -60,15 +60,23 @@ export default function Orders() {
 
               {/* Progress Bar */}
               {order.orderStatus !== 'cancelled' && (
-                <div className="flex items-center mb-4">
-                  {statusSteps.map((step, i) => (
-                    <div key={step} className="flex items-center flex-1">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${i <= currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                        {i <= currentStep ? <Check size={12} /> : i + 1}
-                      </div>
-                      {i < statusSteps.length - 1 && <div className={`flex-1 h-1 mx-1 ${i < currentStep ? 'bg-green-500' : 'bg-gray-200'}`}></div>}
-                    </div>
-                  ))}
+                <div className="relative mb-6">
+                  <div className="absolute top-3 left-3 right-3 h-1 bg-gray-200 rounded-full"></div>
+                  <div className="absolute top-3 left-3 h-1 bg-green-500 rounded-full transition-all duration-500"
+                    style={{ width: `calc(${Math.max(0, currentStep) * (100 / (statusSteps.length - 1))}% - 24px)` }}></div>
+                  <div className="relative flex justify-between">
+                    {statusSteps.map((step, i) => {
+                      const label = t(`cust.status${step.charAt(0).toUpperCase() + step.slice(1)}`);
+                      return (
+                        <div key={step} className="flex flex-col items-center z-10">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 ${i <= currentStep ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-gray-300 text-gray-500'}`}>
+                            {i <= currentStep ? <Check size={12} /> : i + 1}
+                          </div>
+                          <span className={`mt-1.5 text-[10px] font-medium text-center leading-tight ${i <= currentStep ? 'text-gold-700' : 'text-gray-500'}`}>{label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,6 +7,7 @@ import api from '../utils/api';
 
 const POLL_INTERVAL = 15000;
 const STORAGE_KEY = 'hm_last_order_id';
+const DELIVERY_KNOWN_KEY = 'hm_delivery_known_ids';
 
 function beep(ctx, freq, start, duration) {
   const osc = ctx.createOscillator();
@@ -49,10 +51,12 @@ function playUnlockPulse(ctx) {
 export default function NewOrderNotifier() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const audioCtxRef = useRef(null);
   const alarmIntervalRef = useRef(null);
   const toastIdRef = useRef(null);
   const lastIdRef = useRef(null);
+  const knownDeliveryRef = useRef(null);
 
   const getAudioCtx = () => {
     if (!audioCtxRef.current) {
@@ -78,10 +82,86 @@ export default function NewOrderNotifier() {
     }
   };
 
-  useEffect(() => {
-    if (!user || (user.role !== 'admin' && user.role !== 'employee')) return undefined;
+  const ringAlarm = async () => {
+    try {
+      const ctx = getAudioCtx();
+      if (ctx) {
+        if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
+        if (ctx.state === 'running') {
+          playAlarmCycle(ctx);
+          alarmIntervalRef.current = setInterval(() => {
+            const c = audioCtxRef.current;
+            if (c && c.state === 'running') playAlarmCycle(c);
+          }, 2600);
+        }
+      }
+    } catch (e) {
+      console.warn('[NewOrderNotifier] audio unavailable:', e);
+    }
+    try {
+      if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500, 300, 500]);
+    } catch (e) {
+      // vibration unsupported
+    }
+  };
 
-    lastIdRef.current = localStorage.getItem(STORAGE_KEY) || null;
+  const fireAlert = ({ title, message, navigatePath }) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        const n = new Notification(title, { body: message, icon: '/logo.png' });
+        n.onclick = () => {
+          window.focus();
+          navigate(navigatePath);
+        };
+      } catch (e) {
+        // notification unsupported
+      }
+    }
+
+    toastIdRef.current = toast.custom(
+      (toastEl) => (
+        <div
+          onClick={() => {
+            navigate(navigatePath);
+            stopAlarm();
+          }}
+          className="cursor-pointer bg-white rounded-lg shadow-lg border border-gold-400 p-4 w-80"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-xl">🔔</div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-gray-900">{title}</p>
+              <p className="text-sm text-gray-600">{message}</p>
+              <p className="text-xs text-gold-600 mt-1 font-medium">{t('comp.newOrderOpen')}</p>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); stopAlarm(); }}
+              className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded whitespace-nowrap"
+            >
+              {t('comp.newOrderStop')}
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity, position: 'top-right' }
+    );
+
+    ringAlarm();
+  };
+
+  useEffect(() => {
+    if (!user || !['admin', 'employee', 'delivery'].includes(user.role)) return undefined;
+    const isDelivery = user.role === 'delivery';
+
+    if (isDelivery) {
+      try {
+        knownDeliveryRef.current = new Set(JSON.parse(localStorage.getItem(DELIVERY_KNOWN_KEY) || '[]'));
+      } catch (e) {
+        knownDeliveryRef.current = new Set();
+      }
+    } else {
+      lastIdRef.current = localStorage.getItem(STORAGE_KEY) || null;
+    }
 
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {});
@@ -109,8 +189,7 @@ export default function NewOrderNotifier() {
     const checkLatest = async () => {
       try {
         const { data } = await api.get('/orders/latest');
-        if (!active) return;
-        if (!data) return;
+        if (!active || !data) return;
 
         const id = data._id;
         if (!lastIdRef.current) {
@@ -123,69 +202,46 @@ export default function NewOrderNotifier() {
           localStorage.setItem(STORAGE_KEY, id);
 
           const total = `₹${Number(data.total || 0).toLocaleString('en-IN')}`;
-          const title = t('comp.newOrderTitle');
-          const message = t('comp.newOrderBody', {
-            orderNumber: data.orderNumber,
-            total,
+          fireAlert({
+            title: t('comp.newOrderTitle'),
+            message: t('comp.newOrderBody', { orderNumber: data.orderNumber, total }),
+            navigatePath: `/${user.role === 'employee' ? 'employee' : 'admin'}/orders?focus=${id}`,
           });
-
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(title, { body: message, icon: '/logo.png' });
-          }
-
-          toastIdRef.current = toast.custom(
-            (toastEl) => (
-              <div
-                onClick={() => {
-                  stopAlarm();
-                  toast.dismiss(toastEl.id);
-                }}
-                className="cursor-pointer bg-white rounded-lg shadow-lg border border-gold-400 p-4 w-80"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-xl">🔔</div>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-900">{title}</p>
-                    <p className="text-sm text-gray-600">{message}</p>
-                  </div>
-                  <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded whitespace-nowrap">
-                    {t('comp.newOrderStop')}
-                  </span>
-                </div>
-              </div>
-            ),
-            { duration: Infinity, position: 'top-right' }
-          );
-
-          // Ring the alarm (audio when allowed, vibration as a mobile fallback)
-          try {
-            const ctx = getAudioCtx();
-            if (ctx) {
-              if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
-              if (ctx.state === 'running') {
-                playAlarmCycle(ctx);
-                alarmIntervalRef.current = setInterval(() => {
-                  const c = audioCtxRef.current;
-                  if (c && c.state === 'running') playAlarmCycle(c);
-                }, 2600);
-              }
-            }
-          } catch (e) {
-            console.warn('[NewOrderNotifier] audio unavailable:', e);
-          }
-          try {
-            if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500, 300, 500]);
-          } catch (e) {
-            // vibration unsupported
-          }
         }
       } catch (e) {
         // network errors / not authed — ignore, keep polling
       }
     };
 
-    checkLatest();
-    const poll = setInterval(checkLatest, POLL_INTERVAL);
+    const checkAssigned = async () => {
+      try {
+        const { data } = await api.get('/orders/delivery');
+        if (!active || !Array.isArray(data)) return;
+
+        const ids = data.map(o => o._id);
+        const known = knownDeliveryRef.current;
+        const hadBaseline = known.size > 0;
+        const fresh = ids.filter(id => !known.has(id));
+        ids.forEach(id => known.add(id));
+        localStorage.setItem(DELIVERY_KNOWN_KEY, JSON.stringify([...known]));
+
+        if (!hadBaseline || fresh.length === 0) return;
+        const order = data.find(o => o._id === fresh[0]);
+        if (!order) return;
+
+        fireAlert({
+          title: t('delv.newAssignmentTitle'),
+          message: t('delv.newAssignmentBody', { orderNumber: order.orderNumber }),
+          navigatePath: `/delivery?focus=${order._id}`,
+        });
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const pollFn = isDelivery ? checkAssigned : checkLatest;
+    pollFn();
+    const poll = setInterval(pollFn, POLL_INTERVAL);
     return () => {
       active = false;
       clearInterval(poll);
@@ -197,7 +253,7 @@ export default function NewOrderNotifier() {
         audioCtxRef.current = null;
       }
     };
-  }, [user, t]);
+  }, [user, t, navigate]);
 
   return null;
 }

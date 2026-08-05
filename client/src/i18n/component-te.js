@@ -206,6 +206,7 @@ export default {
   'comp.newOrderTitle': 'కొత్త ఆర్డర్!',
   'comp.newOrderBody': 'ఆర్డర్ {orderNumber} {total} కోసం వచ్చింది',
   'comp.newOrderStop': 'ఆపండి',
+  'comp.newOrderOpen': 'ఆర్డర్ తెరవడానికి క్లిక్ చేయండి',
   // LocationPicker
   'comp.searchAddressPlaceholder': 'మీ చిరునామాను శోధించండి...',
   'comp.dragPinHint': 'ఖచ్చితమైన డెలివరీ స్థానాన్ని సెట్ చేయడానికి పిన్ డ్రాగ్ చేయండి లేదా మ్యాప్ పై ట్యాప్ చేయండి',

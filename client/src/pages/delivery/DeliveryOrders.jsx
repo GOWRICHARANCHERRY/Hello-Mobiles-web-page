@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { Bike, ChevronDown, ChevronUp, MapPin, RefreshCw, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -20,6 +21,9 @@ export default function DeliveryOrders() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [expanded, setExpanded] = useState(null);
+  const [searchParams] = useSearchParams();
+  const focusId = searchParams.get('focus');
+  const focusedOnce = useRef(false);
 
   const loadOrders = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -36,9 +40,14 @@ export default function DeliveryOrders() {
   useEffect(() => { loadOrders(); }, [loadOrders]);
 
   useEffect(() => {
-    const timer = setInterval(() => loadOrders(true), 30000);
-    return () => clearInterval(timer);
-  }, [loadOrders]);
+    if (!focusId || focusedOnce.current) return;
+    const el = document.getElementById(`order-${focusId}`);
+    if (el) {
+      focusedOnce.current = true;
+      setExpanded(focusId);
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  }, [focusId, orders]);
 
   const updateDeliveryStatus = async (orderId, deliveryStatus) => {
     try {
@@ -96,7 +105,7 @@ export default function DeliveryOrders() {
       ) : (
         <div className="space-y-3">
           {filtered.map(order => (
-            <div key={order._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div key={order._id} id={`order-${order._id}`} className="bg-white rounded-xl shadow-sm overflow-hidden scroll-mt-24">
               <div className="p-4 flex flex-col md:flex-row md:items-center justify-between cursor-pointer"
                 onClick={() => setExpanded(expanded === order._id ? null : order._id)}>
                 <div className="flex items-center gap-4">

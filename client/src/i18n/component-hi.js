@@ -206,6 +206,7 @@ export default {
   'comp.newOrderTitle': 'नया ऑर्डर!',
   'comp.newOrderBody': 'ऑर्डर {orderNumber} {total} में प्राप्त हुआ',
   'comp.newOrderStop': 'रोकें',
+  'comp.newOrderOpen': 'ऑर्डर खोलने के लिए क्लिक करें',
   // LocationPicker
   'comp.searchAddressPlaceholder': 'अपना पता खोजें...',
   'comp.dragPinHint': 'सटीक डिलीवरी स्थान सेट करने के लिए पिन खींचें या मानचित्र पर टैप करें',

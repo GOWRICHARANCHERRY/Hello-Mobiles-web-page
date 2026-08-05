@@ -28,4 +28,6 @@ export default {
   'delv.statusUpdated': 'Delivery status updated!',
   'delv.failed': 'Failed to update status',
   'delv.deliveredOn': 'Delivered on {date}',
+  'delv.newAssignmentTitle': 'New Delivery Assigned!',
+  'delv.newAssignmentBody': 'Order {orderNumber} assigned to you',
 };

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../utils/api';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
@@ -11,6 +12,9 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [searchParams] = useSearchParams();
+  const focusId = searchParams.get('focus');
+  const focusedOnce = useRef(false);
 
   useEffect(() => {
     api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false));
@@ -18,6 +22,16 @@ export default function AdminOrders() {
       setDeliveryStaff((r.data || []).filter(u => u.role === 'delivery'));
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!focusId || focusedOnce.current) return;
+    const el = document.getElementById(`order-${focusId}`);
+    if (el) {
+      focusedOnce.current = true;
+      setExpanded(focusId);
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  }, [focusId, orders]);
 
   const assignDelivery = async (orderId, deliveryId) => {
     try {
@@ -95,7 +109,7 @@ export default function AdminOrders() {
 
       <div className="space-y-3">
         {filtered.map(order => (
-          <div key={order._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div key={order._id} id={`order-${order._id}`} className="bg-white rounded-xl shadow-sm overflow-hidden scroll-mt-24">
             <div className="p-4 flex flex-col md:flex-row md:items-center justify-between cursor-pointer"
               onClick={() => setExpanded(expanded === order._id ? null : order._id)}>
               <div className="flex items-center gap-4">

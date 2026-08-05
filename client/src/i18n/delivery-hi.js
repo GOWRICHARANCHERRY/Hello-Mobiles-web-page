@@ -28,4 +28,6 @@ export default {
   'delv.statusUpdated': 'डिलीवरी स्थिति अपडेट हो गई!',
   'delv.failed': 'स्थिति अपडेट करने में विफल',
   'delv.deliveredOn': '{date} को डिलीवर हुआ',
+  'delv.newAssignmentTitle': 'नई डिलीवरी असाइन हुई!',
+  'delv.newAssignmentBody': 'ऑर्डर {orderNumber} आपको असाइन किया गया',
 };

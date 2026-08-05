@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { Package, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -9,10 +10,23 @@ export default function EmployeeOrders() {
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const focusId = searchParams.get('focus');
+  const focusedOnce = useRef(false);
 
   useEffect(() => {
     api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!focusId || focusedOnce.current) return;
+    const el = document.getElementById(`order-${focusId}`);
+    if (el) {
+      focusedOnce.current = true;
+      setExpandedOrder(focusId);
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  }, [focusId, orders]);
 
   const updateStatus = async (orderId, status) => {
     try {
@@ -54,7 +68,7 @@ export default function EmployeeOrders() {
         {orders.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl"><p className="text-gray-500">{t('emp.noOrders')}</p></div>
         ) : orders.map(order => (
-          <div key={order._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div key={order._id} id={`order-${order._id}`} className="bg-white rounded-xl shadow-sm overflow-hidden scroll-mt-24">
             <div className="p-4 flex flex-col md:flex-row md:items-center justify-between cursor-pointer"
               onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}>
               <div className="flex items-center gap-4">

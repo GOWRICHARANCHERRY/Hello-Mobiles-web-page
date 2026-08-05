@@ -206,6 +206,7 @@ export default {
   'comp.newOrderTitle': 'New Order!',
   'comp.newOrderBody': 'Order {orderNumber} placed for {total}',
   'comp.newOrderStop': 'Stop',
+  'comp.newOrderOpen': 'Click to open order',
   // LocationPicker
   'comp.searchAddressPlaceholder': 'Search your address...',
   'comp.dragPinHint': 'Drag the pin or tap the map to set exact delivery location',

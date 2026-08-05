@@ -28,4 +28,6 @@ export default {
   'delv.statusUpdated': 'డెలివరీ స్థితి నవీకరించబడింది!',
   'delv.failed': 'స్థితి నవీకరించడంలో విఫలమైంది',
   'delv.deliveredOn': '{date} న డెలివరీ అయింది',
+  'delv.newAssignmentTitle': 'కొత్త డెలివరీ కేటాయించబడింది!',
+  'delv.newAssignmentBody': 'ఆర్డర్ {orderNumber} మీకు కేటాయించబడింది',
 };
