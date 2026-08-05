@@ -246,6 +246,7 @@ export default {
   'admin2.km': 'किमी',
   'admin2.zoneSetOnMap': 'मानचित्र पर स्टोर की लोकेशन चुनें',
   'admin2.zoneMapHint': 'स्टोर की लोकेशन सेट करने के लिए मानचित्र पर क्लिक करें या पिन खींचें',
+  'admin2.searchLocationPlaceholder': 'लोकेशन खोजें...',
   'admin2.zoneActive': 'सक्रिय',
   'admin2.zoneInactive': 'निष्क्रिय',
   'admin2.zoneSave': 'ज़ोन सहेजें',

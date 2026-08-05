@@ -246,6 +246,7 @@ export default {
   'admin2.km': 'km',
   'admin2.zoneSetOnMap': 'Set store location on map',
   'admin2.zoneMapHint': 'Click the map or drag the pin to set the store location',
+  'admin2.searchLocationPlaceholder': 'Search for a location...',
   'admin2.zoneActive': 'Active',
   'admin2.zoneInactive': 'Inactive',
   'admin2.zoneSave': 'Save zone',

@@ -246,6 +246,7 @@ export default {
   'admin2.km': 'కి.మీ',
   'admin2.zoneSetOnMap': 'మ్యాప్‌లో స్టోర్ లొకేషన్ సెట్ చేయండి',
   'admin2.zoneMapHint': 'స్టోర్ లొకేషన్ సెట్ చేయడానికి మ్యాప్‌పై క్లిక్ చేయండి లేదా పిన్ లాగండి',
+  'admin2.searchLocationPlaceholder': 'లొకేషన్ కోసం వెతకండి...',
   'admin2.zoneActive': 'యాక్టివ్',
   'admin2.zoneInactive': 'నిష్క్రియం',
   'admin2.zoneSave': 'జోన్ సేవ్ చేయండి',

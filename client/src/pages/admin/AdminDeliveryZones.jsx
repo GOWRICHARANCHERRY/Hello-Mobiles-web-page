@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, Plus, Pencil, Trash2, Save, X, Loader, Power } from 'lucide-react';
+import { MapPin, Plus, Pencil, Trash2, Save, X, Loader, Power, Search, LocateFixed } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -9,11 +9,14 @@ const DEFAULT_CENTER = { lat: 14.4426, lng: 79.9865 };
 const PRESETS = [10, 25, 50, 60, 100];
 
 function ZoneMap({ lat, lng, radiusKm, onPlace }) {
+  const { t } = useLanguage();
   const ref = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const circleRef = useRef(null);
+  const searchRef = useRef(null);
   const [ready, setReady] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,7 +56,66 @@ function ZoneMap({ lat, lng, radiusKm, onPlace }) {
     });
   }, [ready, lat, lng, radiusKm]); // eslint-disable-line
 
-  return <div ref={ref} className="w-full h-80 rounded-xl border-2 border-gold-200" />;
+  useEffect(() => {
+    if (!ready || !searchRef.current) return;
+    if (!window.google?.maps?.places?.Autocomplete) return;
+    const autocomplete = new window.google.maps.places.Autocomplete(searchRef.current);
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place?.geometry?.location) return;
+      const ll = place.geometry.location;
+      mapRef.current?.setCenter(ll);
+      mapRef.current?.setZoom(12);
+      markerRef.current?.setPosition(ll);
+      onPlace(ll.lat(), ll.lng());
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      return toast.error(t('cust.toastGeoNotSupported'));
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const ll = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        mapRef.current?.setCenter(ll);
+        mapRef.current?.setZoom(12);
+        markerRef.current?.setPosition(ll);
+        onPlace(ll.lat, ll.lng);
+      },
+      () => {
+        setLocating(false);
+        toast.error(t('cust.toastGetLocationFailed'));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            ref={searchRef}
+            placeholder={t('admin2.searchLocationPlaceholder')}
+            className="w-full border-2 border-gold-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={useMyLocation}
+          className="flex-shrink-0 bg-white border-2 border-gold-300 text-gold-700 rounded-lg px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5 hover:bg-gold-50 transition">
+          {locating ? <Loader size={14} className="animate-spin" /> : <LocateFixed size={14} className="text-gold-700" />}
+          {t('cust.useCurrentLocation')}
+        </button>
+      </div>
+      <div ref={ref} className="w-full h-80 rounded-xl border-2 border-gold-200" />
+    </div>
+  );
 }
 
 export default function AdminDeliveryZones() {
