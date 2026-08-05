@@ -33,6 +33,17 @@ export default function OrderDetail() {
     setOrder(data);
   };
 
+  const handlePrint = () => {
+    const invoice = document.getElementById('invoice');
+    if (invoice) {
+      const printablePx = 900;
+      const scale = Math.min(1, printablePx / invoice.offsetHeight);
+      invoice.style.zoom = scale.toFixed(3);
+    }
+    window.print();
+    if (invoice) invoice.style.zoom = '';
+  };
+
   const handleCancel = async () => {
     setActionLoading(true);
     try {
@@ -114,7 +125,7 @@ export default function OrderDetail() {
   };
 
   return (
-    <div className="animate-fade-in max-w-4xl mx-auto">
+    <div className="animate-fade-in max-w-4xl mx-auto print:max-w-full print:mx-0">
       <Link to="/orders" className="flex items-center gap-1 text-gray-600 hover:text-gold-700 mb-4 text-sm print:hidden"><ChevronLeft size={18} /> {t('cust.backToOrders')}</Link>
 
       {/* Header */}
@@ -159,7 +170,7 @@ export default function OrderDetail() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-3 mt-6">
-          <button onClick={() => window.print()}
+          <button onClick={handlePrint}
             className="flex items-center gap-2 bg-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gold-700 transition">
             <Printer size={16} /> {t('cust.downloadPrintInvoice')}
           </button>
@@ -183,7 +194,7 @@ export default function OrderDetail() {
         <div className="gold-gradient h-1.5"></div>
 
         {/* Invoice Header */}
-        <div className="px-6 md:px-10 pt-8 pb-6 flex flex-col md:flex-row justify-between gap-6">
+        <div className="px-6 md:px-10 pt-5 pb-4 flex flex-col md:flex-row justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <img src="/logo.png" alt="Hello Mobile Electronics & Furniture" width="48" height="48" className="w-12 h-12 rounded-xl object-contain border-2 border-gold-500/30 shadow-md" />
@@ -208,7 +219,7 @@ export default function OrderDetail() {
         </div>
 
         {/* Billed To */}
-        <div className="mx-6 md:mx-10 px-5 py-4 bg-gold-50/60 border border-gold-200 rounded-xl invoice-no-break">
+        <div className="mx-6 md:mx-10 px-5 py-3 bg-gold-50/60 border border-gold-200 rounded-xl invoice-no-break">
           <h3 className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1">{t('cust.billedTo')}</h3>
           <p className="text-sm font-semibold text-gray-900">{order.shippingAddress?.name}</p>
           <p className="text-xs text-gray-600 mt-0.5">{order.shippingAddress?.street}, {order.shippingAddress?.city}</p>
@@ -228,11 +239,11 @@ export default function OrderDetail() {
         </div>
 
         {/* Items Table */}
-        <div className="px-6 md:px-10 pt-6 invoice-table overflow-x-auto">
+        <div className="px-6 md:px-10 pt-4 invoice-table overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-[11px] text-white uppercase tracking-wide bg-gradient-to-r from-gray-800 to-gray-700">
-                <th className="py-2.5 px-3 text-left rounded-l-lg">{t('cust.item')}</th>
+                <th className="py-2 px-3 text-left rounded-l-lg">{t('cust.item')}</th>
                 <th className="py-2.5 px-3 text-center">{t('cust.qtyTable')}</th>
                 <th className="py-2.5 px-3 text-right">{t('cust.rate')}</th>
                 <th className="py-2.5 px-3 text-right">{t('cust.taxable')}</th>
@@ -244,7 +255,7 @@ export default function OrderDetail() {
             <tbody>
               {gstItems.map(({ item, amount, taxable, cgst, sgst }, i) => (
                 <tr key={i} className={i % 2 ? 'bg-gold-50/40' : ''}>
-                  <td className="py-3 px-3">
+                  <td className="py-2 px-3">
                     <p className="font-medium text-gray-800">{item.name}</p>
                     {item.variant && (
                       <p className="text-[11px] text-gray-500">
@@ -253,12 +264,12 @@ export default function OrderDetail() {
                       </p>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-center">{item.quantity}</td>
-                  <td className="py-3 px-3 text-right">{item.price.toLocaleString('en-IN')}</td>
-                  <td className="py-3 px-3 text-right">{fmt2(taxable)}</td>
-                  <td className="py-3 px-3 text-right">{fmt2(cgst)}</td>
-                  <td className="py-3 px-3 text-right">{fmt2(sgst)}</td>
-                  <td className="py-3 px-3 text-right font-semibold text-gray-900">{amount.toLocaleString('en-IN')}</td>
+                  <td className="py-2 px-3 text-center">{item.quantity}</td>
+                  <td className="py-2 px-3 text-right">{item.price.toLocaleString('en-IN')}</td>
+                  <td className="py-2 px-3 text-right">{fmt2(taxable)}</td>
+                  <td className="py-2 px-3 text-right">{fmt2(cgst)}</td>
+                  <td className="py-2 px-3 text-right">{fmt2(sgst)}</td>
+                  <td className="py-2 px-3 text-right font-semibold text-gray-900">{amount.toLocaleString('en-IN')}</td>
                 </tr>
               ))}
             </tbody>
@@ -266,10 +277,10 @@ export default function OrderDetail() {
         </div>
 
         {/* Totals */}
-        <div className="px-6 md:px-10 pt-6 pb-8 flex flex-col md:flex-row justify-between gap-6 invoice-no-break">
+        <div className="px-6 md:px-10 pt-4 pb-5 flex flex-col md:flex-row justify-between gap-6 invoice-no-break">
           <div className="flex-1">
             <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1.5">{t('cust.amountInWords')}</p>
-            <p className="text-sm text-gray-700 font-medium bg-gold-50/60 border border-gold-200 rounded-lg px-3 py-2.5">{t('cust.rupeesOnly', { words: toWords(Math.round(order.total)) })}</p>
+            <p className="text-sm text-gray-700 font-medium bg-gold-50/60 border border-gold-200 rounded-lg px-3 py-2">{t('cust.rupeesOnly', { words: toWords(Math.round(order.total)) })}</p>
             <div className="mt-4 text-[11px] text-gray-500 leading-relaxed">
               <p>{t('cust.gstNote')}</p>
               <p>{t('cust.deliveryChargeNote', { amount: order.deliveryCharge?.toLocaleString() || 0 })}</p>
