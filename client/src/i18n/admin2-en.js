@@ -225,4 +225,11 @@ export default {
   'admin2.deliveryStatus.cancelled': 'Cancelled',
   'admin2.deliveryAssigned': 'Delivery assigned!',
   'admin2.deliveryUnassigned': 'Delivery unassigned!',
+  'admin2.searchOrders': 'Search by order #, name or phone...',
+  'admin2.noOrdersMatch': 'No orders match your filters',
+  'admin2.delivery': 'Delivery',
+  'admin2.colOrder': 'Order',
+  'admin2.colDate': 'Date',
+  'admin2.colPayment': 'Payment',
+  'admin2.colTotal': 'Total',
 };

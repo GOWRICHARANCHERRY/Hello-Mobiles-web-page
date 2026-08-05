@@ -7,6 +7,40 @@ import { sendOrderWhatsApp } from '../utils/whatsapp.js';
 
 const router = express.Router();
 
+// Return an order's items back to stock (variant/color stock + IMEI status) when
+// an order is cancelled. Shared by admin/employee status change, delivery cancel,
+// and customer cancel so stock is never lost on cancellation.
+async function restoreOrderStock(order) {
+  for (const item of order.items) {
+    const product = await Product.findById(item.product);
+    if (!product) continue;
+    if (item.variant?.variantId) {
+      const variant = product.variants.id(item.variant.variantId);
+      if (variant) {
+        const colorEntry = item.variant.color ? variant.colors?.find(c => c.name === item.variant.color) : null;
+        if (colorEntry) {
+          colorEntry.stock += item.quantity;
+          for (const imei of (colorEntry.imei || [])) {
+            if (typeof imei === 'object' && imei.status === 'sold' && imei.orderId?.toString() === order._id.toString()) {
+              imei.status = 'in_stock';
+              imei.orderId = undefined;
+              imei.orderNumber = undefined;
+              imei.soldAt = undefined;
+              imei.soldPrice = undefined;
+              imei.soldTo = undefined;
+            }
+          }
+        } else {
+          for (const c of variant.colors) { c.stock += item.quantity; }
+        }
+      }
+    } else {
+      product.stock += item.quantity;
+    }
+    await product.save();
+  }
+}
+
 router.get('/', auth, async (req, res) => {
   try {
     let query = {};
@@ -76,17 +110,24 @@ router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee
     if (!['assigned', 'out_for_delivery', 'delivered', 'cancelled'].includes(deliveryStatus)) {
       return res.status(400).json({ message: 'Invalid delivery status' });
     }
-    const update = { deliveryStatus };
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
     if (deliveryStatus === 'delivered') {
-      update.deliveredAt = new Date();
-      update.orderStatus = 'delivered';
-      update.paymentStatus = 'paid';
+      order.deliveredAt = new Date();
+      order.orderStatus = 'delivered';
+      order.paymentStatus = 'paid';
     }
     if (deliveryStatus === 'cancelled') {
-      update.orderStatus = 'cancelled';
+      if (order.orderStatus !== 'cancelled') {
+        await restoreOrderStock(order);
+        if (order.paymentStatus === 'paid') order.paymentStatus = 'refunded';
+      }
+      order.orderStatus = 'cancelled';
+      order.cancelledAt = new Date();
     }
-    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+    order.deliveryStatus = deliveryStatus;
+    await order.save();
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -252,15 +293,28 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id/status', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
     const { orderStatus, trackingId } = req.body;
-    const update = { orderStatus };
-    if (trackingId) update.trackingId = trackingId;
-    if (orderStatus === 'delivered') {
-      update.deliveredAt = new Date();
-      update.deliveryStatus = 'delivered';
+    if (!['confirmed', 'processing', 'packed', 'shipped', 'delivered', 'cancelled'].includes(orderStatus)) {
+      return res.status(400).json({ message: 'Invalid order status' });
     }
-    if (orderStatus === 'cancelled') update.deliveryStatus = 'cancelled';
-    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (orderStatus === 'cancelled' && order.orderStatus !== 'cancelled') {
+      await restoreOrderStock(order);
+      if (order.paymentStatus === 'paid') order.paymentStatus = 'refunded';
+      order.cancelledAt = new Date();
+    }
+    order.orderStatus = orderStatus;
+    if (trackingId) order.trackingId = trackingId;
+    if (orderStatus === 'delivered') {
+      order.deliveredAt = new Date();
+      order.deliveryStatus = 'delivered';
+    }
+    if (orderStatus === 'cancelled') {
+      order.cancelledAt = new Date();
+      order.deliveryStatus = 'cancelled';
+    }
+    await order.save();
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -290,34 +344,7 @@ router.post('/:id/cancel', auth, async (req, res) => {
     }
 
     // Restore stock and IMEI entries
-    for (const item of order.items) {
-      const product = await Product.findById(item.product);
-      if (!product) continue;
-      if (item.variant?.variantId) {
-        const variant = product.variants.id(item.variant.variantId);
-        if (variant) {
-          const colorEntry = item.variant.color ? variant.colors?.find(c => c.name === item.variant.color) : null;
-          if (colorEntry) {
-            colorEntry.stock += item.quantity;
-            for (const imei of (colorEntry.imei || [])) {
-              if (typeof imei === 'object' && imei.status === 'sold' && imei.orderId?.toString() === order._id.toString()) {
-                imei.status = 'in_stock';
-                imei.orderId = undefined;
-                imei.orderNumber = undefined;
-                imei.soldAt = undefined;
-                imei.soldPrice = undefined;
-                imei.soldTo = undefined;
-              }
-            }
-          } else {
-            for (const c of variant.colors) { c.stock += item.quantity; }
-          }
-        }
-      } else {
-        product.stock += item.quantity;
-      }
-      await product.save();
-    }
+    await restoreOrderStock(order);
 
     order.orderStatus = 'cancelled';
     order.cancelReason = req.body.reason || 'Cancelled by customer';

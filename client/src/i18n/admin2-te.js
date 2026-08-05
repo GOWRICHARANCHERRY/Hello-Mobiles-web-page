@@ -225,4 +225,11 @@ export default {
   'admin2.deliveryStatus.cancelled': 'రద్దు',
   'admin2.deliveryAssigned': 'డెలివరీ కేటాయించబడింది!',
   'admin2.deliveryUnassigned': 'డెలివరీ కేటాయింపు తీసివేయబడింది!',
+  'admin2.searchOrders': 'ఆర్డర్ #, పేరు లేదా ఫోన్ ద్వారా వెతకండి...',
+  'admin2.noOrdersMatch': 'మీ ఫిల్టర్లకు సరిపోలిన ఆర్డర్ లేదు',
+  'admin2.delivery': 'డెలివరీ',
+  'admin2.colOrder': 'ఆర్డర్',
+  'admin2.colDate': 'తేదీ',
+  'admin2.colPayment': 'చెల్లింపు',
+  'admin2.colTotal': 'మొత్తం',
 };

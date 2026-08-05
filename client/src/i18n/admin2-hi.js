@@ -225,4 +225,11 @@ export default {
   'admin2.deliveryStatus.cancelled': 'रद्द',
   'admin2.deliveryAssigned': 'डिलीवरी असाइन हो गई!',
   'admin2.deliveryUnassigned': 'डिलीवरी असाइन हट गई!',
+  'admin2.searchOrders': 'ऑर्डर #, नाम या फोन से खोजें...',
+  'admin2.noOrdersMatch': 'आपके फ़िल्टर से मेल खाता कोई ऑर्डर नहीं',
+  'admin2.delivery': 'डिलीवरी',
+  'admin2.colOrder': 'ऑर्डर',
+  'admin2.colDate': 'तारीख',
+  'admin2.colPayment': 'भुगतान',
+  'admin2.colTotal': 'कुल',
 };
