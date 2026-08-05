@@ -32,6 +32,16 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [deliveryZone, setDeliveryZone] = useState({ enabled: false, zones: [] });
+  const [deliveryStatus, setDeliveryStatus] = useState(null);
+
+  const needsDelivery = deliveryZone.enabled && paymentMethod !== 'store_pickup';
+
+  useEffect(() => {
+    api.get('/delivery-zones')
+      .then((r) => setDeliveryZone(r.data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     try {
@@ -98,6 +108,15 @@ export default function Checkout() {
     setCouponCode('');
   };
 
+  const checkDeliverability = async (lat, lng) => {
+    try {
+      const { data } = await api.post('/delivery-zones/check', { latitude: lat, longitude: lng });
+      setDeliveryStatus(data);
+    } catch (e) {
+      setDeliveryStatus(null);
+    }
+  };
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       return toast.error(t('cust.toastGeoNotSupported'));
@@ -107,6 +126,8 @@ export default function Checkout() {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
+          setMapLoc({ lat: latitude, lng: longitude, mapLabel: '' });
+          checkDeliverability(latitude, longitude);
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
             { headers: { 'User-Agent': 'HelloMobiles/1.0' } }
@@ -150,6 +171,28 @@ export default function Checkout() {
       pincode: fields.pincode || prev.pincode,
     }));
     toast.success(t('cust.toastLocationDetected'));
+    checkDeliverability(fields.lat, fields.lng);
+  };
+
+  const ensureDeliverable = async () => {
+    if (mapLoc.lat == null || mapLoc.lng == null) {
+      if (needsDelivery) {
+        toast.error(t('cust.toastSetPin'));
+        return false;
+      }
+      return true;
+    }
+    try {
+      const { data } = await api.post('/delivery-zones/check', { latitude: mapLoc.lat, longitude: mapLoc.lng });
+      setDeliveryStatus(data);
+      if (data.restricted && !data.deliverable) {
+        toast.error(t('cust.notDeliverable'));
+        return false;
+      }
+    } catch (e) {
+      // server remains the authority; don't block on a transient check error
+    }
+    return true;
   };
 
   const validateShipping = () => {
@@ -169,6 +212,8 @@ export default function Checkout() {
   const handlePlaceOrder = async () => {
     const err = validateShipping();
     if (err) return toast.error(err);
+    const ok = await ensureDeliverable();
+    if (!ok) return;
     setLoading(true);
     try {
       const orderData = {
@@ -284,6 +329,28 @@ export default function Checkout() {
                   />
                 </div>
               )}
+              {needsDelivery && (
+                <div className="mb-5">
+                  {deliveryStatus?.restricted ? (
+                    deliveryStatus.deliverable ? (
+                      <div className="flex items-center gap-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                        <Check size={16} className="text-green-600 flex-shrink-0" />
+                        <span className="min-w-0">{t('cust.deliverable', { distance: deliveryStatus.distanceKm, zone: deliveryStatus.zoneName })}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                        <X size={16} className="text-red-600 flex-shrink-0" />
+                        <span className="min-w-0">{t('cust.notDeliverable')}</span>
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                      <MapPin size={16} className="text-amber-600 flex-shrink-0" />
+                      <span className="min-w-0">{t('cust.deliveryRestrictedNotice')}</span>
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('cust.fullName')}</label>
@@ -326,9 +393,11 @@ export default function Checkout() {
                     className="w-full border-2 border-gold-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
               </div>
-              <button onClick={() => {
+              <button onClick={async () => {
                 const err = validateShipping();
                 if (err) return toast.error(err);
+                const ok = await ensureDeliverable();
+                if (!ok) return;
                 setStep(2);
               }} className="mt-6 btn-gold rounded-xl">
                 {t('cust.continueToPayment')}

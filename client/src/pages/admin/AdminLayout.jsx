@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image, Tag, Mail } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, UserCheck, BarChart3, LogOut, Menu, X, Image, Tag, Mail, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import NewOrderNotifier from '../../components/NewOrderNotifier';
 
@@ -25,6 +25,7 @@ export default function AdminLayout() {
     { to: '/admin/customers', label: t('admin.customers'), icon: Users },
     { to: '/admin/analytics', label: t('admin.analytics'), icon: BarChart3 },
     { to: '/admin/coupons', label: t('admin.coupons'), icon: Tag },
+    { to: '/admin/delivery-zones', label: t('admin2.deliveryZones'), icon: MapPin },
     { to: '/admin/leads', label: t('admin.leads'), icon: Mail },
   ];
 

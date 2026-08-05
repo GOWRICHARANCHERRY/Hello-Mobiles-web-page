@@ -42,6 +42,7 @@ const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
 const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
 const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'));
+const AdminDeliveryZones = lazy(() => import('./pages/admin/AdminDeliveryZones'));
 const AdminLeads = lazy(() => import('./pages/admin/AdminLeads'));
 
 function PageLoader() {
@@ -120,6 +121,7 @@ function AppRoutes() {
         <Route path="customers" element={<SuspenseRoute><AdminCustomers /></SuspenseRoute>} />
         <Route path="analytics" element={<SuspenseRoute><AdminAnalytics /></SuspenseRoute>} />
         <Route path="coupons" element={<SuspenseRoute><AdminCoupons /></SuspenseRoute>} />
+        <Route path="delivery-zones" element={<SuspenseRoute><AdminDeliveryZones /></SuspenseRoute>} />
         <Route path="leads" element={<SuspenseRoute><AdminLeads /></SuspenseRoute>} />
       </Route>
 

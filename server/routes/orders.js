@@ -4,6 +4,7 @@ import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { auth, roleAuth } from '../middleware/auth.js';
 import { sendOrderWhatsApp } from '../utils/whatsapp.js';
+import { getDeliveryConfig, findDeliverableZone } from '../utils/delivery.js';
 
 const router = express.Router();
 
@@ -152,6 +153,21 @@ router.post('/', auth, async (req, res) => {
     const { items, shippingAddress, paymentMethod, emiDetails, exchangeDetails, couponCode } = req.body;
     let subtotal = 0;
     const orderItems = [];
+
+    if (paymentMethod !== 'store_pickup') {
+      const deliveryCfg = await getDeliveryConfig();
+      if (deliveryCfg.enabled && deliveryCfg.zones.some((z) => z.isActive)) {
+        const lat = shippingAddress?.latitude;
+        const lng = shippingAddress?.longitude;
+        if (typeof lat !== 'number' || typeof lng !== 'number') {
+          return res.status(400).json({ message: 'Delivery location is required. Please set your delivery pin on the map.' });
+        }
+        const zone = findDeliverableZone(lat, lng, deliveryCfg.zones);
+        if (!zone || !zone.deliverable) {
+          return res.status(400).json({ message: 'Delivery is not available at this location.' });
+        }
+      }
+    }
 
     for (const item of items) {
       const product = await Product.findById(item.product);

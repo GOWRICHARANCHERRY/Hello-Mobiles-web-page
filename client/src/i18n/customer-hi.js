@@ -589,4 +589,9 @@ export default {
   'cust.failedToRemove': 'हटाने में विफल',
   'cust.saveItemsLater': 'अपने पसंदीदा आइटम बाद के लिए सहेजें',
   'cust.viewOnMap': 'मानचित्र पर देखें',
+
+  'cust.deliverable': 'डिलीवरी उपलब्ध — {zone} से {distance} किमी',
+  'cust.notDeliverable': 'इस स्थान पर डिलीवरी उपलब्ध नहीं है',
+  'cust.deliveryRestrictedNotice': 'हम केवल अपने डिलीवरी ज़ोन के भीतर ही डिलीवरी करते हैं। उपलब्धता जाँचने के लिए मानचित्र पर अपना डिलीवरी पिन सेट करें।',
+  'cust.toastSetPin': 'कृपया पहले मानचित्र पर अपना डिलीवरी पिन सेट करें',
 };

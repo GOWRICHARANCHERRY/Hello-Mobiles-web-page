@@ -589,4 +589,9 @@ export default {
   'cust.failedToRemove': 'Failed to remove',
   'cust.saveItemsLater': 'Save items you love for later',
   'cust.viewOnMap': 'View on map',
+
+  'cust.deliverable': 'Deliverable — {distance} km from {zone}',
+  'cust.notDeliverable': 'Delivery not available at this location',
+  'cust.deliveryRestrictedNotice': 'We deliver only within our delivery zones. Set your delivery pin on the map to check availability.',
+  'cust.toastSetPin': 'Please set your delivery pin on the map first',
 };

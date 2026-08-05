@@ -17,6 +17,7 @@ import bannerRoutes from './routes/banners.js';
 import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
 import instagramRoutes from './routes/instagram.js';
+import deliveryZoneRoutes from './routes/deliveryZones.js';
 import Product from './models/Product.js';
 import { initFirebase } from './config/firebase.js';
 
@@ -122,6 +123,7 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/instagram', instagramRoutes);
+app.use('/api/delivery-zones', deliveryZoneRoutes);
 
 let sitemapCache = null;
 let sitemapCacheTime = 0;
