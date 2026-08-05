@@ -50,6 +50,11 @@ export default function CustomerLayout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const navLinks = [
     { to: '/', label: t('comp.navHome'), icon: Home },
     { to: '/products', label: t('comp.navProducts'), icon: Search },
@@ -219,7 +224,7 @@ export default function CustomerLayout() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down">
+        <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down max-h-[calc(100dvh-120px)] overflow-y-auto">
           {navLinks.map(link => {
             if (link.href) {
               return (

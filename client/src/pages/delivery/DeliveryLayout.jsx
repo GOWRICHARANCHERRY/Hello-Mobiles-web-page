@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Bike, LogOut, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NewOrderNotifier from '../../components/NewOrderNotifier';
 
 export default function DeliveryLayout() {
@@ -10,6 +10,11 @@ export default function DeliveryLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
+
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [sidebarOpen]);
 
   const links = [
     { to: '/delivery', label: t('delv.myDeliveries'), icon: Bike },
@@ -19,7 +24,7 @@ export default function DeliveryLayout() {
     <div className="min-h-screen bg-gray-100 flex">
       <NewOrderNotifier />
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
+      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform overflow-y-auto md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
         <div className="p-6">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5" />
