@@ -33,7 +33,8 @@ router.post('/check', async (req, res) => {
       return res.status(400).json({ message: 'Latitude and longitude are required' });
     }
     const cfg = await getDeliveryConfig();
-    if (!cfg.enabled) return res.json({ restricted: false, deliverable: true });
+    const hasActiveZone = (cfg.zones || []).some((z) => z.isActive);
+    if (!cfg.enabled || !hasActiveZone) return res.json({ restricted: false, deliverable: true });
     const zone = findDeliverableZone(latitude, longitude, cfg.zones);
     if (!zone) return res.json({ restricted: true, deliverable: false });
     res.json({

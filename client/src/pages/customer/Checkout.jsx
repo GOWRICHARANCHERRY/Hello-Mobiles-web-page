@@ -35,7 +35,9 @@ export default function Checkout() {
   const [deliveryZone, setDeliveryZone] = useState({ enabled: false, zones: [] });
   const [deliveryStatus, setDeliveryStatus] = useState(null);
 
-  const needsDelivery = deliveryZone.enabled && paymentMethod !== 'store_pickup';
+  const needsDelivery = deliveryZone.enabled
+    && (deliveryZone.zones?.some((z) => z.isActive) ?? false)
+    && paymentMethod !== 'store_pickup';
 
   useEffect(() => {
     api.get('/delivery-zones')
