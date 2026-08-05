@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: #fffdf5">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
@@ -20,9 +20,37 @@
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="preconnect" href="https://fdn2.gsmarena.com" />
     <script src="/fonts.js" defer></script>
+    <script src="/boot.js" defer></script>
+    <style>
+      /* Inline so the page never renders black/blank while (or if) the JS/CSS bundle loads. */
+      html, body { margin: 0; background-color: #fffdf5; }
+      #boot {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        background: #fffdf5; font-family: system-ui, -apple-system, sans-serif; color: #444; text-align: center; padding: 24px;
+      }
+      #boot.hm-hidden { display: none; }
+      #boot .hm-spin {
+        width: 40px; height: 40px; border: 4px solid #f3e0a0; border-top-color: #d97706;
+        border-radius: 50%; animation: hm-rotate 0.9s linear infinite; margin-bottom: 14px;
+      }
+      @keyframes hm-rotate { to { transform: rotate(360deg); } }
+      #boot .hm-retry-title { font-weight: 600; font-size: 16px; }
+      #boot .hm-retry-sub { font-size: 13px; color: #777; margin: 8px 0 16px; max-width: 280px; line-height: 1.5; }
+      #boot button { background: #d97706; color: #fff; border: 0; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="boot">
+      <div class="hm-spin"></div>
+      <div>Loading Hello Mobiles…</div>
+    </div>
+    <noscript>
+      <div style="position:fixed;inset:0;background:#fffdf5;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#444;text-align:center;padding:24px">
+        Please enable JavaScript to use Hello Mobiles.
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
