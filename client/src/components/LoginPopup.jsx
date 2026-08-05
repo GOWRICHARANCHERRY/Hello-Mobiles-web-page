@@ -38,6 +38,7 @@ export default function LoginPopup({ onClose }) {
       toast.success(t('comp.loggedIn'));
       if (user?.role === 'admin') { onClose(); navigate('/admin'); }
       else if (user?.role === 'employee') { onClose(); navigate('/employee'); }
+      else if (user?.role === 'delivery') { onClose(); navigate('/delivery'); }
       else onClose();
     } catch (error) {
       toast.error(error.response?.data?.message || t('comp.loginFailed'));
@@ -102,6 +103,7 @@ export default function LoginPopup({ onClose }) {
       toast.success(t('comp.loggedIn'));
       if (res.data.user?.role === 'admin') { onClose(); navigate('/admin'); }
       else if (res.data.user?.role === 'employee') { onClose(); navigate('/employee'); }
+      else if (res.data.user?.role === 'delivery') { onClose(); navigate('/delivery'); }
       else onClose();
       window.location.reload();
     } catch (error) {
