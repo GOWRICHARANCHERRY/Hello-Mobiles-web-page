@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
-import LoginPopup from '../../components/LoginPopup';
+const LoginPopup = lazy(() => import('../../components/LoginPopup'));
 import SearchBar from '../../components/SearchBar';
 import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -339,7 +339,7 @@ export default function ProductList() {
         </div>
       </div>
 
-      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
+      <Suspense fallback={null}>{showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}</Suspense>
     </div>
   );
 }

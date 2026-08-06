@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
-import LoginPopup from '../../components/LoginPopup';
+const LoginPopup = lazy(() => import('../../components/LoginPopup'));
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -594,7 +594,7 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
+      <Suspense fallback={null}>{showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}</Suspense>
     </div>
   );
 }

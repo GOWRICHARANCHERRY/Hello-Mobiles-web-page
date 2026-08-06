@@ -95,7 +95,8 @@ const brands = [
   { name: 'LG', slug: 'lg', color: 'A50034' },
 ];
 
-import LoginPopup from '../../components/LoginPopup';
+import { lazy, Suspense } from 'react';
+const LoginPopup = lazy(() => import('../../components/LoginPopup'));
 
 export default function Home() {
   const { user } = useAuth();
@@ -370,7 +371,7 @@ export default function Home() {
         </div>
       )}
 
-      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
+      <Suspense fallback={null}>{showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}</Suspense>
     </div>
   );
 }
