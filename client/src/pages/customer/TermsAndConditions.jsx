@@ -151,6 +151,7 @@ function Terms() {
       <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
         <p>{t('cust.termsP0')}</p>
         <p>{t('cust.termsP1')}</p>
+        <p>{t('cust.termsP3')}</p>
         <p>{t('cust.termsP2')}</p>
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.termsH1')}</h3>
