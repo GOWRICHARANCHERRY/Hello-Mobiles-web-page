@@ -220,11 +220,10 @@ export default function CustomerLayout() {
         <div className="md:hidden px-4 pb-3">
           <SearchBar placeholder={t('comp.searchProducts')} />
         </div>
-      </header>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down max-h-[calc(100dvh-120px)] overflow-y-auto">
+        {/* Mobile Menu — absolute below the sticky header so it's visible even when scrolled down */}
+        {menuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 z-50 bg-white border-b shadow-lg animate-fade-in-down max-h-[calc(100dvh-120px)] overflow-y-auto">
           {navLinks.map(link => {
             if (link.href) {
               return (
@@ -264,10 +263,11 @@ export default function CustomerLayout() {
               <button onClick={() => { logout(); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-red-500 w-full hover:bg-red-50"><LogOut size={18} /> {t('comp.logout')}</button>
             </>
           ) : (
-            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-700 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> {t('comp.login')}</button>
+            <button onClick={() => { setShowLoginPopup(true); setMenuOpen(false); }} className="flex items-center gap-3 px-6 py-3 text-gold-700 w-full hover:bg-gold-50 font-semibold"><LogIn size={18} /> {t('comp.login')}            </button>
           )}
-        </div>
-      )}
+          </div>
+        )}
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <Outlet />
@@ -301,9 +301,9 @@ export default function CustomerLayout() {
 
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-6">
             {/* Brand */}
-            <div className="lg:col-span-2">
+            <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <img src="/logo.png" alt="Hello Mobiles" width="48" height="48" loading="lazy" className="w-12 h-12 rounded-xl shadow-lg object-contain border-2 border-gold-500/30" />
                 <div>
@@ -359,31 +359,40 @@ export default function CustomerLayout() {
               </ul>
             </div>
 
-            {/* Our Stores */}
-            <div>
+            {/* Contact Us — right side */}
+            <div className="col-span-2 lg:col-span-2">
               <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.ourStores')}</h4>
-              <div className="space-y-4">
-                <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer" className="block group">
-                  <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    {t('comp.storeAllur')}
-                  </p>
-                  <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeAllurSub')}</p>
-                </a>
-                <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer" className="block group">
-                  <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    {t('comp.storeBuchi')}
-                  </p>
-                  <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
-                </a>
-                <div className="pt-2 space-y-1.5 text-sm text-gray-300">
-                  <p className="flex items-center gap-2">📞 <span>+91 97157 36736 (Mobiles)</span></p>
-                  <p className="flex items-center gap-2">📞 <span>+91 83747 30336 (Electronics & Furniture)</span></p>
-                  <p className="flex items-center gap-2">📞 <span>+91 73965 78736 (Buchi Store)</span></p>
-                  <p className="flex items-center gap-2">💬 <span>+91 88868 88128 (WhatsApp)</span></p>
-                  <p className="flex items-center gap-2">✉️ <span>svlnmobiles12@gmail.com</span></p>
-                  <p className="flex items-center gap-2">⏰ <span>09:00 AM – 10:00 PM</span></p>
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer" className="block group">
+                    <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                      {t('comp.storeAllur')}
+                    </p>
+                    <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeAllurSub')}</p>
+                  </a>
+                  <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer" className="block group">
+                    <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                      {t('comp.storeBuchi')}
+                    </p>
+                    <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
+                  </a>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
+                  <a href="tel:+919715736736" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 97157 36736 (Mobiles)</span></a>
+                  <a href="tel:+918374730336" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 83747 30336 (Electronics &amp; Furniture)</span></a>
+                  <a href="tel:+917396578736" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 73965 78736 (Buchi)</span></a>
+                  <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-green-400 transition min-w-0"><span className="flex-shrink-0">💬</span><span className="truncate">+91 88868 88128 (WhatsApp)</span></a>
+                  <a href="mailto:svlnmobiles12@gmail.com" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">✉️</span><span className="truncate">svlnmobiles12@gmail.com</span></a>
+                  <p className="flex items-center gap-2 min-w-0"><span className="flex-shrink-0">⏰</span><span className="truncate">09:00 AM – 10:00 PM</span></p>
+                </div>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs font-bold text-gold-400 mb-2">{t('cust.helpTitle')}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
+                    <a href="tel:+919731011999" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">{t('cust.helpVenkatesh')}</span></a>
+                    <a href="tel:+916303858688" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">{t('cust.helpGowri')}</span></a>
+                  </div>
                 </div>
               </div>
             </div>
