@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -104,6 +104,20 @@ export default function HeroCarousel() {
     setCurrent(prev => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
+  const touchStartX = useRef(null);
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0) next(); else prev();
+  };
+
   useEffect(() => {
     if (!isAutoPlaying || slides.length <= 1) return;
     const timer = setInterval(next, 4000);
@@ -127,8 +141,10 @@ export default function HeroCarousel() {
       {/* Dynamic Banners */}
       {isDynamic ? (
         <div key={slide._id || slide.bigText || slide.title}
-          className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden"
-          style={{ backgroundColor: slide.bgColor || '#1a1a2e' }}>
+          className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide overflow-hidden touch-pan-y"
+          style={{ backgroundColor: slide.bgColor || '#1a1a2e' }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
           </div>
@@ -161,7 +177,7 @@ export default function HeroCarousel() {
           </div>
 
           {slide.image && (
-            <div className="w-1/4 sm:w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-2 sm:p-4 md:p-8 animate-float">
+            <div className="w-1/4 sm:w-1/3 md:w-2/5 self-center flex-shrink-0 flex items-center justify-center p-2 sm:p-4 md:p-8 md:pr-14 lg:pr-16 animate-float">
               <img src={slide.image} alt="" fetchPriority="high" className="animate-zoom-in max-h-24 sm:max-h-36 md:max-h-72 w-auto max-w-full object-contain rounded-xl shadow-2xl"
                 style={{ boxShadow: '0 25px 60px rgba(0,0,0,0.45), 0 0 40px rgba(212,160,23,0.25)' }} />
             </div>
@@ -169,7 +185,9 @@ export default function HeroCarousel() {
         </div>
       ) : (
         /* Fallback Slides */
-        <div className={`bg-gradient-to-br ${slide.bg || 'from-gray-900 to-black'} relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide`}>
+        <div className={`bg-gradient-to-br ${slide.bg || 'from-gray-900 to-black'} relative min-h-[260px] sm:min-h-[300px] md:min-h-[420px] flex items-center hero-slide`}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
@@ -194,11 +212,11 @@ export default function HeroCarousel() {
       {slides.length > 1 && (
         <>
           <button onClick={prev} aria-label="Previous slide"
-            className="absolute z-20 left-2 sm:left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            className="hidden md:flex absolute z-20 left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronLeft size={20} />
           </button>
           <button onClick={next} aria-label="Next slide"
-            className="absolute z-20 right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
+            className="hidden md:flex absolute z-20 right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full items-center justify-center hover:bg-white/40 transition-all duration-300 hover:scale-110">
             <ChevronRight size={20} />
           </button>
         </>
@@ -209,7 +227,7 @@ export default function HeroCarousel() {
         <div className="absolute z-20 bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
           {slides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
-              className={`transition-all duration-300 rounded-full p-1 ${i === current ? 'w-10 h-5 bg-gold-400' : 'w-4 h-4 bg-white/40 hover:bg-white/60'}`} />
+              className={`transition-all duration-300 rounded-full p-1 ${i === current ? 'w-8 h-4 bg-gold-400' : 'w-3.5 h-3.5 bg-white/40 hover:bg-white/60'}`} />
           ))}
         </div>
       )}

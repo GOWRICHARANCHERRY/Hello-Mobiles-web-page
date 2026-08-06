@@ -350,6 +350,13 @@ export default function Profile() {
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
                 </a>
+                <div className="p-4 border border-gray-100 rounded-xl">
+                  <p className="font-semibold text-sm text-gray-800">{t('cust.helpTitle')}</p>
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+                    <a href="tel:+919731011999" className="flex items-center gap-2 hover:text-gold-700 transition">📞 {t('cust.helpVenkatesh')}</a>
+                    <a href="tel:+916303858688" className="flex items-center gap-2 hover:text-gold-700 transition">📞 {t('cust.helpGowri')}</a>
+                  </div>
+                </div>
                 <a href="mailto:svlnmobiles12@gmail.com"
                   className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-gold-300 hover:bg-gold-50 transition">
                   <div className="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center flex-shrink-0">

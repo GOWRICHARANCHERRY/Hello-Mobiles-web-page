@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -53,6 +53,20 @@ export default function TextBannerCarousel() {
   const next = useCallback(() => setCurrent(prev => (prev + 1) % slides.length), [slides.length]);
   const prev = useCallback(() => setCurrent(prev => (prev - 1 + slides.length) % slides.length), [slides.length]);
 
+  const touchStartX = useRef(null);
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0) next(); else prev();
+  };
+
   useEffect(() => {
     if (!isAutoPlaying || slides.length <= 1) return;
     const timer = setInterval(next, 4000);
@@ -78,8 +92,10 @@ export default function TextBannerCarousel() {
       <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3"></div>
       <div className="pointer-events-none absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
 
-      <div key={slide._id} className="relative flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-10 py-6 md:py-8"
-        style={{ background: bgGradient || undefined }}>
+      <div key={slide._id} className="relative flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-14 py-6 md:py-8 touch-pan-y"
+        style={{ background: bgGradient || undefined }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}>
         <div className="flex items-center gap-4 flex-1" style={{ color: slide.textColor || '#ffffff' }}>
           <div className="text-4xl hidden sm:block">🎉</div>
           <div>
@@ -102,11 +118,11 @@ export default function TextBannerCarousel() {
       {slides.length > 1 && (
         <>
           <button onClick={prev} aria-label="Previous slide"
-            className="absolute z-20 left-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
+            className="hidden md:flex absolute z-20 left-3 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronLeft size={18} />
           </button>
           <button onClick={next} aria-label="Next slide"
-            className="absolute z-20 right-2 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
+            className="hidden md:flex absolute z-20 right-3 top-1/2 -translate-y-1/2 bg-black/30 border border-white/20 backdrop-blur-md text-white w-9 h-9 rounded-full items-center justify-center hover:bg-black/50 transition-all duration-300 hover:scale-110 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto">
             <ChevronRight size={18} />
           </button>
         </>

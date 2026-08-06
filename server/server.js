@@ -38,6 +38,8 @@ app.set('trust proxy', 1);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'http://localhost:5050',
+  'http://127.0.0.1:5050',
   'https://hello-mobiles.com',
   'https://www.hello-mobiles.com',
   'https://hello-mobiles.onrender.com',
@@ -177,7 +179,6 @@ ${urls.map(u => `  <url>
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 
 // Preload the first hero banner image so LCP starts downloading in parallel with the JS bundle.
-let indexTemplate = null;
 function heroPreload() {
   return cached('hero-preload', 60_000, async () => {
     const banner = await Banner.findOne({ isActive: true, type: 'hero', image: { $nin: ['', null] } })
@@ -190,9 +191,7 @@ function heroPreload() {
 
 async function serveIndex(req, res) {
   try {
-    if (indexTemplate === null) {
-      indexTemplate = await fs.promises.readFile(path.join(clientDist, 'index.html'), 'utf8');
-    }
+    const indexTemplate = await fs.promises.readFile(path.join(clientDist, 'index.html'), 'utf8');
     const preload = await heroPreload();
     if (!preload || indexTemplate.includes('rel="preload" as="image"')) {
       return res.send(indexTemplate);

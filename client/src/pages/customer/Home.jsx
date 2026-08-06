@@ -316,10 +316,11 @@ export default function Home() {
           <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer"
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
             <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Allur</h3>
-            <p className="text-gray-600 text-sm">📍 Allur, Nellore District, Andhra Pradesh</p>
-            <p className="text-gray-600 text-sm">📞 +91 97157 36736</p>
-            <p className="text-gray-600 text-sm">💬 +91 88868 88128 (WhatsApp)</p>
-            <p className="text-gray-600 text-sm">⏰ 09:00 AM - 10:00 PM (All days)</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeAllurLocation')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeAllurPhone')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeAllurElectronicsPhone')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeWhatsapp')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeAllurHours')}</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
@@ -327,14 +328,21 @@ export default function Home() {
           <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer"
             className="bg-gold-50 rounded-xl p-6 card-hover group block border-2 border-gold-200 hover:border-gold-400 transition">
             <h3 className="font-bold text-xl gold-text mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>Hello Mobiles - Buchi Reddy Palem</h3>
-            <p className="text-gray-600 text-sm">📍 Buchireddypalem, Nellore District, Andhra Pradesh</p>
-            <p className="text-gray-600 text-sm">📞 +91 97157 36736</p>
-            <p className="text-gray-600 text-sm">💬 +91 88868 88128 (WhatsApp)</p>
-            <p className="text-gray-600 text-sm">⏰ 09:00 AM - 10:00 PM (All days)</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeBuchiLocation')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeBuchiPhone')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeWhatsapp')}</p>
+            <p className="text-gray-600 text-sm">{t('cust.storeBuchiHours')}</p>
             <span className="text-gold-700 text-sm font-semibold mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
               {t('cust.viewOnGoogleMaps')} →
             </span>
           </a>
+          <div className="md:col-span-2 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl p-6 text-white">
+            <h3 className="font-bold text-lg mb-3">{t('cust.helpTitle')}</h3>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm sm:text-base">
+              <a href="tel:+919731011999" className="flex items-center gap-2 bg-white/15 rounded-lg px-4 py-2.5 hover:bg-white/25 transition font-semibold">📞 {t('cust.helpVenkatesh')}</a>
+              <a href="tel:+916303858688" className="flex items-center gap-2 bg-white/15 rounded-lg px-4 py-2.5 hover:bg-white/25 transition font-semibold">📞 {t('cust.helpGowri')}</a>
+            </div>
+          </div>
         </div>
       </div>
 
