@@ -87,6 +87,10 @@ function AppRoutes() {
         <Route path="products" element={<SuspenseRoute><ProductList /></SuspenseRoute>} />
         <Route path="products/:id" element={<SuspenseRoute><ProductDetail /></SuspenseRoute>} />
         <Route path="terms-and-conditions" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
+        <Route path="privacy-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
+        <Route path="shipping-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
+        <Route path="return-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
+        <Route path="refund-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
         <Route path="about" element={<SuspenseRoute><AboutUs /></SuspenseRoute>} />
       </Route>
 

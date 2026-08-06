@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
 
@@ -10,16 +10,30 @@ const sections = [
   { id: 'returns', label: 'cust.returnsRefunds' },
 ];
 
+const pathToSection = {
+  '/terms-and-conditions': 'terms',
+  '/privacy-policy': 'privacy',
+  '/shipping-policy': 'shipping',
+  '/return-policy': 'returns',
+  '/refund-policy': 'returns',
+};
+
 export default function TermsAndConditions() {
   const { t } = useLanguage();
-  const [active, setActive] = useState('privacy');
+  const location = useLocation();
+  const [active, setActive] = useState(() => pathToSection[location.pathname] || 'terms');
+
+  useEffect(() => {
+    const s = pathToSection[location.pathname];
+    if (s) setActive(s);
+  }, [location.pathname]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <SEO
         title="Terms & Conditions"
         description="Read the terms and conditions, privacy policy, shipping and returns policy for Hello Mobiles, Nellore district."
-        path="/terms-and-conditions"
+        path={location.pathname}
       />
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>{t('cust.policies')}</h1>
@@ -110,6 +124,20 @@ function PrivacyPolicy() {
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyH6')}</h3>
         <p>{t('cust.privacyLinksP')}</p>
+
+        <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyH7')}</h3>
+        <p>{t('cust.privacyGrievanceP')}</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>{t('cust.privacyGrievanceName')}</li>
+          <li>{t('cust.privacyGrievanceDesignation')}</li>
+          <li>{t('cust.privacyGrievanceCompany')}</li>
+          <li>{t('cust.privacyGrievanceEmail')}</li>
+          <li>{t('cust.privacyGrievancePhone')}</li>
+        </ul>
+        <p>{t('cust.privacyGrievanceWithdraw')}</p>
+
+        <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyH8')}</h3>
+        <p>{t('cust.privacyDeletionP')}</p>
       </div>
     </div>
   );
@@ -121,6 +149,7 @@ function Terms() {
     <div>
       <SectionTitle>{t('cust.termsConditions')}</SectionTitle>
       <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
+        <p>{t('cust.termsP0')}</p>
         <p>{t('cust.termsP1')}</p>
         <p>{t('cust.termsP2')}</p>
 
@@ -129,6 +158,10 @@ function Terms() {
           <li>{t('cust.terms1_1')}</li>
           <li>{t('cust.terms1_2')}</li>
           <li>{t('cust.terms1_3')}</li>
+          <li>{t('cust.terms1_4')}</li>
+          <li>{t('cust.terms1_5')}</li>
+          <li>{t('cust.terms1_6')}</li>
+          <li>{t('cust.terms1_7')}</li>
         </ul>
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.termsH2')}</h3>
@@ -177,6 +210,7 @@ function Terms() {
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.termsH8')}</h3>
         <p>{t('cust.terms8P')}</p>
+        <p>{t('cust.terms8Contact')}</p>
       </div>
     </div>
   );
@@ -196,6 +230,8 @@ function Shipping() {
           <li>{t('cust.shipping1_1')}</li>
           <li>{t('cust.shipping1_2')}</li>
           <li>{t('cust.shipping1_3')}</li>
+          <li>{t('cust.shipping1_4')}</li>
+          <li>{t('cust.shipping1_5')}</li>
         </ul>
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.shippingH2')}</h3>
@@ -244,6 +280,16 @@ function Returns() {
           <li>{t('cust.returns1_1')}</li>
           <li>{t('cust.returns1_2')}</li>
           <li>{t('cust.returns1_3')}</li>
+        </ul>
+
+        <h3 className="font-bold text-gray-800 mt-6">{t('cust.returnsH_Cancel')}</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>{t('cust.returnsCancel1')}</li>
+          <li>{t('cust.returnsCancel2')}</li>
+          <li>{t('cust.returnsCancel3')}</li>
+          <li>{t('cust.returnsCancel4')}</li>
+          <li>{t('cust.returnsCancel5')}</li>
+          <li>{t('cust.returnsCancel6')}</li>
         </ul>
 
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.returnsH2')}</h3>
