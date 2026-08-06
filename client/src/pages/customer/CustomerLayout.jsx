@@ -362,36 +362,36 @@ export default function CustomerLayout() {
             {/* Contact Us — right side */}
             <div className="col-span-2 lg:col-span-2">
               <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">{t('comp.ourStores')}</h4>
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer" className="block group">
-                    <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                      {t('comp.storeAllur')}
-                    </p>
-                    <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeAllurSub')}</p>
-                  </a>
-                  <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer" className="block group">
-                    <p className="font-semibold text-sm text-white group-hover:text-gold-400 transition flex items-center gap-1.5">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                      {t('comp.storeBuchi')}
-                    </p>
-                    <p className="text-gray-500 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
-                  </a>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
-                  <a href="tel:+919715736736" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 97157 36736 (Mobiles)</span></a>
-                  <a href="tel:+918374730336" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 83747 30336 (Electronics &amp; Furniture)</span></a>
-                  <a href="tel:+917396578736" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">+91 73965 78736 (Buchi)</span></a>
-                  <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-green-400 transition min-w-0"><span className="flex-shrink-0">💬</span><span className="truncate">+91 88868 88128 (WhatsApp)</span></a>
-                  <a href="mailto:svlnmobiles12@gmail.com" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">✉️</span><span className="truncate">svlnmobiles12@gmail.com</span></a>
-                  <p className="flex items-center gap-2 min-w-0"><span className="flex-shrink-0">⏰</span><span className="truncate">09:00 AM – 10:00 PM</span></p>
+              <div className="space-y-4">
+                <a href="https://maps.app.goo.gl/8HxWnUeXKD8WgvRs8" target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-white/10 bg-white/5 p-3 hover:border-gold-500/60 hover:bg-white/10 transition">
+                  <p className="font-semibold text-sm text-white flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    {t('comp.storeAllur')}
+                  </p>
+                  <p className="text-gray-400 text-xs mt-0.5">{t('comp.storeAllurSub')}</p>
+                  <div className="mt-2 text-sm text-gray-200 space-y-1">
+                    <p className="flex items-start gap-2"><span className="flex-shrink-0">📞</span><span>+91 97157 36736 <span className="text-gray-400">(Mobiles)</span></span></p>
+                    <p className="flex items-start gap-2"><span className="flex-shrink-0">📞</span><span>+91 83747 30336 <span className="text-gray-400">(Electronics &amp; Furniture)</span></span></p>
+                  </div>
+                </a>
+                <a href="https://maps.app.goo.gl/t2NDNdpWf8zp8R4L8" target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-white/10 bg-white/5 p-3 hover:border-gold-500/60 hover:bg-white/10 transition">
+                  <p className="font-semibold text-sm text-white flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gold-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    {t('comp.storeBuchi')}
+                  </p>
+                  <p className="text-gray-400 text-xs mt-0.5">{t('comp.storeBuchiSub')}</p>
+                  <p className="mt-2 text-sm text-gray-200 flex items-start gap-2"><span className="flex-shrink-0">📞</span><span>+91 73965 78736 <span className="text-gray-400">(Buchireddypalem Store)</span></span></p>
+                </a>
+                <div className="text-sm text-gray-200 space-y-1.5">
+                  <a href="https://wa.me/918886888128" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-green-400 transition"><span className="flex-shrink-0">💬</span><span>+91 88868 88128 <span className="text-gray-400">(WhatsApp)</span></span></a>
+                  <a href="mailto:svlnmobiles12@gmail.com" className="flex items-start gap-2 hover:text-gold-400 transition"><span className="flex-shrink-0">✉️</span><span>svlnmobiles12@gmail.com</span></a>
+                  <p className="flex items-start gap-2"><span className="flex-shrink-0">⏰</span><span>09:00 AM – 10:00 PM</span></p>
                 </div>
                 <div className="pt-3 border-t border-white/10">
                   <p className="text-xs font-bold text-gold-400 mb-2">{t('cust.helpTitle')}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
-                    <a href="tel:+919731011999" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">{t('cust.helpVenkatesh')}</span></a>
-                    <a href="tel:+916303858688" className="flex items-center gap-2 hover:text-gold-400 transition min-w-0"><span className="flex-shrink-0">📞</span><span className="truncate">{t('cust.helpGowri')}</span></a>
+                  <div className="text-sm text-gray-200 space-y-1.5">
+                    <a href="tel:+919731011999" className="flex items-start gap-2 hover:text-gold-400 transition"><span className="flex-shrink-0">📞</span><span>{t('cust.helpVenkatesh')}</span></a>
+                    <a href="tel:+916303858688" className="flex items-start gap-2 hover:text-gold-400 transition"><span className="flex-shrink-0">📞</span><span>{t('cust.helpGowri')}</span></a>
                   </div>
                 </div>
               </div>
