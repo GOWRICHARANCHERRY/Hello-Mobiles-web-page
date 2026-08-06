@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Banner from '../models/Banner.js';
 import { auth, roleAuth } from '../middleware/auth.js';
+import { cached, invalidateCache } from '../utils/cache.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +30,8 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 102
 // Public - get active banners
 router.get('/', async (req, res) => {
   try {
-    const banners = await Banner.find({ isActive: true }).sort({ order: 1 }).populate('product', 'name price images');
+    const banners = await cached('banners', 60_000, () =>
+      Banner.find({ isActive: true }).sort({ order: 1 }).populate('product', 'name price images'));
     res.json(banners);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,6 +72,7 @@ router.post('/', auth, roleAuth('admin'), upload.single('image'), async (req, re
       isActive: isActive !== 'false',
     });
     await banner.save();
+    invalidateCache('banners');
     const populated = await banner.populate('product', 'name price images');
     res.status(201).json(populated);
   } catch (error) {
@@ -84,6 +87,7 @@ router.put('/reorder/batch', auth, roleAuth('admin'), async (req, res) => {
     for (const { id, order: o } of order) {
       await Banner.findByIdAndUpdate(id, { order: o });
     }
+    invalidateCache('banners');
     res.json({ message: 'Order updated' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -100,6 +104,7 @@ router.put('/:id', auth, roleAuth('admin'), upload.single('image'), async (req, 
 
     const banner = await Banner.findByIdAndUpdate(req.params.id, updateData, { new: true }).populate('product', 'name price images');
     if (!banner) return res.status(404).json({ message: 'Banner not found' });
+    invalidateCache('banners');
     res.json(banner);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -110,6 +115,7 @@ router.put('/:id', auth, roleAuth('admin'), upload.single('image'), async (req, 
 router.delete('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     await Banner.findByIdAndDelete(req.params.id);
+    invalidateCache('banners');
     res.json({ message: 'Banner deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });

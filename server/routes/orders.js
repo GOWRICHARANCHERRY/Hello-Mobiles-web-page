@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import { auth, roleAuth } from '../middleware/auth.js';
 import { sendOrderWhatsApp } from '../utils/whatsapp.js';
 import { getDeliveryConfig, findDeliverableZone } from '../utils/delivery.js';
+import { invalidateCache } from '../utils/cache.js';
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ async function restoreOrderStock(order) {
       product.stock += item.quantity;
     }
     await product.save();
+    invalidateCache('products:');
   }
 }
 
@@ -273,6 +275,7 @@ router.post('/', auth, async (req, res) => {
     });
 
     await order.save();
+    invalidateCache('products:');
 
     if (appliedCoupon) {
       appliedCoupon.usedCount += 1;

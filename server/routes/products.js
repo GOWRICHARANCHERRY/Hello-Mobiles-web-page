@@ -1,76 +1,80 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { auth, roleAuth } from '../middleware/auth.js';
+import { cached, invalidateCache } from '../utils/cache.js';
 
 const router = express.Router();
 
+async function buildProducts(q) {
+  const { search, category, brand, minPrice, maxPrice, ram, storage, screenSize, color, sortBy, featured, newArrival, onOffer } = q;
+  let query = { isActive: true };
+  if (search) {
+    const regex = new RegExp(search, 'i');
+    query.$or = [
+      { name: regex },
+      { brand: regex },
+      { category: regex },
+      { description: regex },
+      { tags: regex },
+    ];
+  }
+  if (category) query.category = category;
+  if (brand) query.brand = { $in: brand.split(',') };
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) query.price.$gte = Number(minPrice);
+    if (maxPrice) query.price.$lte = Number(maxPrice);
+  }
+  const specFilters = [];
+  if (ram) specFilters.push({ $or: [{ 'specifications.ram': ram }, { 'specifications.RAM': ram }] });
+  if (storage) specFilters.push({ $or: [{ 'specifications.storage': storage }, { 'specifications.Storage': storage }] });
+  if (screenSize) specFilters.push({ $or: [{ 'specifications.screenSize': screenSize }, { 'specifications.Screen Size': screenSize }] });
+  if (color) specFilters.push({ $or: [{ 'specifications.color': color }, { 'specifications.Color': color }] });
+  if (specFilters.length > 0) query.$and = specFilters;
+  if (featured === 'true') query.isFeatured = true;
+  if (newArrival === 'true') query.isNewArrival = true;
+  if (onOffer === 'true') query.isOnOffer = true;
+
+  let sort = { createdAt: -1 };
+  if (sortBy === 'price_low') sort = { price: 1 };
+  else if (sortBy === 'price_high') sort = { price: -1 };
+  else if (sortBy === 'name') sort = { name: 1 };
+  else if (sortBy === 'rating') sort = { ratings: -1 };
+
+  const products = await Product.find(query).sort(sort);
+
+  // Also match against specification values (Map field can't be regex'd in Mongo)
+  if (search) {
+    const re = new RegExp(search, 'i');
+    const matchesSpec = (p) => Object.values(p.specifications || {}).some(v => v && re.test(String(v)));
+    const filtered = products.filter(p =>
+      re.test(p.name) || re.test(p.brand) || re.test(p.category) ||
+      re.test(p.description || '') || (p.tags || []).some(t => re.test(t)) || matchesSpec(p)
+    );
+    products.splice(0, products.length, ...filtered);
+  }
+
+  // Attach lowest variant price for products with variants
+  return products.map(p => {
+    const obj = p.toObject();
+    if (obj.variants && obj.variants.length > 0) {
+      const lowestPrice = Math.min(...obj.variants.map(v => v.price));
+      const lowestMrp = Math.min(...obj.variants.map(v => v.mrp));
+      const totalVariantStock = obj.variants.reduce((sum, v) => {
+        return sum + (v.colors?.reduce((cs, c) => cs + (c.stock || 0), 0) || 0);
+      }, 0);
+      obj.lowestVariantPrice = lowestPrice;
+      obj.lowestVariantMrp = lowestMrp;
+      obj.totalVariantStock = totalVariantStock;
+    }
+    return obj;
+  });
+}
+
 router.get('/', async (req, res) => {
   try {
-    const { search, category, brand, minPrice, maxPrice, ram, storage, screenSize, color, sortBy, featured, newArrival, onOffer } = req.query;
-    let query = { isActive: true };
-    if (search) {
-      const regex = new RegExp(search, 'i');
-      query.$or = [
-        { name: regex },
-        { brand: regex },
-        { category: regex },
-        { description: regex },
-        { tags: regex },
-      ];
-    }
-    if (category) query.category = category;
-    if (brand) query.brand = { $in: brand.split(',') };
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
-    }
-    const specFilters = [];
-    if (ram) specFilters.push({ $or: [{ 'specifications.ram': ram }, { 'specifications.RAM': ram }] });
-    if (storage) specFilters.push({ $or: [{ 'specifications.storage': storage }, { 'specifications.Storage': storage }] });
-    if (screenSize) specFilters.push({ $or: [{ 'specifications.screenSize': screenSize }, { 'specifications.Screen Size': screenSize }] });
-    if (color) specFilters.push({ $or: [{ 'specifications.color': color }, { 'specifications.Color': color }] });
-    if (specFilters.length > 0) query.$and = specFilters;
-    if (featured === 'true') query.isFeatured = true;
-    if (newArrival === 'true') query.isNewArrival = true;
-    if (onOffer === 'true') query.isOnOffer = true;
-
-    let sort = { createdAt: -1 };
-    if (sortBy === 'price_low') sort = { price: 1 };
-    else if (sortBy === 'price_high') sort = { price: -1 };
-    else if (sortBy === 'name') sort = { name: 1 };
-    else if (sortBy === 'rating') sort = { ratings: -1 };
-
-    const products = await Product.find(query).sort(sort);
-
-    // Also match against specification values (Map field can't be regex'd in Mongo)
-    if (search) {
-      const re = new RegExp(search, 'i');
-      const matchesSpec = (p) => Object.values(p.specifications || {}).some(v => v && re.test(String(v)));
-      const filtered = products.filter(p =>
-        re.test(p.name) || re.test(p.brand) || re.test(p.category) ||
-        re.test(p.description || '') || (p.tags || []).some(t => re.test(t)) || matchesSpec(p)
-      );
-      products.splice(0, products.length, ...filtered);
-    }
-
-    // Attach lowest variant price for products with variants
-    const enriched = products.map(p => {
-      const obj = p.toObject();
-      if (obj.variants && obj.variants.length > 0) {
-        const lowestPrice = Math.min(...obj.variants.map(v => v.price));
-        const lowestMrp = Math.min(...obj.variants.map(v => v.mrp));
-        const totalVariantStock = obj.variants.reduce((sum, v) => {
-          return sum + (v.colors?.reduce((cs, c) => cs + (c.stock || 0), 0) || 0);
-        }, 0);
-        obj.lowestVariantPrice = lowestPrice;
-        obj.lowestVariantMrp = lowestMrp;
-        obj.totalVariantStock = totalVariantStock;
-      }
-      return obj;
-    });
-
-    res.json(enriched);
+    const data = await cached(`products:${JSON.stringify(req.query)}`, 30_000, () => buildProducts(req.query));
+    res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -276,6 +280,7 @@ router.post('/', auth, roleAuth('admin', 'employee'), async (req, res) => {
     }
     const product = new Product(req.body);
     await product.save();
+    invalidateCache('products:');
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -295,6 +300,7 @@ router.put('/:id', auth, roleAuth('admin', 'employee'), async (req, res) => {
     }
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
+    invalidateCache('products:');
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -304,6 +310,7 @@ router.put('/:id', auth, roleAuth('admin', 'employee'), async (req, res) => {
 router.delete('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
+    invalidateCache('products:');
     res.json({ message: 'Product deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
