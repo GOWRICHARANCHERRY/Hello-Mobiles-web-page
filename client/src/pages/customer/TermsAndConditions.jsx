@@ -18,6 +18,8 @@ const pathToSection = {
   '/refund-policy': 'returns',
 };
 
+const blockCopy = (e) => e.preventDefault();
+
 export default function TermsAndConditions() {
   const { t } = useLanguage();
   const location = useLocation();
@@ -29,7 +31,7 @@ export default function TermsAndConditions() {
   }, [location.pathname]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8 select-none" onCopy={blockCopy} onCut={blockCopy} onContextMenu={blockCopy} onSelectStart={blockCopy} onDragStart={blockCopy}>
       <SEO
         title="Terms & Conditions"
         description="Read the terms and conditions, privacy policy, shipping and returns policy for Hello Mobiles, Nellore district."
