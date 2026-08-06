@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
@@ -19,6 +20,8 @@ import leadRoutes from './routes/leads.js';
 import instagramRoutes from './routes/instagram.js';
 import deliveryZoneRoutes from './routes/deliveryZones.js';
 import Product from './models/Product.js';
+import Banner from './models/Banner.js';
+import { cached } from './utils/cache.js';
 import { initFirebase } from './config/firebase.js';
 
 dotenv.config();
@@ -172,6 +175,36 @@ ${urls.map(u => `  <url>
 });
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
+
+// Preload the first hero banner image so LCP starts downloading in parallel with the JS bundle.
+let indexTemplate = null;
+function heroPreload() {
+  return cached('hero-preload', 60_000, async () => {
+    const banner = await Banner.findOne({ isActive: true, type: 'hero', image: { $nin: ['', null] } })
+      .sort({ order: 1 })
+      .lean();
+    if (!banner?.image) return '';
+    return `<link rel="preload" as="image" fetchpriority="high" href="${banner.image}" />`;
+  });
+}
+
+async function serveIndex(req, res) {
+  try {
+    if (indexTemplate === null) {
+      indexTemplate = await fs.promises.readFile(path.join(clientDist, 'index.html'), 'utf8');
+    }
+    const preload = await heroPreload();
+    if (!preload || indexTemplate.includes('rel="preload" as="image"')) {
+      return res.send(indexTemplate);
+    }
+    res.send(indexTemplate.replace('</head>', `${preload}</head>`));
+  } catch (err) {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  }
+}
+
+app.get('/', serveIndex);
+
 app.use(express.static(clientDist, {
   etag: true,
   lastModified: true,
@@ -183,9 +216,10 @@ app.use(express.static(clientDist, {
     }
   },
 }));
+
 app.get(/.*/, (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
-  res.sendFile(path.join(clientDist, 'index.html'));
+  serveIndex(req, res);
 });
 
 const PORT = process.env.PORT || 5000;

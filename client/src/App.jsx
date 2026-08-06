@@ -3,7 +3,6 @@ import { Toaster } from 'react-hot-toast';
 import { Suspense, lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import ScrollToTop from './components/ScrollToTop';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -133,7 +132,6 @@ function AppRoutes() {
 export default function App() {
   return (
     <HelmetProvider>
-    <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
@@ -145,7 +143,6 @@ export default function App() {
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
-    </GoogleOAuthProvider>
     </HelmetProvider>
   );
 }

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import SEO from '../components/SEO';
 import { Smartphone, Tv, Watch, Headphones, Laptop, Home as HomeIcon } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 
@@ -47,6 +47,7 @@ export default function Login() {
   };
 
   return (
+    <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
     <div className="min-h-screen bg-gradient-to-br from-gold-100 via-amber-50 to-gold-200 flex items-center justify-center p-4 relative overflow-hidden">
       <SEO title="Login" description="Sign in to your Hello Mobiles account." path="/login" noindex />
       {/* Decorative circles */}
@@ -123,5 +124,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </GoogleOAuthProvider>
   );
 }

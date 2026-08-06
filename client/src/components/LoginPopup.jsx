@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from 'react';
 import { X } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
@@ -115,6 +115,7 @@ export default function LoginPopup({ onClose }) {
   const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); };
 
   return (
+    <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative animate-scale-in" onClick={e => e.stopPropagation()}>
         <button onClick={onClose} aria-label="Close login popup"
@@ -238,5 +239,6 @@ export default function LoginPopup({ onClose }) {
         </div>
       </div>
     </div>
+    </GoogleOAuthProvider>
   );
 }
