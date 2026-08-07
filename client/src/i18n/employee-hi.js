@@ -83,6 +83,10 @@ export default {
   'emp.landmark': 'लैंडमार्क:',
   'emp.altPhone': 'अल्ट फ़ोन:',
   'emp.payment': 'भुगतान: {method}',
+  'emp.pay.online': 'ऑनलाइन',
+  'emp.pay.phonepe': 'PhonePe',
+  'emp.pay.cod': 'कैश ऑन डिलीवरी',
+  'emp.pay.store_pickup': 'स्टोर पिकअप',
   'emp.markAs': '{status} के रूप में चिह्नित करें',
   'emp.viewOnMap': 'मानचित्र पर देखें',
 };

@@ -5,6 +5,8 @@ import api from '../../utils/api';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const PAYMENT_LABEL = { online: 'admin2.pay.online', phonepe: 'admin2.pay.phonepe', cod: 'admin2.pay.cod', store_pickup: 'admin2.pay.store_pickup' };
+
 export default function AdminOrders() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState([]);
@@ -219,7 +221,7 @@ export default function AdminOrders() {
                         <MapPin size={12} /> {t('admin2.viewOnMap')}
                       </a>
                     )}
-                    <p className="text-sm text-gray-600 mt-2">{t('admin2.payment', { method: order.paymentMethod })}</p>
+                    <p className="text-sm text-gray-600 mt-2">{t('admin2.payment', { method: t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod) })}</p>
                   </div>
                   <div>
                     <h4 className="font-medium text-sm mb-2">{t('admin2.actions')}:</h4>

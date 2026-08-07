@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema({
     longitude: Number,
     mapLabel: String,
   },
-  paymentMethod: { type: String, enum: ['online', 'cod', 'store_pickup'], required: true },
+  paymentMethod: { type: String, enum: ['online', 'phonepe', 'cod', 'store_pickup'], required: true },
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
   orderStatus: {
     type: String,

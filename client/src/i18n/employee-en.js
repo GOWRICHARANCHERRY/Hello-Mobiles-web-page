@@ -83,6 +83,10 @@ export default {
   'emp.landmark': 'Landmark:',
   'emp.altPhone': 'Alt Phone:',
   'emp.payment': 'Payment: {method}',
+  'emp.pay.online': 'Online',
+  'emp.pay.phonepe': 'PhonePe',
+  'emp.pay.cod': 'Cash on Delivery',
+  'emp.pay.store_pickup': 'Store Pickup',
   'emp.markAs': 'Mark as {status}',
   'emp.viewOnMap': 'View on map',
 };

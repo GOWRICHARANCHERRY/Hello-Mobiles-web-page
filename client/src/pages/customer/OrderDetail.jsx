@@ -7,6 +7,8 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+
 const STORE = {
   name: 'Hello Mobiles & Electronics',
   phone: '+91 97157 36736',
@@ -220,7 +222,7 @@ export default function OrderDetail() {
               <p className="text-gray-500">{t('cust.invoiceNo')}<span className="font-semibold text-gray-800">#{order.orderNumber}</span></p>
               <p className="text-gray-500">{t('cust.orderId')}<span className="font-semibold text-gray-800">{order._id.slice(-8).toUpperCase()}</span></p>
               <p className="text-gray-500">{t('cust.date')}<span className="font-semibold text-gray-800">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></p>
-              <p className="text-gray-500">{t('cust.paymentColon')}<span className="font-semibold capitalize text-gray-800">{order.paymentMethod?.replace('_', ' ')}</span></p>
+              <p className="text-gray-500">{t('cust.paymentColon')}<span className="font-semibold text-gray-800">{order.paymentMethod ? t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod) : ''}</span></p>
               <p className="text-gray-500">{t('cust.statusColon')}<span className={`font-semibold ${order.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-500'}`}>{order.paymentStatus}</span></p>
             </div>
           </div>

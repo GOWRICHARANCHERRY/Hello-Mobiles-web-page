@@ -6,6 +6,8 @@ import { Package, Check, Clock, Truck, CheckCircle, XCircle } from 'lucide-react
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +97,7 @@ export default function Orders() {
                 </div>
                 <div className="text-right mt-3 md:mt-0">
                   <p className="text-lg font-bold text-gray-900">₹{order.total.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500 capitalize">{order.paymentMethod.replace('_', ' ')}</p>
+                  <p className="text-xs text-gray-500 capitalize">{t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod)}</p>
                   <Link to={`/orders/${order._id}`} className="inline-block mt-2 text-xs font-semibold text-gold-700 hover:text-gold-700 bg-gold-50 border border-gold-200 px-3 py-1.5 rounded-lg">
                     {t('cust.viewDetailsInvoice')}
                   </Link>

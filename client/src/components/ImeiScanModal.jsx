@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
+const PAYMENT_LABEL = { online: 'comp.pay.online', phonepe: 'comp.pay.phonepe', cod: 'comp.cashOnDelivery', store_pickup: 'comp.pay.store_pickup' };
+
 function CameraScanModal({ open, onClose, onDetected }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -290,7 +292,7 @@ export default function ImeiScanModal({ open, onClose }) {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-gray-500">{t('comp.payment')}</span>
-                            <span className="text-xs text-gray-700 capitalize">{result.order.paymentMethod === 'cod' ? t('comp.cashOnDelivery') : result.order.paymentMethod}</span>
+                            <span className="text-xs text-gray-700">{t(PAYMENT_LABEL[result.order.paymentMethod] || result.order.paymentMethod)}</span>
                           </div>
                           {result.order.shippingAddress && (
                             <div className="pt-2 border-t border-blue-200">

@@ -20,6 +20,7 @@ export default {
   'delv.total': 'మొత్తం',
   'delv.payment': 'చెల్లింపు: {method}',
   'delv.pay.online': 'ఆన్‌లైన్',
+  'delv.pay.phonepe': 'PhonePe',
   'delv.pay.cod': 'క్యాష్ ఆన్ డెలివరీ',
   'delv.pay.store_pickup': 'స్టోర్ పికప్',
   'delv.viewOnMap': 'మ్యాప్‌లో చూడండి',

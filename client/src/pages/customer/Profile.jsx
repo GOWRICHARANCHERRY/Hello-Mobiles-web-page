@@ -6,6 +6,7 @@ import api from '../../utils/api';
 import { User, MapPin, Ticket, HelpCircle, Globe, Edit2, Save, Package, ChevronRight, Phone, Mail, MessageCircle, Clock, Plus, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
 const tabs = [
   { id: 'personal', label: 'cust.personalDetails', icon: User },
   { id: 'orders', label: 'cust.myOrders', icon: Package },
@@ -238,7 +239,7 @@ export default function Profile() {
                               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium capitalize ${statusColor}`}>{order.orderStatus}</span>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{order.items?.length || 0} item{(order.items?.length || 0) > 1 ? 's' : ''} · {order.paymentMethod?.replace('_', ' ')}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{order.items?.length || 0} item{(order.items?.length || 0) > 1 ? 's' : ''} · {t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod)}</p>
                           </div>
                         </div>
                         <div className="text-right flex items-center gap-3 flex-shrink-0">

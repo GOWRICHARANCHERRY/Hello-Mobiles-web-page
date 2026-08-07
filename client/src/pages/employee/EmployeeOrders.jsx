@@ -5,6 +5,8 @@ import { Package, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
 
+const PAYMENT_LABEL = { online: 'emp.pay.online', phonepe: 'emp.pay.phonepe', cod: 'emp.pay.cod', store_pickup: 'emp.pay.store_pickup' };
+
 export default function EmployeeOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +118,7 @@ export default function EmployeeOrders() {
                         <MapPin size={12} /> {t('emp.viewOnMap')}
                       </a>
                     )}
-                    <p className="text-sm text-gray-600 mt-1">{t('emp.payment', { method: order.paymentMethod })}</p>
+                    <p className="text-sm text-gray-600 mt-1">{t('emp.payment', { method: t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod) })}</p>
                   </div>
                 </div>
                 {order.orderStatus !== 'delivered' && order.orderStatus !== 'cancelled' && (

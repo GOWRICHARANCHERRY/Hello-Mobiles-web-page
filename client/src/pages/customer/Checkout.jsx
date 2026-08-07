@@ -9,7 +9,22 @@ import { useLanguage } from '../../context/LanguageContext';
 import LocationPicker from '../../components/LocationPicker';
 
 const STORE_UPI = 'svlnmobiles12@ybl';
+const STORE_NAME = 'Hello Mobiles';
 const HAS_MAPS = !!import.meta.env.VITE_GOOGLE_MAPS_KEY;
+
+const PhonePeLogo = ({ size = 22, className = '' }) => (
+  <img src="https://cdn.simpleicons.org/phonepe" alt="PhonePe" width={size} height={size} className={className} style={{ borderRadius: Math.round(size * 0.2) }} />
+);
+
+const buildUpiParams = (amount) => {
+  const params = new URLSearchParams({
+    pa: STORE_UPI,
+    pn: STORE_NAME,
+    am: String(Math.round(amount)),
+    cu: 'INR',
+  });
+  return params.toString();
+};
 
 export default function Checkout() {
   const { t } = useLanguage();
@@ -209,6 +224,18 @@ export default function Checkout() {
     if (!form.pincode.trim()) return t('cust.toastEnterPincode');
     if (!/^\d{6}$/.test(form.pincode.trim())) return t('cust.toastValidPincode');
     return null;
+  };
+
+  const payWithPhonePe = () => {
+    const qs = buildUpiParams(total);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = `phonepe://pay?${qs}`;
+      setTimeout(() => { window.location.href = `upi://pay?${qs}`; }, 1200);
+    } else {
+      navigator.clipboard?.writeText(STORE_UPI);
+      toast.success(t('cust.toastUpiCopied'));
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -414,6 +441,7 @@ export default function Checkout() {
               <div className="space-y-3">
                 {[
                   { id: 'online', label: 'cust.onlinePayment', icon: CreditCard, desc: 'cust.upiCardNetBanking' },
+                  { id: 'phonepe', label: 'cust.phonePe', icon: PhonePeLogo, desc: 'cust.phonePeDesc' },
                   { id: 'cod', label: 'cust.cashOnDelivery', icon: Banknote, desc: 'cust.payWhenReceive' },
                   { id: 'store_pickup', label: 'cust.storePickup', icon: Store, desc: 'cust.payAtStore' },
                 ].map(method => (
@@ -427,6 +455,33 @@ export default function Checkout() {
                   </label>
                 ))}
               </div>
+
+              {paymentMethod === 'phonepe' && (
+                <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                  <p className="text-sm font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                    <PhonePeLogo size={18} /> {t('cust.payWithPhonePe')}
+                  </p>
+                  <p className="text-xs text-purple-700 mb-2">{t('cust.upiInstruction')}</p>
+                  <div className="bg-white rounded-lg border border-purple-200 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-semibold">{t('cust.upiId')}</p>
+                      <p className="font-mono font-bold text-gray-800 text-lg">{STORE_UPI}</p>
+                    </div>
+                    <button
+                      onClick={() => { navigator.clipboard?.writeText(STORE_UPI); toast.success(t('cust.toastUpiCopied')); }}
+                      className="bg-purple-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-purple-700 transition flex-shrink-0">
+                      {t('cust.copyUpiId')}
+                    </button>
+                  </div>
+                  <button
+                    onClick={payWithPhonePe}
+                    className="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <PhonePeLogo size={18} className="bg-white rounded-md p-0.5" />
+                    {t('cust.payWithPhonePe')} — ₹{Math.round(total).toLocaleString()}
+                  </button>
+                  <p className="text-[11px] text-gray-500 mt-2 text-center">{t('cust.phonePeOpensApp')}</p>
+                </div>
+              )}
 
               {paymentMethod === 'online' && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
@@ -466,7 +521,7 @@ export default function Checkout() {
                   {form.altPhone && <p className="text-sm text-gray-600">{t('cust.altPhone')}: {form.altPhone}</p>}
                 </div>
                 <div className="border-b pb-4">
-                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
+                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'phonepe' ? t('cust.phonePe') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-700 mb-2">{t('cust.items')}</h3>

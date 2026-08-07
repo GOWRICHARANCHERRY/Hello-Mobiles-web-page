@@ -20,6 +20,7 @@ export default {
   'delv.total': 'Total',
   'delv.payment': 'Payment: {method}',
   'delv.pay.online': 'Online',
+  'delv.pay.phonepe': 'PhonePe',
   'delv.pay.cod': 'Cash on Delivery',
   'delv.pay.store_pickup': 'Store Pickup',
   'delv.viewOnMap': 'View on map',
