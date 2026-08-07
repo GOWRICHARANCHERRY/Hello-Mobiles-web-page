@@ -469,7 +469,7 @@ export default {
   'cust.privacyLinksP': 'మా వెబ్\u200Cసైట్\u200Cలో ఆసక్తికరమైన ఇతర వెబ్\u200Cసైట్\u200Cలకు లింక్\u200Cలు ఉండవచ్చు. అయితే, మీరు ఈ లింక్\u200Cలను ఉపయోగించి మా సైట్ నుండి నిష్క్రమించిన తర్వాత, మాకు ఆ ఇతర వెబ్\u200Cసైట్ పై నియంత్రణ లేదని గమనించాలి.',
   'cust.privacyH7': 'ఫిర్యాదు అధికారి (Grievance Officer)',
   'cust.privacyGrievanceP': 'సమాచార సాంకేతిక చట్టం, 2000 మరియు దాని క్రింద రూపొందించిన నియమాల ప్రకారం, ప్లాట్\u200Cఫామ్ కోసం ఫిర్యాదు అధికారి:',
-  'cust.privacyGrievanceName': 'పేరు: VENKATA SURESH BABU DONTHAM',
+  'cust.privacyGrievanceName': 'పేరు: VENKATA SURESH BABU DONTHAM SETTY',
   'cust.privacyGrievanceDesignation': 'హోదా: మేనేజింగ్ పార్టనర్',
   'cust.privacyGrievanceCompany': 'సంస్థ: SRI VENKATA LAKSHMI NARASIMHA MOBILES, డోర్ నెం. 3-119, వినయ స్వామి ఆలయం సమీపంలో, R.I. రోడ్, పాత బస్ స్టాండ్, అల్లూరు గ్రామం మరియు పోస్ట్, ALLURU, శ్రీ పొట్టి శ్రీరాములు నెల్లూరు జిల్లా, ఆంధ్రప్రదేశ్',
   'cust.privacyGrievanceEmail': 'ఇమెయిల్: svlnmobiles12@gmail.com',

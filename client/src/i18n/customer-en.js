@@ -483,7 +483,7 @@ export default {
   'cust.privacyLinksP': 'Our website may contain links to other websites of interest. However, once you have used these links to leave our site, you should note that we do not have any control over that other website. Therefore, we cannot be responsible for the protection and privacy of any information which you provide whilst visiting such sites and such sites are not governed by this privacy statement.',
   'cust.privacyH7': 'Grievance Officer',
   'cust.privacyGrievanceP': 'In accordance with the Information Technology Act, 2000 and the rules made thereunder, the Grievance Officer for the Platform is:',
-  'cust.privacyGrievanceName': 'Name: VENKATA SURESH BABU DONTHAM',
+  'cust.privacyGrievanceName': 'Name: VENKATA SURESH BABU DONTHAM SETTY',
   'cust.privacyGrievanceDesignation': 'Designation: Managing Partner',
   'cust.privacyGrievanceCompany': 'Company: SRI VENKATA LAKSHMI NARASIMHA MOBILES, Door No. 3-119, Near Vinaya Swamy Temple, R.I. Road, Old Bus Stand, Alluru Village and Post, ALLURU, Sri Potti Sriramulu Nellore District, Andhra Pradesh',
   'cust.privacyGrievanceEmail': 'Email: svlnmobiles12@gmail.com',
