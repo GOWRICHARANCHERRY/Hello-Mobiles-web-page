@@ -23,6 +23,8 @@ const EMICalculator = lazy(() => import('./pages/customer/EMICalculator'));
 const ExchangeCalculator = lazy(() => import('./pages/customer/ExchangeCalculator'));
 const TermsAndConditions = lazy(() => import('./pages/customer/TermsAndConditions'));
 const AboutUs = lazy(() => import('./pages/customer/AboutUs'));
+const Achievements = lazy(() => import('./pages/customer/Achievements'));
+const Gallery = lazy(() => import('./pages/customer/Gallery'));
 
 const EmployeeLayout = lazy(() => import('./pages/employee/EmployeeLayout'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
@@ -92,6 +94,8 @@ function AppRoutes() {
         <Route path="return-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
         <Route path="refund-policy" element={<SuspenseRoute><TermsAndConditions /></SuspenseRoute>} />
         <Route path="about" element={<SuspenseRoute><AboutUs /></SuspenseRoute>} />
+        <Route path="achievements" element={<SuspenseRoute><Achievements /></SuspenseRoute>} />
+        <Route path="gallery" element={<SuspenseRoute><Gallery /></SuspenseRoute>} />
       </Route>
 
       <Route path="/" element={<ProtectedRoute roles={['customer']}><SuspenseRoute><CustomerLayout /></SuspenseRoute></ProtectedRoute>}>

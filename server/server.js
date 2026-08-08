@@ -161,6 +161,8 @@ app.get('/sitemap.xml', async (req, res) => {
       { loc: '/', priority: '1.0', changefreq: 'daily' },
       { loc: '/products', priority: '0.9', changefreq: 'daily' },
       { loc: '/about', priority: '0.5', changefreq: 'monthly' },
+      { loc: '/achievements', priority: '0.5', changefreq: 'monthly' },
+      { loc: '/gallery', priority: '0.5', changefreq: 'monthly' },
       { loc: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly' },
       { loc: '/emi-calculator', priority: '0.5', changefreq: 'monthly' },
       { loc: '/exchange-calculator', priority: '0.5', changefreq: 'monthly' },

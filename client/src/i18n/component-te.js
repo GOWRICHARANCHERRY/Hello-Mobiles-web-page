@@ -56,6 +56,8 @@ export default {
   'comp.privacyPolicy': 'గోప్యతా విధానం',
   'comp.returnsRefunds': 'రిటర్న్స్ & రీఫండ్స్',
   'comp.aboutUs': 'మా గురించి',
+  'comp.achievements': 'విజయాలు',
+  'comp.gallery': 'గ్యాలరీ',
   // LoginPopup
   'comp.loggedIn': 'లాగిన్ అయ్యారు!',
   'comp.loginFailed': 'లాగిన్ విఫలమైంది',

@@ -56,6 +56,8 @@ export default {
   'comp.privacyPolicy': 'गोपनीयता नीति',
   'comp.returnsRefunds': 'रिटर्न और रिफंड',
   'comp.aboutUs': 'हमारे बारे में',
+  'comp.achievements': 'उपलब्धियाँ',
+  'comp.gallery': 'गैलरी',
   // LoginPopup
   'comp.loggedIn': 'लॉग इन हो गए!',
   'comp.loginFailed': 'लॉगिन विफल',

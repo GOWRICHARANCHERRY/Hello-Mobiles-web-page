@@ -56,6 +56,8 @@ export default {
   'comp.privacyPolicy': 'Privacy Policy',
   'comp.returnsRefunds': 'Returns & Refunds',
   'comp.aboutUs': 'About Us',
+  'comp.achievements': 'Achievements',
+  'comp.gallery': 'Gallery',
   // LoginPopup
   'comp.loggedIn': 'Logged in!',
   'comp.loginFailed': 'Login failed',

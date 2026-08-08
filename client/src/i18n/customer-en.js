@@ -437,6 +437,14 @@ export default {
   'cust.aboutWhy4': 'Doorstep delivery across our service zones plus easy store pickup',
   'cust.aboutWhy5': 'Transparent pricing and honest, no-pressure advice',
   'cust.aboutWhy6': 'Our website speaks your language — English, Hindi & Telugu',
+
+  'cust.achievementsTitle': 'Our Achievements',
+  'cust.achievementsSub': 'Milestones, awards and recognition earned by Hello Mobiles across Nellore district',
+  'cust.achievementsSoon': 'We are building this page — our achievements and milestones will appear here soon. Check back shortly!',
+  'cust.galleryTitle': 'Gallery',
+  'cust.gallerySub': 'Photos from our stores, events and more',
+  'cust.gallerySoon': 'We are building this page — photos and moments from our stores will appear here soon.',
+
   'cust.aboutDeliveryH': 'Delivery & Store Pickup',
   'cust.aboutDeliveryP': 'We deliver orders to customers within our service zones around Allur and Buchireddypalem. Prefer to collect it yourself? Choose store pickup and take your order from any of our stores at a time that suits you.',
   'cust.aboutContactH': 'Need Help?',

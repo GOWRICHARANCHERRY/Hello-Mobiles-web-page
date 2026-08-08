@@ -359,6 +359,8 @@ export default function CustomerLayout() {
                 <li><Link to="/products" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.allProducts')}</Link></li>
                 <li><Link to="/emi-calculator" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.emiCalculator')}</Link></li>
                 <li><Link to="/exchange-calculator" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.exchangeCalculator')}</Link></li>
+                <li><Link to="/achievements" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.achievements')}</Link></li>
+                <li><Link to="/gallery" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.gallery')}</Link></li>
                 <li><a href={BAJAJ_CHECK_LIMIT_URL} target="_blank" rel="noopener noreferrer" className="text-gray-300 text-sm hover:text-gold-400 transition flex items-center gap-2"><span className="w-1 h-1 bg-gold-500 rounded-full"></span>{t('comp.checkBajajLimit')}</a></li>
               </ul>
             </div>
