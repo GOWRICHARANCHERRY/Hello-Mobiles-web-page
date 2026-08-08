@@ -5,7 +5,7 @@ import { Package, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
 
-const PAYMENT_LABEL = { online: 'emp.pay.online', phonepe: 'emp.pay.phonepe', cod: 'emp.pay.cod', store_pickup: 'emp.pay.store_pickup' };
+const PAYMENT_LABEL = { online: 'emp.pay.online', phonepe: 'emp.pay.phonepe', razorpay: 'emp.pay.razorpay', cod: 'emp.pay.cod', store_pickup: 'emp.pay.store_pickup' };
 
 export default function EmployeeOrders() {
   const [orders, setOrders] = useState([]);

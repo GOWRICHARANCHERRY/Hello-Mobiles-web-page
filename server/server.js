@@ -19,6 +19,7 @@ import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
 import instagramRoutes from './routes/instagram.js';
 import deliveryZoneRoutes from './routes/deliveryZones.js';
+import razorpayRoutes from './routes/razorpay.js';
 import Product from './models/Product.js';
 import Banner from './models/Banner.js';
 import { cached } from './utils/cache.js';
@@ -65,8 +66,9 @@ app.use(helmet({
         'https://www.google.com',
         'https://www.gstatic.com',
         'https://*.firebaseapp.com',
+        'https://checkout.razorpay.com',
       ],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://www.gstatic.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://www.gstatic.com', 'https://checkout.razorpay.com'],
       fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       imgSrc: [
         "'self'", 'data:', 'blob:',
@@ -92,8 +94,10 @@ app.use(helmet({
         'https://oauth2.googleapis.com',
         'https://*.firebaseio.com',
         'wss://*.firebaseio.com',
+        'https://api.razorpay.com',
+        'https://checkout.razorpay.com',
       ],
-      frameSrc: ["'self'", 'https://accounts.google.com', 'https://www.google.com'],
+      frameSrc: ["'self'", 'https://accounts.google.com', 'https://www.google.com', 'https://checkout.razorpay.com', 'https://api.razorpay.com'],
       workerSrc: ["'self'", 'blob:'],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
@@ -129,6 +133,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/delivery-zones', deliveryZoneRoutes);
+app.use('/api/razorpay', razorpayRoutes);
 
 let sitemapCache = null;
 let sitemapCacheTime = 0;

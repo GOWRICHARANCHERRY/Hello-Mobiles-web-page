@@ -85,6 +85,7 @@ export default {
   'emp.payment': 'भुगतान: {method}',
   'emp.pay.online': 'ऑनलाइन',
   'emp.pay.phonepe': 'PhonePe',
+  'emp.pay.razorpay': 'Razorpay',
   'emp.pay.cod': 'कैश ऑन डिलीवरी',
   'emp.pay.store_pickup': 'स्टोर पिकअप',
   'emp.markAs': '{status} के रूप में चिह्नित करें',

@@ -154,6 +154,7 @@ export default {
   'comp.cashOnDelivery': 'Cash on Delivery',
   'comp.pay.online': 'Online',
   'comp.pay.phonepe': 'PhonePe',
+  'comp.pay.razorpay': 'Razorpay',
   'comp.pay.store_pickup': 'Store Pickup',
   'comp.shippingAddress': 'Shipping Address',
   'comp.phoneLabel': 'Phone: {phone}',

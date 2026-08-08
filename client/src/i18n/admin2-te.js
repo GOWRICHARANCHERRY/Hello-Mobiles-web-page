@@ -137,6 +137,7 @@ export default {
   'admin2.payment': 'చెల్లింపు: {method}',
   'admin2.pay.online': 'ఆన్‌లైన్',
   'admin2.pay.phonepe': 'PhonePe',
+  'admin2.pay.razorpay': 'Razorpay',
   'admin2.pay.cod': 'క్యాష్ ఆన్ డెలివరీ',
   'admin2.pay.store_pickup': 'స్టోర్ పికప్',
   'admin2.selectStatus': 'స్థితిని నవీకరించండి...',

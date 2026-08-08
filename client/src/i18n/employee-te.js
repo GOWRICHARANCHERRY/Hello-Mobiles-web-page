@@ -85,6 +85,7 @@ export default {
   'emp.payment': 'చెల్లింపు: {method}',
   'emp.pay.online': 'ఆన్‌లైన్',
   'emp.pay.phonepe': 'PhonePe',
+  'emp.pay.razorpay': 'Razorpay',
   'emp.pay.cod': 'క్యాష్ ఆన్ డెలివరీ',
   'emp.pay.store_pickup': 'స్టోర్ పికప్',
   'emp.markAs': '{status} గా గుర్తించండి',

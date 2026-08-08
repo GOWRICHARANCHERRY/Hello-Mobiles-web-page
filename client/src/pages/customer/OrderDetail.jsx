@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft, MapPin } from 'lucide-react';
+import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft, MapPin, CreditCard } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { payWithRazorpay } from '../../utils/razorpay';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
-const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
 
 const STORE = {
   name: 'Hello Mobiles & Electronics',
@@ -33,6 +34,27 @@ export default function OrderDetail() {
   const refresh = async () => {
     const { data } = await api.get(`/orders/${id}`);
     setOrder(data);
+  };
+
+  const handlePayNow = async () => {
+    if (!order) return;
+    setActionLoading(true);
+    try {
+      const { data } = await api.post('/razorpay/create-order', { orderId: order._id });
+      const response = await payWithRazorpay({
+        amount: data.amount,
+        currency: data.currency,
+        orderId: data.order_id,
+        description: `${t('cust.order')} ${order.orderNumber}`,
+        prefill: { name: order.shippingAddress?.name, contact: order.shippingAddress?.phone },
+      });
+      await api.post('/razorpay/verify-payment', response);
+      toast.success(t('cust.toastPaymentSuccess'));
+      refresh();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || t('cust.toastPaymentFailed'));
+    }
+    setActionLoading(false);
   };
 
   const handlePrint = () => {
@@ -184,6 +206,12 @@ export default function OrderDetail() {
             className="flex items-center gap-2 bg-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gold-700 transition">
             <Printer size={16} /> {t('cust.downloadPrintInvoice')}
           </button>
+          {order.paymentMethod === 'razorpay' && order.paymentStatus === 'pending' && order.orderStatus !== 'cancelled' && (
+            <button onClick={handlePayNow} disabled={actionLoading}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50">
+              <CreditCard size={16} /> {actionLoading ? `${t('cust.processing')}...` : t('cust.payNow')}
+            </button>
+          )}
           {canCancel && (
             <button onClick={() => setShowCancel(true)}
               className="flex items-center gap-2 border border-red-300 text-red-500 px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-50 transition">

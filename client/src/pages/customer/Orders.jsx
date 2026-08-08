@@ -1,21 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
-import { Package, Check, Clock, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { payWithRazorpay } from '../../utils/razorpay';
+import { Package, Check, Clock, Truck, CheckCircle, XCircle, CreditCard } from 'lucide-react';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
-const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [payingId, setPayingId] = useState(null);
   const { t } = useLanguage();
 
-  useEffect(() => {
+  const loadOrders = useCallback(() => {
     api.get('/orders').then(r => { setOrders(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  const handlePayNow = async (order) => {
+    setPayingId(order._id);
+    try {
+      const { data } = await api.post('/razorpay/create-order', { orderId: order._id });
+      const response = await payWithRazorpay({
+        amount: data.amount,
+        currency: data.currency,
+        orderId: data.order_id,
+        description: `${t('cust.order')} ${order.orderNumber}`,
+        prefill: { name: order.shippingAddress?.name, contact: order.shippingAddress?.phone },
+      });
+      await api.post('/razorpay/verify-payment', response);
+      toast.success(t('cust.toastPaymentSuccess'));
+      loadOrders();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || t('cust.toastPaymentFailed'));
+    }
+    setPayingId(null);
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -98,6 +125,15 @@ export default function Orders() {
                 <div className="text-right mt-3 md:mt-0">
                   <p className="text-lg font-bold text-gray-900">₹{order.total.toLocaleString()}</p>
                   <p className="text-xs text-gray-500 capitalize">{t(PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod)}</p>
+                  {order.paymentMethod === 'razorpay' && order.paymentStatus === 'pending' && order.orderStatus !== 'cancelled' && (
+                    <button
+                      onClick={() => handlePayNow(order)}
+                      disabled={payingId === order._id}
+                      className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-3 py-1.5 rounded-lg transition">
+                      <CreditCard size={13} />
+                      {payingId === order._id ? `${t('cust.processing')}...` : t('cust.payNow')}
+                    </button>
+                  )}
                   <Link to={`/orders/${order._id}`} className="inline-block mt-2 text-xs font-semibold text-gold-700 hover:text-gold-700 bg-gold-50 border border-gold-200 px-3 py-1.5 rounded-lg">
                     {t('cust.viewDetailsInvoice')}
                   </Link>

@@ -6,7 +6,7 @@ import api from '../../utils/api';
 import { User, MapPin, Ticket, HelpCircle, Globe, Edit2, Save, Package, ChevronRight, Phone, Mail, MessageCircle, Clock, Plus, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
 const tabs = [
   { id: 'personal', label: 'cust.personalDetails', icon: User },
   { id: 'orders', label: 'cust.myOrders', icon: Package },

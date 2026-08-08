@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import LocationPicker from '../../components/LocationPicker';
+import { payWithRazorpay } from '../../utils/razorpay';
 
 const STORE_UPI = 'svlnmobiles12@ybl';
 const STORE_NAME = 'Hello Mobiles';
@@ -238,6 +239,18 @@ export default function Checkout() {
     }
   };
 
+  const payOrderWithRazorpay = async (order) => {
+    const { data } = await api.post('/razorpay/create-order', { orderId: order._id });
+    const response = await payWithRazorpay({
+      amount: data.amount,
+      currency: data.currency,
+      orderId: data.order_id,
+      description: t('cust.order') + ' ' + (order.orderNumber || data.receipt),
+      prefill: { name: form.name, contact: form.phone, email: user?.email || '' },
+    });
+    await api.post('/razorpay/verify-payment', response);
+  };
+
   const handlePlaceOrder = async () => {
     const err = validateShipping();
     if (err) return toast.error(err);
@@ -271,8 +284,20 @@ export default function Checkout() {
         couponCode: coupon?.code || undefined,
       };
       const { data } = await api.post('/orders', orderData);
+      if (paymentMethod === 'razorpay') {
+        try {
+          await payOrderWithRazorpay(data);
+          toast.success(t('cust.toastPaymentSuccess'));
+        } catch (razorpayError) {
+          clearCart();
+          toast.error(razorpayError?.response?.data?.message || razorpayError.message || t('cust.toastPaymentFailed'));
+          navigate('/orders');
+          return;
+        }
+      } else {
+        toast.success(t('cust.toastOrderPlaced'));
+      }
       clearCart();
-      toast.success(t('cust.toastOrderPlaced'));
       navigate('/orders');
     } catch (error) {
       toast.error(error.response?.data?.message || t('cust.toastOrderFailed'));
@@ -440,6 +465,7 @@ export default function Checkout() {
               <h2 className="text-lg font-bold mb-4">{t('cust.paymentMethod')}</h2>
               <div className="space-y-3">
                 {[
+                  { id: 'razorpay', label: 'cust.razorpay', icon: CreditCard, desc: 'cust.razorpayDesc' },
                   { id: 'online', label: 'cust.onlinePayment', icon: CreditCard, desc: 'cust.upiCardNetBanking' },
                   { id: 'phonepe', label: 'cust.phonePe', icon: PhonePeLogo, desc: 'cust.phonePeDesc' },
                   { id: 'cod', label: 'cust.cashOnDelivery', icon: Banknote, desc: 'cust.payWhenReceive' },
@@ -483,6 +509,14 @@ export default function Checkout() {
                 </div>
               )}
 
+              {paymentMethod === 'razorpay' && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> {t('cust.razorpaySecure')}</p>
+                  <p className="text-xs text-blue-700 mb-2">{t('cust.razorpayMethods')}</p>
+                  <p className="text-[11px] text-gray-500">{t('cust.razorpayRedirect')}</p>
+                </div>
+              )}
+
               {paymentMethod === 'online' && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> {t('cust.payViaUpi')}</p>
@@ -521,7 +555,7 @@ export default function Checkout() {
                   {form.altPhone && <p className="text-sm text-gray-600">{t('cust.altPhone')}: {form.altPhone}</p>}
                 </div>
                 <div className="border-b pb-4">
-                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'phonepe' ? t('cust.phonePe') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
+                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'razorpay' ? t('cust.razorpay') : paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'phonepe' ? t('cust.phonePe') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-700 mb-2">{t('cust.items')}</h3>

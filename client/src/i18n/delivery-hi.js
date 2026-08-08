@@ -21,6 +21,7 @@ export default {
   'delv.payment': 'भुगतान: {method}',
   'delv.pay.online': 'ऑनलाइन',
   'delv.pay.phonepe': 'PhonePe',
+  'delv.pay.razorpay': 'Razorpay',
   'delv.pay.cod': 'कैश ऑन डिलीवरी',
   'delv.pay.store_pickup': 'स्टोर पिकअप',
   'delv.viewOnMap': 'मानचित्र पर देखें',

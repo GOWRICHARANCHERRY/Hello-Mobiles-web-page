@@ -137,6 +137,7 @@ export default {
   'admin2.payment': 'भुगतान: {method}',
   'admin2.pay.online': 'ऑनलाइन',
   'admin2.pay.phonepe': 'PhonePe',
+  'admin2.pay.razorpay': 'Razorpay',
   'admin2.pay.cod': 'कैश ऑन डिलीवरी',
   'admin2.pay.store_pickup': 'स्टोर पिकअप',
   'admin2.selectStatus': 'स्थिति अपडेट करें...',
