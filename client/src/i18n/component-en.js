@@ -35,6 +35,7 @@ export default {
   'comp.subscribe': 'Subscribe',
   'comp.footerBrandTagline': 'MOBILES | TVS | ELECTRONICS',
   'comp.aboutDescription': 'Your trusted destination for mobiles, TVs, electronics, furniture, and home appliances. Best prices, easy EMI options, and exciting exchange offers.',
+  'comp.paymentGateways': 'Payment Gateways',
   'comp.quickLinks': 'Quick Links',
   'comp.allProducts': 'All Products',
   'comp.emiCalculator': 'EMI Calculator',

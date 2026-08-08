@@ -84,6 +84,7 @@ app.use(helmet({
         'https://cdn.simpleicons.org',
         'https://upload.wikimedia.org',
         'https://*.cdninstagram.com',
+        'https://plcorp-cdn.pinelabs.com',
       ],
       connectSrc: [
         "'self'",

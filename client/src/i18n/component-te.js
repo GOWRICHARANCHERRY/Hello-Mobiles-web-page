@@ -35,6 +35,7 @@ export default {
   'comp.subscribe': 'సబ్స్క్రైబ్ చేయండి',
   'comp.footerBrandTagline': 'మొబైల్స్ | టీవీలు | ఎలక్ట్రానిక్స్',
   'comp.aboutDescription': 'మొబైల్స్, టీవీలు, ఎలక్ట్రానిక్స్, ఫర్నిచర్ మరియు హోమ్ అప్లయెన్సెస్ కోసం మీ నమ్మకమైన గమ్యం. ఉత్తమ ధరలు, సులభమైన EMI ఎంపికలు మరియు ఆకర్షణీయమైన ఎక్స్ఛేంజ్ ఆఫర్లు.',
+  'comp.paymentGateways': 'పేమెంట్ గేట్వేలు',
   'comp.quickLinks': 'త్వరిత లింకులు',
   'comp.allProducts': 'అన్ని ఉత్పత్తులు',
   'comp.emiCalculator': 'EMI కాలిక్యులేటర్',

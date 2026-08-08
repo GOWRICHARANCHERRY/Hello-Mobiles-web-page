@@ -334,6 +334,21 @@ export default function CustomerLayout() {
                   <Mail size={18} />
                 </a>
               </div>
+
+              <div className="mt-6">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3 text-white">{t('comp.paymentGateways')}</h4>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="bg-white rounded-lg px-3 py-1.5 shadow-sm" title="Razorpay">
+                    <img src="https://cdn.simpleicons.org/razorpay" alt="Razorpay" loading="lazy" className="h-5 w-auto" />
+                  </span>
+                  <span className="bg-white rounded-lg px-3 py-1.5 shadow-sm" title="PhonePe">
+                    <img src="https://cdn.simpleicons.org/phonepe" alt="PhonePe" loading="lazy" className="h-5 w-auto" />
+                  </span>
+                  <span className="bg-white rounded-lg px-2 py-1.5 shadow-sm" title="Pine Labs">
+                    <img src="https://plcorp-cdn.pinelabs.com/2025/03/pinelabs-logo.svg" alt="Pine Labs" loading="lazy" className="h-5 w-auto" />
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Quick Links */}

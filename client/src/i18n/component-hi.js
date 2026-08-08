@@ -35,6 +35,7 @@ export default {
   'comp.subscribe': 'सब्सक्राइब करें',
   'comp.footerBrandTagline': 'मोबाइल | टीवी | इलेक्ट्रॉनिक्स',
   'comp.aboutDescription': 'मोबाइल, टीवी, इलेक्ट्रॉनिक्स, फर्नीचर और होम अप्लायंसेज के लिए आपका विश्वसनीय गंतव्य। सर्वोत्तम मूल्य, आसान ईएमआई विकल्प और आकर्षक एक्सचेंज ऑफ़र।',
+  'comp.paymentGateways': 'भुगतान गेटवे',
   'comp.quickLinks': 'त्वरित लिंक',
   'comp.allProducts': 'सभी उत्पाद',
   'comp.emiCalculator': 'ईएमआई कैलकुलेटर',
