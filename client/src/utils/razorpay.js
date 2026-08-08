@@ -26,7 +26,12 @@ export function loadRazorpayScript() {
   });
 }
 
-export function payWithRazorpay({ amount, currency = 'INR', orderId, description = '', prefill = {}, theme = { color: '#b8860b' } }) {
+export function normalizeContact(phone) {
+  if (!phone) return '';
+  return String(phone).replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '').slice(-10);
+}
+
+export function payWithRazorpay({ amount, currency = 'INR', orderId, description = '', prefill = {}, readonly = {}, theme = { color: '#b8860b' } }) {
   return new Promise((resolve, reject) => {
     if (!KEY_ID) return reject(new Error('Payment gateway is not configured'));
     loadRazorpayScript().then((Razorpay) => {
@@ -38,6 +43,7 @@ export function payWithRazorpay({ amount, currency = 'INR', orderId, description
         description,
         order_id: orderId,
         prefill,
+        readonly,
         theme,
         handler: (response) => resolve(response),
         modal: { ondismiss: () => reject(new Error('Payment cancelled')) },

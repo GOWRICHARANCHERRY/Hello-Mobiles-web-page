@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import LocationPicker from '../../components/LocationPicker';
-import { payWithRazorpay } from '../../utils/razorpay';
+import { payWithRazorpay, normalizeContact } from '../../utils/razorpay';
 
 const STORE_UPI = 'svlnmobiles12@ybl';
 const STORE_NAME = 'Hello Mobiles';
@@ -241,12 +241,14 @@ export default function Checkout() {
 
   const payOrderWithRazorpay = async (order) => {
     const { data } = await api.post('/razorpay/create-order', { orderId: order._id });
+    const contact = normalizeContact(form.phone || user?.phone);
     const response = await payWithRazorpay({
       amount: data.amount,
       currency: data.currency,
       orderId: data.order_id,
       description: t('cust.order') + ' ' + (order.orderNumber || data.receipt),
-      prefill: { name: form.name, contact: form.phone, email: user?.email || '' },
+      prefill: { name: form.name || user?.name || '', contact, email: user?.email || '' },
+      readonly: { name: true, email: true, contact: true },
     });
     await api.post('/razorpay/verify-payment', response);
   };

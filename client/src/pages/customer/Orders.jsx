@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
-import { payWithRazorpay } from '../../utils/razorpay';
+import { payWithRazorpay, normalizeContact } from '../../utils/razorpay';
 import { Package, Check, Clock, Truck, CheckCircle, XCircle, CreditCard } from 'lucide-react';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
@@ -28,12 +28,14 @@ export default function Orders() {
     setPayingId(order._id);
     try {
       const { data } = await api.post('/razorpay/create-order', { orderId: order._id });
+      const contact = normalizeContact(order.shippingAddress?.phone);
       const response = await payWithRazorpay({
         amount: data.amount,
         currency: data.currency,
         orderId: data.order_id,
         description: `${t('cust.order')} ${order.orderNumber}`,
-        prefill: { name: order.shippingAddress?.name, contact: order.shippingAddress?.phone },
+        prefill: { name: order.shippingAddress?.name, contact, email: '' },
+        readonly: { name: true, email: true, contact: true },
       });
       await api.post('/razorpay/verify-payment', response);
       toast.success(t('cust.toastPaymentSuccess'));
