@@ -191,6 +191,38 @@ ${urls.map(u => `  <url>
 
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 
+// Server-rendered structured data + canonical so Google sees the store's
+// LocalBusiness schema in the RAW html (no JS execution needed). Injected only
+// on the homepage to avoid conflicting with react-helmet's per-page canonicals.
+const storeSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Hello Mobiles',
+  description: 'Mobile phones, electronics, laptops, TVs and gadgets store in Allur and Buchireddypalem, Nellore district, Andhra Pradesh. Best prices, EMI options and home delivery.',
+  url: 'https://hello-mobiles.com',
+  telephone: '+91-97157-36736',
+  image: 'https://hello-mobiles.com/logo.png',
+  priceRange: '₹',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Allur and Buchireddypalem',
+    addressLocality: 'Nellore',
+    addressRegion: 'Andhra Pradesh',
+    addressCountry: 'IN',
+  },
+  areaServed: ['Allur', 'Buchireddypalem', 'Nellore district'],
+  openingHours: 'Mo-Su 09:00-21:30',
+};
+
+function seoHeadFor(pathname) {
+  const parts = [];
+  if (pathname === '/') {
+    parts.push('<link rel="canonical" href="https://hello-mobiles.com/" />');
+    parts.push(`<script type="application/ld+json">${JSON.stringify(storeSchema)}</script>`);
+  }
+  return parts.join('\n    ');
+}
+
 // Preload the first hero banner image so LCP starts downloading in parallel with the JS bundle.
 function heroPreload() {
   return cached('hero-preload', 60_000, async () => {
@@ -206,10 +238,12 @@ async function serveIndex(req, res) {
   try {
     const indexTemplate = await fs.promises.readFile(path.join(clientDist, 'index.html'), 'utf8');
     const preload = await heroPreload();
-    if (!preload || indexTemplate.includes('rel="preload" as="image"')) {
-      return res.send(indexTemplate);
+    let head = seoHeadFor(req.path);
+    if (preload && !indexTemplate.includes('rel="preload" as="image"')) {
+      head += `\n    ${preload}`;
     }
-    res.send(indexTemplate.replace('</head>', `${preload}</head>`));
+    if (!head) return res.send(indexTemplate);
+    res.send(indexTemplate.replace('</head>', `${head}</head>`));
   } catch (err) {
     res.sendFile(path.join(clientDist, 'index.html'));
   }

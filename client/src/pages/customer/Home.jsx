@@ -115,27 +115,9 @@ export default function Home() {
   return (
     <div className="space-y-10 animate-fade-in">
       <SEO
-        title="Home"
+        title=""
         description="Hello Mobiles — Your one-stop shop for mobile phones, electronics, laptops, TVs, and gadgets in Allur & Buchireddypalem, Nellore district. Best prices, EMI options, and home delivery."
         path="/"
-        structuredData={{
-          '@context': 'https://schema.org',
-          '@type': 'LocalBusiness',
-          name: 'Hello Mobiles',
-          description: 'Mobile phones, electronics, laptops, TVs, and gadgets store in Allur and Buchireddypalem, Nellore district',
-          url: 'https://hello-mobiles.com',
-          telephone: '+91-97157-36736',
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: 'Allur and Buchireddypalem',
-            addressLocality: 'Nellore',
-            addressRegion: 'Andhra Pradesh',
-            addressCountry: 'IN',
-          },
-          areaServed: ['Allur', 'Buchireddypalem', 'Nellore district'],
-          priceRange: '₹',
-          image: 'https://hello-mobiles.com/logo.png',
-        }}
       />
       {/* Hero Carousel */}
       <HeroCarousel />
