@@ -121,6 +121,10 @@ function PrivacyPolicy() {
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyH4')}</h3>
         <p>{t('cust.privacySecurityP')}</p>
 
+        <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyPayH')}</h3>
+        <p>{t('cust.privacyPayP1')}</p>
+        <p>{t('cust.privacyPayP2')}</p>
+
         <h3 className="font-bold text-gray-800 mt-6">{t('cust.privacyH5')}</h3>
         <p>{t('cust.privacyCookiesP')}</p>
 
