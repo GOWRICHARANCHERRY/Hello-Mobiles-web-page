@@ -7,6 +7,7 @@ import SEO from '../../components/SEO';
 import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
 import InstagramReels from '../../components/InstagramReels';
+import GoogleReviews from '../../components/GoogleReviews';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
@@ -346,6 +347,9 @@ export default function Home() {
           </a>
         </div>
       </div>
+
+      {/* Google Reviews */}
+      <GoogleReviews />
 
       {/* Instagram Reels */}
       <InstagramReels />

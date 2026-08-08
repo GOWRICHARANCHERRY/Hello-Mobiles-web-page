@@ -1,25 +1,50 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, TrendingDown } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
+const getPrice = (p) => p.variants?.length ? Math.min(...p.variants.map(v => v.price)) : p.price;
+
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
+  const [priceDrops, setPriceDrops] = useState({});
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { t } = useLanguage();
 
   useEffect(() => {
-    api.get('/auth/me').then(r => { setWishlist(r.data.wishlist || []); setLoading(false); }).catch(() => setLoading(false));
+    api.get('/auth/me').then(r => {
+      const list = r.data.wishlist || [];
+      setWishlist(list);
+      setLoading(false);
+      const savedPrices = JSON.parse(localStorage.getItem('hm_wishlist_prices') || '{}');
+      const drops = {};
+      const updated = { ...savedPrices };
+      list.forEach(p => {
+        const current = getPrice(p) || p.price;
+        if (savedPrices[p._id] && current < savedPrices[p._id]) {
+          drops[p._id] = { old: savedPrices[p._id], new: current };
+        }
+        updated[p._id] = current;
+      });
+      localStorage.setItem('hm_wishlist_prices', JSON.stringify(updated));
+      if (Object.keys(drops).length > 0) {
+        setPriceDrops(drops);
+        toast.success(t('cust.priceDropToast'));
+      }
+    }).catch(() => setLoading(false));
   }, []);
 
   const handleRemove = async (productId) => {
     try {
       await api.post(`/auth/wishlist/${productId}`);
       setWishlist(prev => prev.filter(p => p._id !== productId));
+      const prices = JSON.parse(localStorage.getItem('hm_wishlist_prices') || '{}');
+      delete prices[productId];
+      localStorage.setItem('hm_wishlist_prices', JSON.stringify(prices));
       toast.success(t('cust.removedFromWishlist'));
     } catch (error) {
       toast.error(t('cust.failedToRemove'));
@@ -43,27 +68,35 @@ export default function Wishlist() {
     <div className="animate-fade-in">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('cust.myWishlist')} ({wishlist.length})</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {wishlist.map(product => (
-          <div key={product._id} className="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
-            <Link to={`/products/${product._id}`} className="bg-gray-100 p-4 h-48 flex items-center justify-center">
-              {product.images?.[0] ? <img src={product.images[0]} alt={product.name} loading="lazy" className="max-h-full object-contain" /> : <span className="text-gray-400">{t('cust.noImage')}</span>}
-            </Link>
-            <div className="p-4">
-              <p className="text-xs text-gray-500">{product.brand}</p>
-              <h3 className="font-semibold text-sm text-gray-800 mt-1">{product.name}</h3>
-              <p className="text-lg font-bold text-gray-900 mt-2">₹{product.price?.toLocaleString()}</p>
-              <div className="flex gap-2 mt-3">
-                <button onClick={() => { addToCart(product); toast.success(t('cust.addedToCart')); }}
-                  className="flex-1 bg-gold-600 text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 hover:bg-gold-700">
-                  <ShoppingCart size={14} /> {t('cust.addToCart')}
-                </button>
-                <button onClick={() => handleRemove(product._id)} className="text-red-500 hover:text-red-600 px-3 py-2 border rounded-lg">
-                  <Heart size={16} className="fill-red-500" />
-                </button>
+        {wishlist.map(product => {
+          const drop = priceDrops[product._id];
+          return (
+            <div key={product._id} className="bg-white rounded-xl shadow-sm overflow-hidden card-hover relative">
+              {drop && (
+                <div className="absolute top-2 left-2 z-10 bg-green-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <TrendingDown size={12} /> {t('cust.priceDropped', { old: drop.old.toLocaleString('en-IN'), new: drop.new.toLocaleString('en-IN') })}
+                </div>
+              )}
+              <Link to={`/products/${product._id}`} className="bg-gray-100 p-4 h-48 flex items-center justify-center">
+                {product.images?.[0] ? <img src={product.images[0]} alt={product.name} loading="lazy" className="max-h-full object-contain" /> : <span className="text-gray-400">{t('cust.noImage')}</span>}
+              </Link>
+              <div className="p-4">
+                <p className="text-xs text-gray-500">{product.brand}</p>
+                <h3 className="font-semibold text-sm text-gray-800 mt-1">{product.name}</h3>
+                <p className="text-lg font-bold text-gray-900 mt-2">₹{(getPrice(product) || product.price)?.toLocaleString()}</p>
+                <div className="flex gap-2 mt-3">
+                  <button onClick={() => { addToCart(product); toast.success(t('cust.addedToCart')); }}
+                    className="flex-1 bg-gold-600 text-white py-2 rounded-lg text-sm flex items-center justify-center gap-1 hover:bg-gold-700">
+                    <ShoppingCart size={14} /> {t('cust.addToCart')}
+                  </button>
+                  <button onClick={() => handleRemove(product._id)} className="text-red-500 hover:text-red-600 px-3 py-2 border rounded-lg">
+                    <Heart size={16} className="fill-red-500" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

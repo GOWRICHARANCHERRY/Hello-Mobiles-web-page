@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { CompareProvider } from './context/CompareContext';
 import { LanguageProvider } from './context/LanguageContext';
 
 const Login = lazy(() => import('./pages/Login'));
@@ -25,6 +26,7 @@ const TermsAndConditions = lazy(() => import('./pages/customer/TermsAndCondition
 const AboutUs = lazy(() => import('./pages/customer/AboutUs'));
 const Achievements = lazy(() => import('./pages/customer/Achievements'));
 const Gallery = lazy(() => import('./pages/customer/Gallery'));
+const Compare = lazy(() => import('./pages/customer/Compare'));
 
 const EmployeeLayout = lazy(() => import('./pages/employee/EmployeeLayout'));
 const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
@@ -96,6 +98,7 @@ function AppRoutes() {
         <Route path="about" element={<SuspenseRoute><AboutUs /></SuspenseRoute>} />
         <Route path="achievements" element={<SuspenseRoute><Achievements /></SuspenseRoute>} />
         <Route path="gallery" element={<SuspenseRoute><Gallery /></SuspenseRoute>} />
+        <Route path="compare" element={<SuspenseRoute><Compare /></SuspenseRoute>} />
       </Route>
 
       <Route path="/" element={<ProtectedRoute roles={['customer']}><SuspenseRoute><CustomerLayout /></SuspenseRoute></ProtectedRoute>}>
@@ -144,10 +147,12 @@ export default function App() {
         <ScrollToTop />
         <AuthProvider>
           <CartProvider>
-            <LanguageProvider>
-              <Toaster position="top-right" />
-              <AppRoutes />
-            </LanguageProvider>
+            <CompareProvider>
+              <LanguageProvider>
+                <Toaster position="top-right" />
+                <AppRoutes />
+              </LanguageProvider>
+            </CompareProvider>
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>

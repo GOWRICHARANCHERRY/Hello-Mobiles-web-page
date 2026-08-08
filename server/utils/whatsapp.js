@@ -69,3 +69,57 @@ export async function sendOrderWhatsApp(order, customer) {
     return { sent: false, reason: error.message };
   }
 }
+
+export function buildAbandonedCartMessage(items, subtotal) {
+  const itemLines = items
+    .slice(0, 5)
+    .map(i => `• ${i.name} × ${i.quantity}`)
+    .join('\n');
+  const more = items.length > 5 ? `\n• +${items.length - 5} more` : '';
+  return `🛒 You left items in your cart!
+
+${itemLines}${more}
+
+Subtotal: ${formatINR(subtotal)}
+
+Complete your order before the offers expire:
+https://hello-mobiles.com/cart
+https://wa.me/918886888128
+
+— Hello Mobiles & Electronics`;
+}
+
+export async function sendAbandonedCartWhatsApp(phone, items, subtotal) {
+  if (!TOKEN || !PHONE_NUMBER_ID) {
+    console.log('[WhatsApp] not configured — skipping abandoned-cart reminder');
+    return { sent: false, reason: 'not-configured' };
+  }
+  const to = phone || TO_NUMBER;
+  try {
+    const body = buildAbandonedCartMessage(items, subtotal);
+    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${PHONE_NUMBER_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'text',
+        text: { body },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('[WhatsApp] abandoned-cart error:', data?.error?.message || data);
+      return { sent: false, reason: data?.error?.message || 'api-error' };
+    }
+    console.log(`[WhatsApp] abandoned-cart reminder sent to ${to}`);
+    return { sent: true };
+  } catch (error) {
+    console.error('[WhatsApp] abandoned-cart error:', error.message);
+    return { sent: false, reason: error.message };
+  }
+}
+

@@ -218,4 +218,11 @@ export default {
   'comp.searchAddressPlaceholder': 'Search your address...',
   'comp.dragPinHint': 'Drag the pin or tap the map to set exact delivery location',
   'comp.mapsLoadFailed': 'Google Maps failed to load. Please try again.',
+  // Compare
+  'comp.compare': 'Compare',
+  'comp.compareCount': 'Compare ({count})',
+  // Google Reviews
+  'comp.googleReviewsTitle': 'Google Reviews',
+  'comp.googleReviewsCount': '{count} Google reviews',
+  'comp.googleReviewsSeeMore': 'See all reviews on Google',
 };

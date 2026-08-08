@@ -218,4 +218,11 @@ export default {
   'comp.searchAddressPlaceholder': 'మీ చిరునామాను శోధించండి...',
   'comp.dragPinHint': 'ఖచ్చితమైన డెలివరీ స్థానాన్ని సెట్ చేయడానికి పిన్ డ్రాగ్ చేయండి లేదా మ్యాప్ పై ట్యాప్ చేయండి',
   'comp.mapsLoadFailed': 'Google Maps లోడ్ కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.',
+  // Compare
+  'comp.compare': 'పోల్చండి',
+  'comp.compareCount': 'పోల్చండి ({count})',
+  // Google Reviews
+  'comp.googleReviewsTitle': 'గూగుల్ సమీక్షలు',
+  'comp.googleReviewsCount': '{count} గూగుల్ సమీక్షలు',
+  'comp.googleReviewsSeeMore': 'గూగుల్‌లో అన్ని సమీక్షలను చూడండి',
 };

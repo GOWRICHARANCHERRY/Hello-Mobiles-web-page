@@ -3,7 +3,7 @@ import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { auth, roleAuth } from '../middleware/auth.js';
-import { sendOrderWhatsApp } from '../utils/whatsapp.js';
+import { sendOrderWhatsApp, sendAbandonedCartWhatsApp } from '../utils/whatsapp.js';
 import { getDeliveryConfig, findDeliverableZone } from '../utils/delivery.js';
 import { invalidateCache } from '../utils/cache.js';
 
@@ -133,6 +133,34 @@ router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee
     order.deliveryStatus = deliveryStatus;
     await order.save();
     res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Customer: abandoned-cart reminder — WhatsApp the customer's saved cart items
+// when they didn't check out. No auth requirement server-side beyond the token
+// (phone comes from the logged-in user when available).
+const lastAbandonedSent = new Map();
+router.post('/abandoned-cart', auth, async (req, res) => {
+  try {
+    const { items, subtotal } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'Cart is empty' });
+    }
+    const user = await User.findById(req.user.id).select('phone');
+    const phone = user?.phone;
+
+    const key = `${req.user.id}:${items.length}:${Math.round(subtotal || 0)}`;
+    const now = Date.now();
+    const last = lastAbandonedSent.get(key);
+    if (last && now - last < 60 * 60 * 1000) {
+      return res.json({ sent: false, reason: 'rate-limited' });
+    }
+    lastAbandonedSent.set(key, now);
+
+    const result = await sendAbandonedCartWhatsApp(phone, items, subtotal || 0);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

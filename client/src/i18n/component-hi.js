@@ -218,4 +218,11 @@ export default {
   'comp.searchAddressPlaceholder': 'अपना पता खोजें...',
   'comp.dragPinHint': 'सटीक डिलीवरी स्थान सेट करने के लिए पिन खींचें या मानचित्र पर टैप करें',
   'comp.mapsLoadFailed': 'Google Maps लोड नहीं हो पाया। कृपया पुनः प्रयास करें।',
+  // Compare
+  'comp.compare': 'तुलना करें',
+  'comp.compareCount': 'तुलना ({count})',
+  // Google Reviews
+  'comp.googleReviewsTitle': 'गूगल समीक्षाएं',
+  'comp.googleReviewsCount': '{count} गूगल समीक्षाएं',
+  'comp.googleReviewsSeeMore': 'गूगल पर सभी समीक्षाएं देखें',
 };

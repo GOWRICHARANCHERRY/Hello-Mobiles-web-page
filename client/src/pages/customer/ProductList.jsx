@@ -3,11 +3,12 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useCompare } from '../../context/CompareContext';
 import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
 const LoginPopup = lazy(() => import('../../components/LoginPopup'));
 import SearchBar from '../../components/SearchBar';
-import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Star, ShoppingCart, Filter, X, ChevronDown, ChevronUp, Scale, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function FilterSection({ title, defaultOpen = true, children }) {
@@ -32,6 +33,8 @@ export default function ProductList() {
   const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { isInCompare, toggleCompare } = useCompare();
   const { t } = useLanguage();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
@@ -321,15 +324,23 @@ export default function ProductList() {
                     )}
                     <div className="flex gap-2 mt-3">
                       {product.variants?.length > 0 ? (
-                        <Link to={`/products/${product._id}`} className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1 text-center">
+                        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/products/${product._id}`); }}
+                          className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1 text-center">
                           {t('cust.viewOptions')}
-                        </Link>
+                        </button>
                       ) : (
                         <button onClick={(e) => handleAddToCart(product, e)} disabled={product.stock <= 0}
                           className="flex-1 btn-gold rounded-xl text-sm py-2 flex items-center justify-center gap-1">
                           <ShoppingCart size={14} /> {t('cust.addToCart')}
                         </button>
                       )}
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); const res = toggleCompare(product._id); if (res === 'full') toast.error(t('cust.compareMax')); }}
+                        title={t('comp.compare')}
+                        aria-label={t('comp.compare')}
+                        className={`w-9 h-9 rounded-xl border-2 flex items-center justify-center transition flex-shrink-0 ${isInCompare(product._id) ? 'border-gold-500 bg-gold-500 text-white' : 'border-gold-200 text-gold-700 hover:border-gold-400 hover:bg-gold-50'}`}>
+                        {isInCompare(product._id) ? <Check size={15} /> : <Scale size={15} />}
+                      </button>
                     </div>
                   </div>
                 </Link>

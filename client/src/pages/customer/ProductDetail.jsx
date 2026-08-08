@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useCompare } from '../../context/CompareContext';
 import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
 const LoginPopup = lazy(() => import('../../components/LoginPopup'));
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2 } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle, ChevronLeft, Minus, Plus, Check, Trash2, Scale, Calculator } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COLOR_MAP = {
@@ -51,8 +52,10 @@ export default function ProductDetail() {
   const [inWishlist, setInWishlist] = useState(false);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { isInCompare, toggleCompare } = useCompare();
   const { t } = useLanguage();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [emiTenure, setEmiTenure] = useState(12);
 
   const [selectedRam, setSelectedRam] = useState('');
   const [selectedStorage, setSelectedStorage] = useState('');
@@ -214,10 +217,20 @@ export default function ProductDetail() {
     if (!user) return setShowLoginPopup(true);
     try {
       await api.post(`/auth/wishlist/${product._id}`);
-      setInWishlist(!inWishlist);
-      toast.success(inWishlist ? 'Removed from wishlist' : 'Added to wishlist!');
+      const willBeIn = !inWishlist;
+      setInWishlist(willBeIn);
+      toast.success(willBeIn ? t('cust.addedToWishlist') : t('cust.removedFromWishlist'));
+      if (willBeIn) {
+        const prices = JSON.parse(localStorage.getItem('hm_wishlist_prices') || '{}');
+        prices[product._id] = currentPrice || product.price;
+        localStorage.setItem('hm_wishlist_prices', JSON.stringify(prices));
+      } else {
+        const prices = JSON.parse(localStorage.getItem('hm_wishlist_prices') || '{}');
+        delete prices[product._id];
+        localStorage.setItem('hm_wishlist_prices', JSON.stringify(prices));
+      }
     } catch (error) {
-      toast.error('Failed to update wishlist');
+      toast.error(error.response?.data?.message || t('cust.failedToUpdateWishlist'));
     }
   };
 
@@ -387,8 +400,27 @@ export default function ProductDetail() {
             {/* EMI Info */}
             {product.emiAvailable && (
               <div className="mt-4 p-3 border border-green-200 bg-green-50 rounded-xl">
-                <p className="text-green-700 font-medium text-sm">EMI starts from ₹{product.emiStarting?.toLocaleString() || Math.round((currentPrice || product.price) / 12).toLocaleString()}/month</p>
+                <p className="text-green-700 font-medium text-sm">EMI starts from ₹{(product.emiStarting ?? Math.round((currentPrice || product.price) / 12)).toLocaleString()}/month</p>
                 <p className="text-xs text-gray-600 mt-1">No Cost EMI available on select banks. 0% Down Payment option available.</p>
+
+                {/* Inline EMI calculator */}
+                <div className="mt-3 pt-3 border-t border-green-200">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-green-800 mb-2">
+                    <Calculator size={13} /> {t('cust.calculateEmi')}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {[3, 6, 9, 12, 18, 24].map(months => (
+                      <button key={months} onClick={() => setEmiTenure(months)}
+                        className={`px-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition ${emiTenure === months ? 'border-green-600 bg-green-600 text-white' : 'border-green-200 bg-white text-green-700 hover:border-green-400'}`}>
+                        {months} {t('cust.months', { count: months })}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-lg font-bold text-green-800">
+                    ₹{Math.round((currentPrice || product.price) / emiTenure).toLocaleString()}
+                    <span className="text-xs font-medium text-green-600"> /{t('cust.month')} × {emiTenure} {t('cust.months', { count: emiTenure })}</span>
+                  </p>
+                </div>
               </div>
             )}
 
@@ -422,6 +454,10 @@ export default function ProductDetail() {
             <div className="mt-3 flex flex-wrap gap-3">
               <button onClick={handleWishlist} className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm transition ${inWishlist ? 'bg-red-50 border-red-300 text-red-600' : 'hover:bg-gold-50'}`}>
                 <Heart size={16} className={inWishlist ? 'fill-red-500' : ''} /> {inWishlist ? 'Wishlisted' : 'Wishlist'}
+              </button>
+              <button onClick={() => { const res = toggleCompare(product._id); if (res === 'full') toast.error(t('cust.compareMax')); }}
+                className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-sm transition ${isInCompare(product._id) ? 'bg-gold-600 border-gold-600 text-white' : 'hover:bg-gold-50'}`}>
+                <Scale size={16} /> {isInCompare(product._id) ? t('cust.compareInList') : t('comp.compare')}
               </button>
               <button onClick={handleWhatsApp} className="flex items-center gap-2 px-4 py-2 border border-green-300 bg-green-50 text-green-700 rounded-xl text-sm hover:bg-green-100 transition">
                 <MessageCircle size={16} /> Ask on WhatsApp
