@@ -412,13 +412,13 @@ export default function ProductDetail() {
                     {[3, 6, 9, 12, 18, 24].map(months => (
                       <button key={months} onClick={() => setEmiTenure(months)}
                         className={`px-3 py-1.5 rounded-lg border-2 text-xs font-semibold transition ${emiTenure === months ? 'border-green-600 bg-green-600 text-white' : 'border-green-200 bg-white text-green-700 hover:border-green-400'}`}>
-                        {months} {t('cust.months', { count: months })}
+                        {t('cust.months', { count: months })}
                       </button>
                     ))}
                   </div>
                   <p className="text-lg font-bold text-green-800">
                     ₹{Math.round((currentPrice || product.price) / emiTenure).toLocaleString()}
-                    <span className="text-xs font-medium text-green-600"> /{t('cust.month')} × {emiTenure} {t('cust.months', { count: emiTenure })}</span>
+                    <span className="text-xs font-medium text-green-600"> /{t('cust.month')} × {t('cust.months', { count: emiTenure })}</span>
                   </p>
                 </div>
               </div>
