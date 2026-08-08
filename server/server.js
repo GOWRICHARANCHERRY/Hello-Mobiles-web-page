@@ -19,7 +19,7 @@ import couponRoutes from './routes/coupons.js';
 import leadRoutes from './routes/leads.js';
 import instagramRoutes from './routes/instagram.js';
 import deliveryZoneRoutes from './routes/deliveryZones.js';
-import razorpayRoutes from './routes/razorpay.js';
+import razorpayRoutes, { razorpayWebhook } from './routes/razorpay.js';
 import Product from './models/Product.js';
 import Banner from './models/Banner.js';
 import { cached } from './utils/cache.js';
@@ -121,6 +121,10 @@ const apiLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later.' },
 });
 app.use('/api', apiLimiter);
+
+// Razorpay webhook must see the RAW body (for HMAC verification), so it is
+// registered before express.json() parses streams. URL: /api/razorpay/webhook
+app.post('/api/razorpay/webhook', express.raw({ type: 'application/json', limit: '2mb' }), razorpayWebhook);
 
 app.use(express.json({ limit: '2mb' }));
 

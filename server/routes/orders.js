@@ -16,8 +16,9 @@ async function restoreOrderStock(order) {
   for (const item of order.items) {
     const product = await Product.findById(item.product);
     if (!product) continue;
-    if (item.variant?.variantId) {
-      const variant = product.variants.id(item.variant.variantId);
+    const variantId = item.variant?.variantId || item.variantId;
+    if (variantId) {
+      const variant = product.variants.id(variantId);
       if (variant) {
         const colorEntry = item.variant.color ? variant.colors?.find(c => c.name === item.variant.color) : null;
         if (colorEntry) {
@@ -224,7 +225,7 @@ router.post('/', auth, async (req, res) => {
         price: itemPrice,
         quantity: item.quantity,
         image: itemImage,
-        variant: item.variant || undefined,
+        variant: item.variant ? { ...item.variant, variantId: item.variant.variantId || item.variantId } : undefined,
       });
     }
 

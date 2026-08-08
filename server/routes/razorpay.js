@@ -103,4 +103,75 @@ router.post('/verify-payment', auth, async (req, res) => {
   }
 });
 
+function verifyWebhookSignature(rawBody, signatureHeader, secret) {
+  if (!signatureHeader || !secret) return false;
+  // Razorpay sends either the legacy signature or "t=<ts>,v1=<sig>".
+  const legacyMatch = signatureHeader.match(/^[a-f0-9]{64}$/);
+  if (legacyMatch) {
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    return expected === signatureHeader;
+  }
+  const fields = {};
+  signatureHeader.replace(/,/g, '&').split('&').forEach((pair) => {
+    const [k, ...v] = pair.split('=');
+    fields[k] = v.join('=');
+  });
+  if (!fields.v1) return false;
+  const signedPayload = `${fields.t}.${rawBody}`;
+  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
+  return expected === fields.v1;
+}
+
+// Webhook endpoint registered in server.js with a RAW body parser (before
+// express.json) so the HMAC can be verified over the exact bytes Razorpay sent.
+// Auto-marks orders paid when Razorpay confirms payment.captured — covers the
+// case where the customer's browser closes before the client-side verify call.
+export async function razorpayWebhook(req, res) {
+  try {
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      return res.status(503).json({ message: 'Webhook not configured' });
+    }
+    const signature = req.get('x-razorpay-signature');
+    if (!verifyWebhookSignature(req.body, signature, secret)) {
+      return res.status(400).json({ message: 'Invalid signature' });
+    }
+
+    const event = JSON.parse(req.body.toString('utf8'));
+    const entity = event?.payload?.payment?.entity;
+    const eventName = event?.event;
+
+    if (eventName === 'payment.captured' && entity) {
+      const order = await Order.findOne({
+        $or: [{ razorpayPaymentId: entity.id }, { razorpayOrderId: entity.order_id }],
+      });
+      if (order && order.paymentStatus !== 'paid' && order.orderStatus !== 'cancelled') {
+        // Cross-check the charged amount against the order total.
+        if (Math.round(order.total * 100) === Number(entity.amount)) {
+          order.paymentStatus = 'paid';
+          order.razorpayPaymentId = entity.id;
+          order.razorpayOrderId = order.razorpayOrderId || entity.order_id;
+          order.razorpaySignature = order.razorpaySignature || signature;
+          await order.save();
+          console.log(`[webhook] order ${order.orderNumber} marked paid (${entity.id})`);
+        } else {
+          console.error(`[webhook] amount mismatch for order ${order.orderNumber}: ${entity.amount} vs ${order.total * 100}`);
+        }
+      }
+    } else if (eventName === 'payment.failed' && entity) {
+      const order = await Order.findOne({ razorpayPaymentId: entity.id });
+      if (order && order.paymentStatus === 'pending') {
+        order.paymentStatus = 'failed';
+        await order.save();
+        console.log(`[webhook] order ${order.orderNumber} marked failed`);
+      }
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Razorpay webhook error:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export default router;
