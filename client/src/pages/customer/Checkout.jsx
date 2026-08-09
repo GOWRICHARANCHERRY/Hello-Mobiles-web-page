@@ -368,14 +368,14 @@ export default function Checkout() {
 
       <div className="flex items-center mb-8">
         {[1, 2, 3].map(s => (
-          <div key={s} className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= s ? 'bg-gold-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+          <div key={s} className="flex items-center min-w-0">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${step >= s ? 'bg-gold-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
               {step > s ? <Check size={16} /> : s}
             </div>
-            <span className={`ml-2 text-sm ${step >= s ? 'text-gold-700 font-medium' : 'text-gray-500'}`}>
+            <span className={`ml-2 text-xs sm:text-sm whitespace-nowrap ${step >= s ? 'text-gold-700 font-medium' : 'text-gray-500'}`}>
               {s === 1 ? t('cust.stepShipping') : s === 2 ? t('cust.stepPayment') : t('cust.stepReview')}
             </span>
-            {s < 3 && <div className={`w-12 h-0.5 mx-2 ${step > s ? 'bg-gold-600' : 'bg-gray-200'}`}></div>}
+            {s < 3 && <div className={`flex-1 min-w-2 max-w-12 mx-1 sm:mx-2 h-0.5 ${step > s ? 'bg-gold-600' : 'bg-gray-200'}`}></div>}
           </div>
         ))}
       </div>

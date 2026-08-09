@@ -292,7 +292,7 @@ export default function CustomerLayout() {
             <form onSubmit={handleNewsletter} className="flex w-full md:w-auto gap-2">
               <input type="email" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)}
                 placeholder={t('comp.enterEmail')}
-                className="flex-1 md:w-72 bg-gray-900 border border-gray-700 text-white text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-gold-500 outline-none placeholder-gray-500" />
+                className="flex-1 min-w-0 md:w-72 bg-gray-900 border border-gray-700 text-white text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-gold-500 outline-none placeholder-gray-500" />
               <button type="submit" disabled={newsletterLoading}
                 className="bg-gradient-to-r from-gold-500 to-gold-600 text-white font-semibold text-sm px-5 py-3 rounded-xl hover:from-gold-600 hover:to-gold-700 transition disabled:opacity-50 flex-shrink-0">
                 {newsletterLoading ? t('comp.subscribing') : t('comp.subscribe')}
