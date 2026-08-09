@@ -121,35 +121,56 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4">{t('admin.recentOrders')}</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b">
-              <tr>
-                <th className="text-left py-2 text-gray-600">{t('admin.orderColumn')}</th>
-                <th className="text-left py-2 text-gray-600">{t('admin.customerColumn')}</th>
-                <th className="text-left py-2 text-gray-600">{t('admin.amountColumn')}</th>
-                <th className="text-left py-2 text-gray-600">{t('admin.statusColumn')}</th>
-                <th className="text-left py-2 text-gray-600">{t('admin.dateColumn')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.recentOrders?.map(order => (
-                <tr key={order._id} className="border-b last:border-0">
-                  <td className="py-3 font-medium">#{order.orderNumber}</td>
-                  <td className="py-3 text-gray-600">{order.customer?.name}</td>
-                  <td className="py-3 font-medium">₹{order.total.toLocaleString()}</td>
-                  <td className="py-3"><span className="capitalize text-xs bg-gray-100 px-2 py-1 rounded">{order.orderStatus}</span></td>
-                  <td className="py-3 text-gray-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
-                </tr>
+        {(!data?.recentOrders || data.recentOrders.length === 0) ? (
+          <p className="py-8 text-center text-gray-400">{t('admin.noOrdersYet')}</p>
+        ) : (
+          <>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b">
+                  <tr>
+                    <th className="text-left py-2 pr-3 text-gray-600 whitespace-nowrap">{t('admin.orderColumn')}</th>
+                    <th className="text-left py-2 pr-3 text-gray-600 whitespace-nowrap">{t('admin.customerColumn')}</th>
+                    <th className="text-left py-2 pr-3 text-gray-600 whitespace-nowrap">{t('admin.amountColumn')}</th>
+                    <th className="text-left py-2 pr-3 text-gray-600 whitespace-nowrap">{t('admin.statusColumn')}</th>
+                    <th className="text-left py-2 text-gray-600 whitespace-nowrap">{t('admin.dateColumn')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.recentOrders.map(order => (
+                    <tr key={order._id} className="border-b last:border-0">
+                      <td className="py-3 pr-3 font-medium whitespace-nowrap">#{order.orderNumber}</td>
+                      <td className="py-3 pr-3 text-gray-600 truncate max-w-[200px]">{order.customer?.name}</td>
+                      <td className="py-3 pr-3 font-medium whitespace-nowrap">₹{order.total.toLocaleString()}</td>
+                      <td className="py-3 pr-3"><span className="capitalize text-xs bg-gray-100 px-2 py-1 rounded">{order.orderStatus}</span></td>
+                      <td className="py-3 text-gray-500 text-xs whitespace-nowrap">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="sm:hidden space-y-3">
+              {data.recentOrders.map(order => (
+                <div key={order._id} className="border border-gray-100 rounded-xl p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold text-gray-800">#{order.orderNumber}</span>
+                    <span className={`capitalize text-[11px] px-2 py-0.5 rounded-full ${order.orderStatus === 'delivered' ? 'bg-green-100 text-green-700' : order.orderStatus === 'cancelled' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'}`}>{order.orderStatus}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1.5 truncate">{order.customer?.name}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="font-bold text-gray-900">₹{order.total.toLocaleString()}</span>
+                    <span className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
+                  </div>
+                </div>
               ))}
-              {(!data?.recentOrders || data.recentOrders.length === 0) && (
-                <tr><td colSpan={5} className="py-8 text-center text-gray-400">{t('admin.noOrdersYet')}</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

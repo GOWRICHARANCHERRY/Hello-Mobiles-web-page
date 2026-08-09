@@ -705,22 +705,22 @@ function VariantManager({ variants, onChange, basePrice, baseMrp, baseStock, cat
                               </datalist>
                             </div>
                             {isMobiles ? (
-                              <div className="flex items-center gap-1 bg-green-50 border border-green-200 rounded px-2 py-1 min-w-[72px] justify-center">
+                              <div className="flex items-center gap-1 bg-green-50 border border-green-200 rounded px-2 py-1 min-w-[72px] justify-center flex-shrink-0">
                                 <span className="text-[10px] text-green-600">Stock:</span>
                                 <span className="text-xs font-bold text-green-700">{color.imei?.length || 0}</span>
                               </div>
                             ) : (
                               <input type="number" value={color.stock} onChange={e => updateColor(i, ci, 'stock', Number(e.target.value))}
                                 placeholder="Stock" min="0"
-                                className="w-20 border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none" />
+                                className="w-20 border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none flex-shrink-0" />
                             )}
-                            <input value={color.image} onChange={e => updateColor(i, ci, 'image', e.target.value)}
-                              placeholder="Image URL (optional)"
-                              className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none" />
                             <button type="button" onClick={() => removeColorFromVariant(i, ci)} className="text-red-400 hover:text-red-600 p-0.5 flex-shrink-0">
                               <Trash2 size={12} />
                             </button>
                           </div>
+                          <input value={color.image} onChange={e => updateColor(i, ci, 'image', e.target.value)}
+                            placeholder="Image URL (optional)"
+                            className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-gold-400 outline-none mt-1" />
 
                           {isMobiles && (
                             <div className="mt-2">

@@ -23,6 +23,10 @@ export default function DeliveryLayout() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <NewOrderNotifier />
+      {/* Mobile backdrop - closes sidebar on outside click */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform overflow-y-auto md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
         <div className="p-6">
@@ -62,7 +66,7 @@ export default function DeliveryLayout() {
           <h1 className="font-bold">{t('delv.portal')}</h1>
           <div></div>
         </header>
-        <main className="flex-1 min-w-0 p-6 overflow-x-hidden">
+        <main className="flex-1 min-w-0 p-4 md:p-6 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

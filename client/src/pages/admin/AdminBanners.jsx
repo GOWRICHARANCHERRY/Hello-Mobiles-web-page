@@ -205,21 +205,21 @@ export default function AdminBanners() {
             <div key={banner._id} className="bg-white rounded-2xl shadow-sm overflow-hidden gold-border">
               <div className="flex flex-col md:flex-row">
                 {/* Preview */}
-                <div className="md:w-96 h-48 md:h-auto relative flex-shrink-0"
+                <div className="md:w-96 h-36 sm:h-44 md:h-auto relative flex-shrink-0"
                   style={{ backgroundColor: banner.bgColor }}>
                   {banner.image && (
                     <img src={banner.image} alt="" className="w-full h-full object-cover" />
                   )}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-6 text-center"
                     style={{ color: banner.textColor }}>
                     {banner.highlightedText && (
-                      <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{banner.highlightedText}</p>
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 opacity-80">{banner.highlightedText}</p>
                     )}
                     {banner.bigText && (
-                      <h2 className="text-2xl md:text-3xl font-bold leading-tight">{banner.bigText}</h2>
+                      <h2 className="text-lg sm:text-2xl md:text-3xl font-bold leading-tight">{banner.bigText}</h2>
                     )}
                     {banner.smallText && (
-                      <p className="text-sm mt-2 opacity-75">{banner.smallText}</p>
+                      <p className="text-xs sm:text-sm mt-1 sm:mt-2 opacity-75">{banner.smallText}</p>
                     )}
                   </div>
                 </div>
