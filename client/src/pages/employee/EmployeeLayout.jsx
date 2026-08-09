@@ -61,12 +61,17 @@ export default function EmployeeLayout() {
 
       {/* Main Content */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="bg-white shadow-sm p-4 flex items-center justify-between md:hidden">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          <h1 className="font-bold">{t('emp.portal')}</h1>
-          <div></div>
+        <header className="bg-white shadow-sm px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden">
+              {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <h1 className="font-bold md:hidden">{t('emp.portal')}</h1>
+          </div>
+          <Link to="/employee" className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-50 transition" title={t('emp.dashboard')}>
+            <img src="/logo.png" alt="Hello Mobiles" className="w-7 h-7 rounded-lg object-contain bg-white border border-gold-200" />
+            <span className="text-sm font-bold text-gray-800 hidden sm:inline">HELLO MOBILES</span>
+          </Link>
         </header>
         <main className="flex-1 min-w-0 p-4 md:p-6 overflow-x-hidden">
           <Outlet />
