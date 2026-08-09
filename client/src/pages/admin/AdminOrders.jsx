@@ -273,6 +273,11 @@ export default function AdminOrders() {
                           </button>
                         )}
                       </div>
+                      {['assigned', 'out_for_delivery'].includes(order.deliveryStatus) && order.deliveryOtp && (
+                        <p className="mt-2 text-xs text-gray-600">
+                          {t('admin2.deliveryOtp')}: <b className="tracking-widest text-gray-900">{order.deliveryOtp}</b>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

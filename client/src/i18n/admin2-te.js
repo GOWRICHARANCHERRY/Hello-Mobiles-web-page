@@ -221,6 +221,7 @@ export default {
   'admin2.unassign': 'కేటాయింపు తీసివేయి',
   'admin2.assignedTo': 'కేటాయించినది: {name}',
   'admin2.notAssigned': 'కేటాయించబడలేదు',
+  'admin2.deliveryOtp': 'డెలివరీ OTP',
   'admin2.selectDeliveryStaff': 'డెలివరీ బాయ్‌ను ఎంచుకోండి...',
   'admin2.deliveryStatus': 'డెలివరీ',
   'admin2.deliveryStatus.unassigned': 'కేటాయించబడలేదు',

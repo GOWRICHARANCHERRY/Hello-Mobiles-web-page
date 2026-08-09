@@ -221,6 +221,7 @@ export default {
   'admin2.unassign': 'Unassign',
   'admin2.assignedTo': 'Assigned to: {name}',
   'admin2.notAssigned': 'Not assigned',
+  'admin2.deliveryOtp': 'Delivery OTP',
   'admin2.selectDeliveryStaff': 'Select delivery boy...',
   'admin2.deliveryStatus': 'Delivery',
   'admin2.deliveryStatus.unassigned': 'Unassigned',

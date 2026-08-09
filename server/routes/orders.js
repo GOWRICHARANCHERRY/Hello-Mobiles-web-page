@@ -9,12 +9,12 @@ import { invalidateCache } from '../utils/cache.js';
 
 const router = express.Router();
 
-// Strip the delivery OTP from any response unless the requester is the customer
-// who owns the order (the delivery boy must ASK the customer for the OTP, and
-// staff don't need it either).
+// Hide the delivery OTP from the DELIVERY BOY so he must ask the customer for
+// it (the whole point of the handshake). The owning customer, plus admin and
+// employee (who run the store), can see it.
 function orderJson(order, role) {
   const json = order?.toObject ? order.toObject() : order;
-  if (json && role !== 'customer') {
+  if (json && role === 'delivery') {
     delete json.deliveryOtp;
     delete json.deliveryOtpExpiresAt;
   }
@@ -186,6 +186,14 @@ router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (req.user.role === 'delivery' && order.assignedDelivery?.toString() !== req.user.id) {
       return res.status(403).json({ message: 'This order is not assigned to you' });
+    }
+
+    // Always ensure a fresh OTP exists while a delivery is in progress (covers
+    // orders that predate the OTP feature, which only get one on assignment).
+    if (['assigned', 'out_for_delivery'].includes(deliveryStatus) &&
+      (!order.deliveryOtp || !order.deliveryOtpExpiresAt || new Date(order.deliveryOtpExpiresAt) < new Date())) {
+      order.deliveryOtp = generateOtp();
+      order.deliveryOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
     }
 
     if (deliveryStatus === 'delivered') {

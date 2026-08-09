@@ -221,6 +221,7 @@ export default {
   'admin2.unassign': 'असाइन हटाएँ',
   'admin2.assignedTo': 'असाइन किया: {name}',
   'admin2.notAssigned': 'असाइन नहीं हुआ',
+  'admin2.deliveryOtp': 'डिलीवरी ओटीपी',
   'admin2.selectDeliveryStaff': 'डिलीवरी बॉय चुनें...',
   'admin2.deliveryStatus': 'डिलीवरी',
   'admin2.deliveryStatus.unassigned': 'असाइन नहीं हुआ',
