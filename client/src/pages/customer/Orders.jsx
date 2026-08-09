@@ -156,6 +156,26 @@ export default function Orders() {
                   </Link>
                 </div>
               </div>
+
+              {order.deliveryStatus === 'delivered' && (order.startDeliveryPhoto || order.deliveryPhoto) && (
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <p className="text-xs font-medium text-gray-500 mb-2">{t('cust.deliveryPhotos')}</p>
+                  <div className="flex gap-3">
+                    {order.startDeliveryPhoto && (
+                      <div className="flex flex-col gap-1">
+                        <img src={order.startDeliveryPhoto} alt="" className="w-24 h-24 rounded-lg object-cover border border-gray-200" />
+                        <span className="text-[10px] text-gray-500">{t('cust.startDeliveryPhoto')}</span>
+                      </div>
+                    )}
+                    {order.deliveryPhoto && (
+                      <div className="flex flex-col gap-1">
+                        <img src={order.deliveryPhoto} alt="" className="w-24 h-24 rounded-lg object-cover border border-gray-200" />
+                        <span className="text-[10px] text-gray-500">{t('cust.deliveryProofPhoto')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
