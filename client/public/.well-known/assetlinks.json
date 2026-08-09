@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.hellomobiles.app",
+      "sha256_cert_fingerprints": ["FC:18:F1:2B:E4:5D:6F:F3:A3:6D:73:F1:95:3F:CA:D4:39:24:AD:4B:95:2D:BE:B0:06:1A:E4:67:85:ED:E6:67"]
+    }
+  }
+]

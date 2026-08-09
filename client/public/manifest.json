@@ -1,0 +1,46 @@
+{
+  "name": "Hello Mobiles — Mobile Phones, Electronics & Gadgets",
+  "short_name": "Hello Mobiles",
+  "description": "Mobile phones, electronics, laptops, TVs, and gadgets in Allur and Buchireddypalem, Nellore district. Best prices, EMI options, and home delivery.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffdf5",
+  "theme_color": "#D97706",
+  "lang": "en",
+  "categories": ["shopping", "business"],
+  "icons": [
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Mobiles",
+      "short_name": "Mobiles",
+      "url": "/products?category=Mobiles",
+      "icons": [{ "src": "/logo.png", "sizes": "256x256" }]
+    },
+    {
+      "name": "Track My Order",
+      "short_name": "Orders",
+      "url": "/orders",
+      "icons": [{ "src": "/logo.png", "sizes": "256x256" }]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Android signing key + build outputs (regenerate with: twa/build.sh)
+android.keystore
+*.keystore
+app-release-*.apk
+app-release-*.aab
+*.idsig
+app/build/
+build/
+.gradle/
+twa-manifest.json.sha256

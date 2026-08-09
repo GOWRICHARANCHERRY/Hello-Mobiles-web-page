@@ -4,6 +4,12 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 const bootEl = document.getElementById('boot');
 if (bootEl) bootEl.classList.add('hm-hidden');
 

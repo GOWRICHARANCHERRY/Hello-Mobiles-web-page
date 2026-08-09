@@ -9,6 +9,15 @@ body {
   background-color: #fffdf5;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.pb-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+.pt-safe-top {
+  padding-top: max(env(safe-area-inset-top), 0.5rem);
 }
 
 h1, h2, h3, h4, h5, h6 {

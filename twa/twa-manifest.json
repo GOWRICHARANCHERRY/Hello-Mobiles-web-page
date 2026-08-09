@@ -1,0 +1,28 @@
+{
+  "packageId": "com.hellomobiles.app",
+  "host": "hello-mobiles.com",
+  "name": "Hello Mobiles",
+  "launcherName": "Hello Mobiles",
+  "display": "standalone",
+  "themeColor": "#D97706",
+  "navigationColor": "#ffffff",
+  "navigationColorDark": "#1a1a1a",
+  "backgroundColor": "#fffdf5",
+  "startUrl": "/",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "splashScreenFadeOutDuration": 300,
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://hello-mobiles.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "enableNotifications": true,
+  "enableSiteSettingsShortcut": true,
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "hellomobiles"
+  },
+  "iconUrl": "https://hello-mobiles.com/logo-512.png",
+  "maskableIconUrl": "https://hello-mobiles.com/logo-512-maskable.png"
+}

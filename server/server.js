@@ -255,6 +255,12 @@ async function serveIndex(req, res) {
 
 app.get('/', serveIndex);
 
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(path.join(clientDist, '.well-known', 'assetlinks.json'));
+});
+
 app.use(express.static(clientDist, {
   etag: true,
   lastModified: true,
