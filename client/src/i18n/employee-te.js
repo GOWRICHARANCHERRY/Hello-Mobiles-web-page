@@ -16,6 +16,8 @@ export default {
   'emp.stock': 'స్టాక్',
   'emp.outOfStock': 'స్టాక్ లేదు',
   'emp.stockLeft': '{count} మిగిలి ఉన్నాయి',
+  'emp.left': 'మిగిలి ఉంది',
+  'emp.stockLeftShort': 'స్టాక్ మిగిలి ఉంది',
 
   'emp.inventoryManagement': 'ఇన్వెంటరీ నిర్వహణ',
   'emp.ofTotal': 'మొత్తం {total} లో',

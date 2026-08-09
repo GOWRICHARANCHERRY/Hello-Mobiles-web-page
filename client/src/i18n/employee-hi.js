@@ -16,6 +16,8 @@ export default {
   'emp.stock': 'स्टॉक',
   'emp.outOfStock': 'स्टॉक खत्म',
   'emp.stockLeft': '{count} शेष',
+  'emp.left': 'शेष',
+  'emp.stockLeftShort': 'स्टॉक शेष',
 
   'emp.inventoryManagement': 'इन्वेंटरी प्रबंधन',
   'emp.ofTotal': 'कुल {total} में से',

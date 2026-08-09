@@ -16,6 +16,8 @@ export default {
   'emp.stock': 'Stock',
   'emp.outOfStock': 'Out of Stock',
   'emp.stockLeft': '{count} left',
+  'emp.left': 'left',
+  'emp.stockLeftShort': 'Stock left',
 
   'emp.inventoryManagement': 'Inventory Management',
   'emp.ofTotal': 'of {total}',
