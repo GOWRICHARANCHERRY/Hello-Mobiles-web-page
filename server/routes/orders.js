@@ -3,11 +3,29 @@ import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { auth, roleAuth } from '../middleware/auth.js';
-import { sendOrderWhatsApp, sendAbandonedCartWhatsApp } from '../utils/whatsapp.js';
+import { sendOrderWhatsApp, sendAbandonedCartWhatsApp, sendDeliveryAssignedWhatsApp } from '../utils/whatsapp.js';
 import { getDeliveryConfig, findDeliverableZone } from '../utils/delivery.js';
 import { invalidateCache } from '../utils/cache.js';
 
 const router = express.Router();
+
+// Strip the delivery OTP from any response unless the requester is the customer
+// who owns the order (the delivery boy must ASK the customer for the OTP, and
+// staff don't need it either).
+function orderJson(order, role) {
+  const json = order?.toObject ? order.toObject() : order;
+  if (json && role !== 'customer') {
+    delete json.deliveryOtp;
+    delete json.deliveryOtpExpiresAt;
+  }
+  return json;
+}
+
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+const OTP_TTL_MS = 48 * 60 * 60 * 1000;
 
 // Return an order's items back to stock (variant/color stock + IMEI status) when
 // an order is cancelled. Shared by admin/employee status change, delivery cancel,
@@ -52,7 +70,7 @@ router.get('/', auth, async (req, res) => {
       query.customer = req.user.id;
     }
     const orders = await Order.find(query).populate('customer', 'name phone email').populate('assignedDelivery', 'name phone').populate('items.product', 'name images').sort({ createdAt: -1 });
-    res.json(orders);
+    res.json(orders.map(o => orderJson(o, req.user.role)));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -81,43 +99,106 @@ router.get('/delivery', auth, roleAuth('delivery', 'admin', 'employee'), async (
       .populate('assignedDelivery', 'name phone')
       .populate('items.product', 'name images')
       .sort({ createdAt: -1 });
-    res.json(orders);
+    res.json(orders.map(o => orderJson(o, req.user.role)));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Admin/Employee: assign or unassign an order to a delivery boy
+// Admin/Employee: assign or unassign an order to a delivery boy.
+// On assignment we generate the delivery OTP (customer sees it on their order
+// page and shares it with the boy) and try to WhatsApp the customer the boy's
+// name, phone and the OTP.
 router.put('/:id/assign', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
     const { deliveryId } = req.body;
+    let delivery = null;
     if (deliveryId) {
-      const delivery = await User.findOne({ _id: deliveryId, role: 'delivery' });
+      delivery = await User.findOne({ _id: deliveryId, role: 'delivery' });
       if (!delivery) return res.status(400).json({ message: 'Delivery staff not found' });
     }
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { assignedDelivery: deliveryId || null, deliveryStatus: deliveryId ? 'assigned' : 'unassigned' },
-      { new: true }
-    ).populate('assignedDelivery', 'name phone');
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    res.json(order);
+
+    order.assignedDelivery = deliveryId || null;
+    order.deliveryStatus = deliveryId ? 'assigned' : 'unassigned';
+    if (deliveryId) {
+      order.deliveryOtp = generateOtp();
+      order.deliveryOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+    } else {
+      order.deliveryOtp = undefined;
+      order.deliveryOtpExpiresAt = undefined;
+    }
+    await order.save();
+
+    if (delivery && deliveryId) {
+      const populated = await order.populate('customer', 'name phone');
+      const customerPhone = order.shippingAddress?.phone || populated.customer?.phone;
+      sendDeliveryAssignedWhatsApp(customerPhone, order, delivery, order.deliveryOtp);
+    }
+
+    res.json(orderJson(await Order.findById(order._id).populate('assignedDelivery', 'name phone'), req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Delivery boy: update delivery progress
+// Delivery boy: start delivery (photo of parcel) or mark delivered (photo + customer OTP)
+router.post('/:id/delivery/start', auth, roleAuth('delivery', 'admin', 'employee'), async (req, res) => {
+  try {
+    const { photo } = req.body;
+    if (!photo || typeof photo !== 'string') {
+      return res.status(400).json({ message: 'A parcel photo is required to start delivery' });
+    }
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (req.user.role === 'delivery' && order.assignedDelivery?.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'This order is not assigned to you' });
+    }
+
+    // Regenerate the OTP if missing or expired so it is always fresh while the
+    // parcel is actually on the road.
+    if (!order.deliveryOtp || !order.deliveryOtpExpiresAt || new Date(order.deliveryOtpExpiresAt) < new Date()) {
+      order.deliveryOtp = generateOtp();
+      order.deliveryOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+    }
+    order.deliveryStatus = 'out_for_delivery';
+    order.startDeliveryPhoto = photo;
+    order.startDeliveryAt = new Date();
+    await order.save();
+
+    res.json(orderJson(order, req.user.role));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delivery boy: update delivery progress. Marking delivered requires the
+// delivery boy to upload a photo of the delivered parcel AND enter the customer's
+// OTP (delivery boy role enforces both; admin/employee may force-deliver).
 router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee'), async (req, res) => {
   try {
-    const { deliveryStatus } = req.body;
+    const { deliveryStatus, photo, otp } = req.body;
     if (!['assigned', 'out_for_delivery', 'delivered', 'cancelled'].includes(deliveryStatus)) {
       return res.status(400).json({ message: 'Invalid delivery status' });
     }
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (req.user.role === 'delivery' && order.assignedDelivery?.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'This order is not assigned to you' });
+    }
 
     if (deliveryStatus === 'delivered') {
+      if (req.user.role === 'delivery') {
+        if (!photo || typeof photo !== 'string') {
+          return res.status(400).json({ message: 'A photo of the delivered parcel is required' });
+        }
+        if (!otp) return res.status(400).json({ message: 'The customer OTP is required to mark delivered' });
+        const valid = order.deliveryOtp && String(otp).trim() === order.deliveryOtp
+          && order.deliveryOtpExpiresAt && new Date(order.deliveryOtpExpiresAt) > new Date();
+        if (!valid) return res.status(400).json({ message: 'Invalid or expired OTP' });
+        order.deliveryPhoto = photo;
+      }
       order.deliveredAt = new Date();
       order.orderStatus = 'delivered';
       order.paymentStatus = 'paid';
@@ -132,7 +213,28 @@ router.put('/:id/delivery-status', auth, roleAuth('delivery', 'admin', 'employee
     }
     order.deliveryStatus = deliveryStatus;
     await order.save();
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delivery boy: push live GPS location while out for delivery. The customer's
+// order page polls the order and shows the latest position on a map.
+router.post('/:id/location', auth, roleAuth('delivery'), async (req, res) => {
+  try {
+    const { lat, lng } = req.body;
+    if (typeof lat !== 'number' || typeof lng !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({ message: 'Invalid location' });
+    }
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.assignedDelivery?.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'This order is not assigned to you' });
+    }
+    order.liveLocation = { lat, lng, updatedAt: new Date() };
+    await order.save();
+    res.json({ ok: true, updatedAt: order.liveLocation.updatedAt });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -173,7 +275,7 @@ router.get('/:id', auth, async (req, res) => {
     if (req.user.role === 'customer' && order.customer._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -363,7 +465,7 @@ router.put('/:id/status', auth, roleAuth('admin', 'employee'), async (req, res) 
       order.deliveryStatus = 'cancelled';
     }
     await order.save();
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -373,7 +475,7 @@ router.put('/:id/payment', auth, roleAuth('admin', 'employee'), async (req, res)
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, { paymentStatus: req.body.paymentStatus }, { new: true });
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -400,7 +502,7 @@ router.post('/:id/cancel', auth, async (req, res) => {
     order.deliveryStatus = 'cancelled';
     if (order.paymentStatus === 'paid') order.paymentStatus = 'refunded';
     await order.save();
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -441,7 +543,7 @@ router.put('/:id/return-status', auth, roleAuth('admin', 'employee'), async (req
     }
     const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

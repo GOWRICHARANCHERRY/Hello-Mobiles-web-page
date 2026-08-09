@@ -70,6 +70,16 @@ const orderSchema = new mongoose.Schema({
     default: 'unassigned',
   },
   deliveredAt: Date,
+  deliveryOtp: String,
+  deliveryOtpExpiresAt: Date,
+  startDeliveryPhoto: String,
+  startDeliveryAt: Date,
+  deliveryPhoto: String,
+  liveLocation: {
+    lat: Number,
+    lng: Number,
+    updatedAt: Date,
+  },
   invoiceUrl: String,
   notes: String,
 }, { timestamps: true });

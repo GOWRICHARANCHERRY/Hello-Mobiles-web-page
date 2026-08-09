@@ -70,6 +70,58 @@ export async function sendOrderWhatsApp(order, customer) {
   }
 }
 
+export function buildDeliveryAssignedMessage(order, deliveryPerson, otp) {
+  const customerName = order.shippingAddress?.name || 'Customer';
+  const boyName = deliveryPerson?.name || 'Delivery boy';
+  const boyPhone = deliveryPerson?.phone || '';
+  return `🚚 DELIVERY ASSIGNED — Hello Mobiles
+
+Order: ${order.orderNumber}
+Total: ${formatINR(order.total)}
+
+Your delivery boy: ${boyName}
+Phone: ${boyPhone}
+
+Delivery OTP: ${otp}
+Share this OTP with your delivery boy to confirm delivery.
+
+Track order: https://hello-mobiles.com/orders/${order._id}`;
+}
+
+export async function sendDeliveryAssignedWhatsApp(customerPhone, order, deliveryPerson, otp) {
+  if (!TOKEN || !PHONE_NUMBER_ID) {
+    console.log('[WhatsApp] not configured — skipping delivery-assignment alert');
+    return { sent: false, reason: 'not-configured' };
+  }
+  const to = customerPhone || TO_NUMBER;
+  try {
+    const body = buildDeliveryAssignedMessage(order, deliveryPerson, otp);
+    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${PHONE_NUMBER_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'text',
+        text: { body },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('[WhatsApp] delivery-assignment error:', data?.error?.message || data);
+      return { sent: false, reason: data?.error?.message || 'api-error' };
+    }
+    console.log(`[WhatsApp] delivery-assignment alert sent to ${to}`);
+    return { sent: true };
+  } catch (error) {
+    console.error('[WhatsApp] delivery-assignment error:', error.message);
+    return { sent: false, reason: error.message };
+  }
+}
+
 export function buildAbandonedCartMessage(items, subtotal) {
   const itemLines = items
     .slice(0, 5)

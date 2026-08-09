@@ -111,6 +111,21 @@ export default function Orders() {
                 </div>
               )}
 
+              {order.assignedDelivery && ['assigned', 'out_for_delivery'].includes(order.deliveryStatus) && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 px-3 py-2 bg-gold-50/70 border border-gold-200 rounded-lg text-sm">
+                  <span className="flex items-center gap-1.5 text-gray-700"><Truck size={14} className="text-gold-600" />
+                    {t('cust.deliveryBoy')}: <b className="text-gray-900">{order.assignedDelivery.name}</b>
+                  </span>
+                  {order.assignedDelivery.phone && (
+                    <a href={`tel:${order.assignedDelivery.phone}`} className="text-gold-700 hover:text-gold-800 font-medium">📞 {order.assignedDelivery.phone}</a>
+                  )}
+                  {order.deliveryOtp && (
+                    <span className="text-gray-600">{t('cust.deliveryOtp')}: <b className="text-gray-900 tracking-widest">{order.deliveryOtp}</b></span>
+                  )}
+                  <Link to={`/orders/${order._id}`} className="ml-auto text-xs font-semibold text-blue-600 hover:text-blue-800">{t('cust.trackDelivery')}</Link>
+                </div>
+              )}
+
               <div className="flex flex-col md:flex-row md:items-center justify-between">
                 <div className="flex gap-2 overflow-x-auto">
                   {order.items.slice(0, 3).map((item, i) => (

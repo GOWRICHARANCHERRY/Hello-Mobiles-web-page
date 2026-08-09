@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft, MapPin, CreditCard } from 'lucide-react';
+import { Package, Check, Clock, Truck, CheckCircle, XCircle, Printer, RotateCcw, X, Loader, ChevronLeft, MapPin, CreditCard, Bike, Phone, Copy, Navigation } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { payWithRazorpay, normalizeContact } from '../../utils/razorpay';
+import LiveTrackingMap from '../../components/LiveTrackingMap';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
@@ -31,10 +32,20 @@ export default function OrderDetail() {
     api.get(`/orders/${id}`).then(r => { setOrder(r.data); setLoading(false); }).catch(() => setLoading(false));
   }, [id]);
 
-  const refresh = async () => {
-    const { data } = await api.get(`/orders/${id}`);
-    setOrder(data);
-  };
+  const refresh = useCallback(async () => {
+    try {
+      const { data } = await api.get(`/orders/${id}`);
+      setOrder(data);
+    } catch (e) { /* transient */ }
+  }, [id]);
+
+  useEffect(() => {
+    if (!order) return;
+    const active = ['assigned', 'out_for_delivery'].includes(order.deliveryStatus);
+    if (!active) return;
+    const interval = setInterval(refresh, 10000);
+    return () => clearInterval(interval);
+  }, [order, refresh]);
 
   const handlePayNow = async () => {
     if (!order) return;
@@ -68,6 +79,15 @@ export default function OrderDetail() {
     }
     window.print();
     if (invoice) invoice.style.zoom = '';
+  };
+
+  const copyOtp = async () => {
+    try {
+      await navigator.clipboard.writeText(order.deliveryOtp);
+      toast.success(t('cust.otpCopied'));
+    } catch (e) {
+      toast.error('Could not copy');
+    }
   };
 
   const handleCancel = async () => {
@@ -227,6 +247,90 @@ export default function OrderDetail() {
             </button>
           )}
         </div>
+      </div>
+
+      {/* Delivery tracking */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mt-6 print:hidden">
+        <div className="flex items-center gap-2 mb-3">
+          <Bike size={20} className="text-gold-600" />
+          <h2 className="text-lg font-bold text-gray-800">{t('cust.deliveryInfo')}</h2>
+        </div>
+
+        {order.assignedDelivery ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3 p-4 bg-gold-50/60 border border-gold-200 rounded-xl">
+              <div>
+                <p className="text-sm text-gray-500">{t('cust.deliveryBoy')}</p>
+                <p className="font-semibold text-gray-900">{order.assignedDelivery.name}</p>
+                {order.assignedDelivery.phone && (
+                  <p className="text-sm text-gray-600">{order.assignedDelivery.phone}</p>
+                )}
+              </div>
+              {order.assignedDelivery.phone && (
+                <a href={`tel:${order.assignedDelivery.phone}`}
+                  className="inline-flex items-center gap-1.5 bg-gold-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gold-700 transition">
+                  <Phone size={15} /> {t('cust.callDelivery')}
+                </a>
+              )}
+            </div>
+
+            {['assigned', 'out_for_delivery'].includes(order.deliveryStatus) && order.deliveryOtp && (
+              <div className="p-4 border-2 border-gold-300 rounded-xl text-center">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t('cust.deliveryOtp')}</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl font-bold tracking-[0.4em] text-gray-900">{order.deliveryOtp}</span>
+                  <button onClick={copyOtp} className="text-gold-700 hover:text-gold-800" title={t('cust.copyOtp')}>
+                    <Copy size={18} />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">{t('cust.shareOtpHint')}</p>
+                {order.deliveryOtpExpiresAt && (
+                  <p className="text-[11px] text-gray-400 mt-1">{t('cust.otpExpires', { time: new Date(order.deliveryOtpExpiresAt).toLocaleString('en-IN') })}</p>
+                )}
+              </div>
+            )}
+
+            {order.deliveryStatus === 'out_for_delivery' && (
+              <div className="p-4 bg-blue-50/50 border border-blue-200 rounded-xl">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <p className="font-semibold text-gray-800 flex items-center gap-1.5"><Navigation size={16} className="text-blue-600" /> {t('cust.liveTracking')}</p>
+                  {order.liveLocation?.updatedAt && (
+                    <span className="text-xs text-gray-500">{t('cust.trackingUpdatedAt', { time: new Date(order.liveLocation.updatedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) })}</span>
+                  )}
+                </div>
+                {order.liveLocation?.lat && order.liveLocation?.lng ? (
+                  <LiveTrackingMap lat={order.liveLocation.lat} lng={order.liveLocation.lng} />
+                ) : (
+                  <p className="text-xs text-gray-500">{t('cust.waitingForLocation')}</p>
+                )}
+              </div>
+            )}
+
+            {order.deliveryStatus === 'delivered' && (order.startDeliveryPhoto || order.deliveryPhoto) && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">{t('cust.deliveryPhotos')}</p>
+                <div className="flex gap-3">
+                  {order.startDeliveryPhoto && (
+                    <div className="flex flex-col gap-1">
+                      <img src={order.startDeliveryPhoto} alt="" className="w-28 h-28 rounded-xl object-cover border border-gray-200" />
+                      <span className="text-[10px] text-gray-500">{t('cust.startDeliveryPhoto')}</span>
+                    </div>
+                  )}
+                  {order.deliveryPhoto && (
+                    <div className="flex flex-col gap-1">
+                      <img src={order.deliveryPhoto} alt="" className="w-28 h-28 rounded-xl object-cover border border-gray-200" />
+                      <span className="text-[10px] text-gray-500">{t('cust.deliveryProofPhoto')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          ['confirmed', 'processing', 'packed', 'shipped'].includes(order.orderStatus) && (
+            <p className="text-sm text-gray-500">{t('cust.deliveryStatusUnassigned')}</p>
+          )
+        )}
       </div>
 
       {/* Invoice body (printable) */}
