@@ -28,7 +28,7 @@ export default function DeliveryLayout() {
         <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform overflow-y-auto md:sticky md:top-0 md:inset-y-auto md:h-screen`}>
+      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 bg-gold-700 text-white transition-transform md:sticky md:top-0 md:inset-y-auto md:h-screen flex flex-col`}>
         <div className="p-6">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="Hello Mobiles" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5" />
@@ -38,7 +38,7 @@ export default function DeliveryLayout() {
             </div>
           </div>
         </div>
-        <nav className="px-4 space-y-1">
+        <nav className="px-4 space-y-1 flex-1 overflow-y-auto">
           {links.map(link => (
             <Link key={link.to} to={link.to} onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${location.pathname === link.to ? 'bg-white/20' : 'hover:bg-white/10'}`}>
@@ -46,7 +46,7 @@ export default function DeliveryLayout() {
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="p-4 border-t border-white/10">
           <div className="bg-white/10 rounded-lg p-3">
             <p className="text-sm font-medium">{user?.name}</p>
             <p className="text-xs text-blue-200">{user?.phone}</p>
