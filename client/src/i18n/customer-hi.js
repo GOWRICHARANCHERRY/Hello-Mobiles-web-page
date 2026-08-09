@@ -217,6 +217,7 @@ export default {
   'cust.razorpaySecure': 'Razorpay के माध्यम से सुरक्षित भुगतान',
   'cust.razorpayMethods': 'कार्ड, UPI, नेट बैंकिंग और EMI सभी समर्थित',
   'cust.razorpayRedirect': 'भुगतान पूरा करने के लिए आपको हमारे सुरक्षित भुगतान गेटवे पर भेजा जाएगा।',
+  'cust.payWithRazorpay': 'Razorpay से भुगतान करें',
   'cust.phonePeDesc': 'PhonePe ऐप से सुरक्षित भुगतान करें',
   'cust.payWithPhonePe': 'PhonePe से भुगतान करें',
   'cust.phonePeOpensApp': 'भुगतान पूरा करने के लिए आपके फोन पर PhonePe ऐप खुलेगा',

@@ -212,6 +212,7 @@ export default {
   'cust.razorpaySecure': 'Razorpay ద్వారా సురక్షిత చెల్లింపు',
   'cust.razorpayMethods': 'కార్డ్, UPI, నెట్ బ్యాంకింగ్ మరియు EMI అన్నీ సపోర్ట్ చేయబడతాయి',
   'cust.razorpayRedirect': 'చెల్లింపు పూర్తి చేయడానికి మిమ్మల్ని మా సురక్షిత చెల్లింపు గేట్‌వేకు తీసుకెళ్తాము.',
+  'cust.payWithRazorpay': 'Razorpay ద్వారా చెల్లించండి',
   'cust.phonePeDesc': 'PhonePe యాప్ ద్వారా సురక్షితంగా చెల్లించండి',
   'cust.payWithPhonePe': 'PhonePe ద్వారా చెల్లించండి',
   'cust.phonePeOpensApp': 'చెల్లింపు పూర్తి చేయడానికి మీ ఫోన్‌లో PhonePe యాప్ తెరవబడుతుంది',

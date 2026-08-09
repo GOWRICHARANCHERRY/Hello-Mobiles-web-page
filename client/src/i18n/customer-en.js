@@ -217,6 +217,7 @@ export default {
   'cust.razorpaySecure': 'Secure payment via Razorpay',
   'cust.razorpayMethods': 'Card, UPI, Net Banking & EMI all supported',
   'cust.razorpayRedirect': 'You will be taken to our secure payment gateway to complete the payment.',
+  'cust.payWithRazorpay': 'Pay with Razorpay',
   'cust.phonePeDesc': 'Pay securely using the PhonePe app',
   'cust.payWithPhonePe': 'Pay with PhonePe',
   'cust.phonePeOpensApp': 'Opens the PhonePe app on your phone to complete the payment',

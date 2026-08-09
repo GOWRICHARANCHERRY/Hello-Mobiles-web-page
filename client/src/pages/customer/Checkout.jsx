@@ -307,6 +307,56 @@ export default function Checkout() {
     setLoading(false);
   };
 
+  const handleRazorpayNow = async () => {
+    const err = validateShipping();
+    if (err) return toast.error(err);
+    const ok = await ensureDeliverable();
+    if (!ok) return;
+    setLoading(true);
+    try {
+      const orderData = {
+        items: cart.map(item => ({
+          product: item._id,
+          quantity: item.quantity,
+          variantId: item.variant?._id || undefined,
+          variant: item.variant ? {
+            variantId: item.variant._id,
+            color: item.selectedColor || '',
+            ram: item.variant.ram || '',
+            storage: item.variant.storage || '',
+            sku: item.variant.sku || '',
+          } : undefined,
+        })),
+        shippingAddress: {
+          name: form.name, phone: form.phone, street: form.street, city: form.city,
+          state: form.state, pincode: form.pincode,
+          landmark: form.landmark || undefined,
+          altPhone: form.altPhone || undefined,
+          latitude: mapLoc.lat || undefined,
+          longitude: mapLoc.lng || undefined,
+          mapLabel: mapLoc.mapLabel || undefined,
+        },
+        paymentMethod: 'razorpay',
+        couponCode: coupon?.code || undefined,
+      };
+      const { data } = await api.post('/orders', orderData);
+      try {
+        await payOrderWithRazorpay(data);
+        toast.success(t('cust.toastPaymentSuccess'));
+      } catch (razorpayError) {
+        clearCart();
+        toast.error(razorpayError?.response?.data?.message || razorpayError.message || t('cust.toastPaymentFailed'));
+        navigate('/orders');
+        return;
+      }
+      clearCart();
+      navigate('/orders');
+    } catch (error) {
+      toast.error(error.response?.data?.message || t('cust.toastOrderFailed'));
+    }
+    setLoading(false);
+  };
+
   if (cart.length === 0) {
     navigate('/cart');
     return null;
@@ -515,7 +565,17 @@ export default function Checkout() {
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <p className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2"><CreditCard size={16} /> {t('cust.razorpaySecure')}</p>
                   <p className="text-xs text-blue-700 mb-2">{t('cust.razorpayMethods')}</p>
-                  <p className="text-[11px] text-gray-500">{t('cust.razorpayRedirect')}</p>
+                  <p className="text-[11px] text-gray-500 mb-3">{t('cust.razorpayRedirect')}</p>
+                  <button
+                    onClick={handleRazorpayNow}
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50">
+                    {loading ? (
+                      <><Loader size={16} className="animate-spin" /> {t('cust.processing')}</>
+                    ) : (
+                      <><CreditCard size={16} /> {t('cust.payWithRazorpay')} — ₹{Math.round(total).toLocaleString()}</>
+                    )}
+                  </button>
                 </div>
               )}
 
