@@ -89,7 +89,6 @@ export default {
   'emp.pay.phonepe': 'PhonePe',
   'emp.pay.razorpay': 'Razorpay',
   'emp.pay.cod': 'कैश ऑन डिलीवरी',
-  'emp.pay.store_pickup': 'स्टोर पिकअप',
   'emp.markAs': '{status} के रूप में चिह्नित करें',
   'emp.viewOnMap': 'मानचित्र पर देखें',
 };

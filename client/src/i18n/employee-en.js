@@ -89,7 +89,6 @@ export default {
   'emp.pay.phonepe': 'PhonePe',
   'emp.pay.razorpay': 'Razorpay',
   'emp.pay.cod': 'Cash on Delivery',
-  'emp.pay.store_pickup': 'Store Pickup',
   'emp.markAs': 'Mark as {status}',
   'emp.viewOnMap': 'View on map',
 };

@@ -14,7 +14,7 @@ const STATUS_COLORS = {
   unassigned: 'bg-gray-100 text-gray-600',
 };
 
-const PAYMENT_LABEL = { online: 'delv.pay.online', phonepe: 'delv.pay.phonepe', razorpay: 'delv.pay.razorpay', cod: 'delv.pay.cod', store_pickup: 'delv.pay.store_pickup' };
+const PAYMENT_LABEL = { online: 'delv.pay.online', phonepe: 'delv.pay.phonepe', razorpay: 'delv.pay.razorpay', cod: 'delv.pay.cod' };
 
 function PhotoInput({ value, onChange, label }) {
   const inputRef = useRef(null);

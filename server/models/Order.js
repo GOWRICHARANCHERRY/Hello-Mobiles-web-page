@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema({
     longitude: Number,
     mapLabel: String,
   },
-  paymentMethod: { type: String, enum: ['online', 'phonepe', 'razorpay', 'cod', 'store_pickup'], required: true },
+  paymentMethod: { type: String, enum: ['online', 'phonepe', 'razorpay', 'cod'], required: true },
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
   razorpayOrderId: String,
   razorpayPaymentId: String,

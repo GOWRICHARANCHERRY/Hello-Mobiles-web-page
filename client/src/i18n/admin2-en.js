@@ -139,7 +139,6 @@ export default {
   'admin2.pay.phonepe': 'PhonePe',
   'admin2.pay.razorpay': 'Razorpay',
   'admin2.pay.cod': 'Cash on Delivery',
-  'admin2.pay.store_pickup': 'Store Pickup',
   'admin2.selectStatus': 'Update Status...',
   'admin2.selectPaymentStatus': 'Payment Status...',
   'admin2.payStatus.paid': 'Paid',

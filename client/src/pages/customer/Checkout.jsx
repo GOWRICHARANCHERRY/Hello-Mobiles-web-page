@@ -4,7 +4,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { CreditCard, Banknote, Store, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { CreditCard, Banknote, Check, MapPin, Loader, Ticket, X, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import LocationPicker from '../../components/LocationPicker';
 import { payWithRazorpay, normalizeContact } from '../../utils/razorpay';
@@ -50,14 +50,20 @@ export default function Checkout() {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [deliveryZone, setDeliveryZone] = useState({ enabled: false, zones: [] });
   const [deliveryStatus, setDeliveryStatus] = useState(null);
+  const [codStatus, setCodStatus] = useState(null);
 
   const needsDelivery = deliveryZone.enabled
-    && (deliveryZone.zones?.some((z) => z.isActive) ?? false)
-    && paymentMethod !== 'store_pickup';
+    && (deliveryZone.zones?.some((z) => z.isActive) ?? false);
 
   useEffect(() => {
     api.get('/delivery-zones')
       .then((r) => setDeliveryZone(r.data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    api.get('/orders/cod-status')
+      .then((r) => setCodStatus(r.data))
       .catch(() => {});
   }, []);
 
@@ -520,18 +526,34 @@ export default function Checkout() {
                   { id: 'razorpay', label: 'cust.razorpay', icon: CreditCard, desc: 'cust.razorpayDesc' },
                   { id: 'online', label: 'cust.onlinePayment', icon: CreditCard, desc: 'cust.upiCardNetBanking' },
                   { id: 'phonepe', label: 'cust.phonePe', icon: PhonePeLogo, desc: 'cust.phonePeDesc' },
-                  { id: 'cod', label: 'cust.cashOnDelivery', icon: Banknote, desc: 'cust.payWhenReceive' },
-                  { id: 'store_pickup', label: 'cust.storePickup', icon: Store, desc: 'cust.payAtStore' },
-                ].map(method => (
-                  <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${paymentMethod === method.id ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'}`}>
-                    <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={e => setPaymentMethod(e.target.value)} className="text-gold-700" />
-                    <method.icon size={22} className={paymentMethod === method.id ? 'text-gold-700' : 'text-gray-400'} />
-                    <div>
-                      <p className="font-medium">{t(method.label)}</p>
-                      <p className="text-sm text-gray-500">{t(method.desc)}</p>
+                  { id: 'cod', label: 'cust.cashOnDelivery', icon: Banknote, desc: 'cust.payWhenReceive', cod: true },
+                ].map(method => {
+                  const codBlocked = method.cod && codStatus && !codStatus.eligible;
+                  const codExceeds = method.cod && codStatus && codStatus.eligible && codStatus.remaining < total;
+                  const disabled = !!codBlocked;
+                  return (
+                    <div key={method.id} className={`rounded-xl border-2 transition ${paymentMethod === method.id ? 'border-gold-500 bg-gold-50' : 'border-gray-200 hover:border-gold-300'} ${disabled ? 'opacity-60' : ''}`}>
+                      <label className={`flex items-center gap-4 p-4 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                        <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id}
+                          onChange={e => { if (!disabled) setPaymentMethod(e.target.value); }} className="text-gold-700" disabled={disabled} />
+                        <method.icon size={22} className={paymentMethod === method.id ? 'text-gold-700' : 'text-gray-400'} />
+                        <div>
+                          <p className="font-medium">{t(method.label)}</p>
+                          <p className="text-sm text-gray-500">{t(method.desc)}</p>
+                        </div>
+                      </label>
+                      {method.cod && codStatus && codBlocked && (
+                        <p className="px-4 pb-3 text-xs text-red-600">{t('cust.codNotEligible', { delivered: Math.round(codStatus.deliveredTotal).toLocaleString() })}</p>
+                      )}
+                      {method.cod && codStatus && codStatus.eligible && !codExceeds && (
+                        <p className="px-4 pb-3 text-xs text-green-600">{t('cust.codRemaining', { remaining: Math.round(codStatus.remaining).toLocaleString() })}</p>
+                      )}
+                      {method.cod && codStatus && codStatus.eligible && codExceeds && (
+                        <p className="px-4 pb-3 text-xs text-red-600">{t('cust.codLimitExceeded', { remaining: Math.round(codStatus.remaining).toLocaleString() })}</p>
+                      )}
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
 
               {paymentMethod === 'phonepe' && (
@@ -617,7 +639,7 @@ export default function Checkout() {
                   {form.altPhone && <p className="text-sm text-gray-600">{t('cust.altPhone')}: {form.altPhone}</p>}
                 </div>
                 <div className="border-b pb-4">
-                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'razorpay' ? t('cust.razorpay') : paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'phonepe' ? t('cust.phonePe') : paymentMethod === 'cod' ? t('cust.cashOnDelivery') : t('cust.storePickup')}</h3>
+                  <h3 className="font-medium text-gray-700 mb-1">{t('cust.paymentColon')}{paymentMethod === 'razorpay' ? t('cust.razorpay') : paymentMethod === 'online' ? t('cust.onlinePayment') : paymentMethod === 'phonepe' ? t('cust.phonePe') : t('cust.cashOnDelivery')}</h3>
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-700 mb-2">{t('cust.items')}</h3>

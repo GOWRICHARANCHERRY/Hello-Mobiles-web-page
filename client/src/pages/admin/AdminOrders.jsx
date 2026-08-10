@@ -5,7 +5,7 @@ import api from '../../utils/api';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const PAYMENT_LABEL = { online: 'admin2.pay.online', phonepe: 'admin2.pay.phonepe', razorpay: 'admin2.pay.razorpay', cod: 'admin2.pay.cod', store_pickup: 'admin2.pay.store_pickup' };
+const PAYMENT_LABEL = { online: 'admin2.pay.online', phonepe: 'admin2.pay.phonepe', razorpay: 'admin2.pay.razorpay', cod: 'admin2.pay.cod' };
 
 export default function AdminOrders() {
   const { t } = useLanguage();

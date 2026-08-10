@@ -23,7 +23,6 @@ export default {
   'delv.pay.phonepe': 'PhonePe',
   'delv.pay.razorpay': 'Razorpay',
   'delv.pay.cod': 'Cash on Delivery',
-  'delv.pay.store_pickup': 'Store Pickup',
   'delv.viewOnMap': 'View on map',
   'delv.startDelivery': 'Start Delivery',
   'delv.markDelivered': 'Mark as Delivered',

@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
@@ -62,6 +63,46 @@ async function restoreOrderStock(order) {
     invalidateCache('products:');
   }
 }
+
+// COD rules:
+// - A customer becomes COD-eligible only after their DELIVERED order value
+//   reaches ₹1,00,000 (the ₹1L of goods must be delivered first).
+// - Once eligible, they may have at most ₹1,00,000 of OUTSTANDING COD orders
+//   (COD orders placed but not yet delivered) at any time. When a COD order is
+//   delivered (payment collected), that amount frees back up into the limit.
+const COD_LIMIT = 100000;
+
+async function getCodStatus(customerId) {
+  const id = new mongoose.Types.ObjectId(customerId);
+  const [deliveredAgg] = await Order.aggregate([
+    { $match: { customer: id, orderStatus: 'delivered' } },
+    { $group: { _id: null, total: { $sum: '$total' } } },
+  ]);
+  const [outstandingAgg] = await Order.aggregate([
+    { $match: { customer: id, paymentMethod: 'cod', orderStatus: { $nin: ['delivered', 'cancelled'] } } },
+    { $group: { _id: null, total: { $sum: '$total' } } },
+  ]);
+  const deliveredTotal = deliveredAgg?.total || 0;
+  const outstandingCod = outstandingAgg?.total || 0;
+  return {
+    codLimit: COD_LIMIT,
+    deliveredTotal,
+    outstandingCod,
+    eligible: deliveredTotal >= COD_LIMIT,
+    remaining: Math.max(0, COD_LIMIT - outstandingCod),
+  };
+}
+
+// Lightweight endpoint for Checkout to know whether COD is available to this
+// customer and how much of the ₹1L COD limit is still unused.
+router.get('/cod-status', auth, async (req, res) => {
+  try {
+    const status = await getCodStatus(req.user.id);
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 router.get('/', auth, async (req, res) => {
   try {
@@ -295,18 +336,42 @@ router.post('/', auth, async (req, res) => {
     let subtotal = 0;
     const orderItems = [];
 
-    if (paymentMethod !== 'store_pickup') {
-      const deliveryCfg = await getDeliveryConfig();
-      if (deliveryCfg.enabled && deliveryCfg.zones.some((z) => z.isActive)) {
-        const lat = shippingAddress?.latitude;
-        const lng = shippingAddress?.longitude;
-        if (typeof lat !== 'number' || typeof lng !== 'number') {
-          return res.status(400).json({ message: 'Delivery location is required. Please set your delivery pin on the map.' });
-        }
-        const zone = findDeliverableZone(lat, lng, deliveryCfg.zones);
-        if (!zone || !zone.deliverable) {
-          return res.status(400).json({ message: 'Delivery is not available at this location.' });
-        }
+    if (paymentMethod === 'store_pickup') {
+      return res.status(400).json({ message: 'Store pickup is no longer available. Please choose delivery.' });
+    }
+
+    const deliveryCfg = await getDeliveryConfig();
+    if (deliveryCfg.enabled && deliveryCfg.zones.some((z) => z.isActive)) {
+      const lat = shippingAddress?.latitude;
+      const lng = shippingAddress?.longitude;
+      if (typeof lat !== 'number' || typeof lng !== 'number') {
+        return res.status(400).json({ message: 'Delivery location is required. Please set your delivery pin on the map.' });
+      }
+      const zone = findDeliverableZone(lat, lng, deliveryCfg.zones);
+      if (!zone || !zone.deliverable) {
+        return res.status(400).json({ message: 'Delivery is not available at this location.' });
+      }
+    }
+
+    // COD rules: only available to customers with ≥₹1,00,000 of DELIVERED
+    // business, and at most ₹1,00,000 of outstanding (undelivered) COD at a
+    // time. Delivered COD orders free the limit back up. Checked BEFORE any
+    // stock is deducted so a failed check never leaks stock.
+    if (paymentMethod === 'cod') {
+      const cod = await getCodStatus(req.user.id);
+      if (!cod.eligible) {
+        return res.status(400).json({ message: `Cash on Delivery is available only after your delivered orders total ₹1,00,000 or more. Your current delivered total is ₹${cod.deliveredTotal.toLocaleString('en-IN')}.` });
+      }
+      let estimateSubtotal = 0;
+      for (const item of items) {
+        const p = await Product.findById(item.product);
+        if (!p) continue;
+        const estPrice = (item.variantId && p.variants?.length > 0 && p.variants.id(item.variantId)) ? p.variants.id(item.variantId).price : p.price;
+        estimateSubtotal += estPrice * item.quantity;
+      }
+      const estimateTotal = estimateSubtotal + (estimateSubtotal > 5000 ? 0 : 99) - (exchangeDetails?.exchangeValue || 0);
+      if (cod.outstandingCod + estimateTotal > cod.codLimit) {
+        return res.status(400).json({ message: `Your outstanding Cash on Delivery limit is ₹1,00,000. You already have ₹${cod.outstandingCod.toLocaleString('en-IN')} of undelivered COD orders; this order would exceed the limit.` });
       }
     }
 
@@ -367,7 +432,7 @@ router.post('/', auth, async (req, res) => {
       });
     }
 
-    const deliveryCharge = paymentMethod === 'store_pickup' ? 0 : (subtotal > 5000 ? 0 : 99);
+    const deliveryCharge = subtotal > 5000 ? 0 : 99;
     let couponDiscount = 0;
     let appliedCoupon = null;
     if (couponCode) {

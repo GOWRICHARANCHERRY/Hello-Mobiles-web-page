@@ -158,7 +158,6 @@ export default {
   'comp.pay.online': 'ఆన్‌లైన్',
   'comp.pay.phonepe': 'PhonePe',
   'comp.pay.razorpay': 'Razorpay',
-  'comp.pay.store_pickup': 'స్టోర్ పికప్',
   'comp.shippingAddress': 'షిప్పింగ్ చిరునామా',
   'comp.phoneLabel': 'ఫోన్: {phone}',
   'comp.enterOrScanImei': 'వివరాలు చూడటానికి IMEI నమోదు చేయండి లేదా స్కాన్ చేయండి',

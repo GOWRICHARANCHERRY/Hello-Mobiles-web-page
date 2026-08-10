@@ -89,7 +89,6 @@ export default {
   'emp.pay.phonepe': 'PhonePe',
   'emp.pay.razorpay': 'Razorpay',
   'emp.pay.cod': 'క్యాష్ ఆన్ డెలివరీ',
-  'emp.pay.store_pickup': 'స్టోర్ పికప్',
   'emp.markAs': '{status} గా గుర్తించండి',
   'emp.viewOnMap': 'మ్యాప్‌లో చూడండి',
 };

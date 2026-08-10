@@ -9,7 +9,7 @@ import LiveTrackingMap from '../../components/LiveTrackingMap';
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
-const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery' };
 
 const STORE = {
   name: 'Hello Mobiles & Electronics',

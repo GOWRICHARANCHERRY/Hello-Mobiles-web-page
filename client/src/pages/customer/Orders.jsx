@@ -8,7 +8,7 @@ import { Package, Check, Clock, Truck, CheckCircle, XCircle, CreditCard } from '
 
 const statusSteps = ['confirmed', 'processing', 'packed', 'shipped', 'delivered'];
 
-const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery', store_pickup: 'cust.storePickup' };
+const PAYMENT_LABEL = { online: 'cust.onlinePayment', phonepe: 'cust.phonePe', razorpay: 'cust.razorpay', cod: 'cust.cashOnDelivery' };
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);

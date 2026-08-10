@@ -23,7 +23,6 @@ export default {
   'delv.pay.phonepe': 'PhonePe',
   'delv.pay.razorpay': 'Razorpay',
   'delv.pay.cod': 'క్యాష్ ఆన్ డెలివరీ',
-  'delv.pay.store_pickup': 'స్టోర్ పికప్',
   'delv.viewOnMap': 'మ్యాప్‌లో చూడండి',
   'delv.startDelivery': 'డెలివరీ ప్రారంభించండి',
   'delv.markDelivered': 'డెలివరీ అయినట్టు గుర్తించండి',

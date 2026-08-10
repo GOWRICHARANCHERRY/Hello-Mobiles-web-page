@@ -158,7 +158,6 @@ export default {
   'comp.pay.online': 'Online',
   'comp.pay.phonepe': 'PhonePe',
   'comp.pay.razorpay': 'Razorpay',
-  'comp.pay.store_pickup': 'Store Pickup',
   'comp.shippingAddress': 'Shipping Address',
   'comp.phoneLabel': 'Phone: {phone}',
   'comp.enterOrScanImei': 'Enter or scan an IMEI to view details',

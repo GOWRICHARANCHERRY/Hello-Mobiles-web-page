@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../utils/api';
 
-const PAYMENT_LABEL = { online: 'comp.pay.online', phonepe: 'comp.pay.phonepe', razorpay: 'comp.pay.razorpay', cod: 'comp.cashOnDelivery', store_pickup: 'comp.pay.store_pickup' };
+const PAYMENT_LABEL = { online: 'comp.pay.online', phonepe: 'comp.pay.phonepe', razorpay: 'comp.pay.razorpay', cod: 'comp.cashOnDelivery' };
 
 function CameraScanModal({ open, onClose, onDetected }) {
   const videoRef = useRef(null);
