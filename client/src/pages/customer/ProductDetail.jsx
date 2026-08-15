@@ -57,8 +57,7 @@ export default function ProductDetail() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [emiTenure, setEmiTenure] = useState(12);
 
-  const [selectedRam, setSelectedRam] = useState('');
-  const [selectedStorage, setSelectedStorage] = useState('');
+  const [selectedVariantKey, setSelectedVariantKey] = useState('');
   const [selectedColorName, setSelectedColorName] = useState('');
 
   const [reviews, setReviews] = useState([]);
@@ -75,8 +74,7 @@ export default function ProductDetail() {
     api.get(`/products/${id}`).then(r => {
       setProduct(r.data);
       setSelectedImage(0);
-      setSelectedRam('');
-      setSelectedStorage('');
+      setSelectedVariantKey('');
       setSelectedColorName('');
       setLoading(false);
     }).catch(() => { setLoading(false); });
@@ -113,40 +111,27 @@ export default function ProductDetail() {
 
   const hasVariants = product?.variants?.length > 0;
   const normalize = (s) => (s || '').toLowerCase().trim();
+  const shortSpec = (s) => (s || '').replace(/\s*gb\s*/gi, ' ').trim();
 
-  const ramOptions = useMemo(() => {
+  const variantOptions = useMemo(() => {
     if (!hasVariants) return [];
     const seen = new Map();
     product.variants.forEach(v => {
-      if (v.ram) {
-        const key = normalize(v.ram);
-        if (!seen.has(key)) seen.set(key, v.ram.trim());
+      if (!v.ram && !v.storage) return;
+      const key = `${normalize(v.ram)}|${normalize(v.storage)}`;
+      if (!seen.has(key)) {
+        const ram = shortSpec(v.ram);
+        const storage = shortSpec(v.storage);
+        seen.set(key, { key, label: [ram, storage].filter(Boolean).join('+') });
       }
     });
     return [...seen.values()];
   }, [product, hasVariants]);
 
-  const storageOptions = useMemo(() => {
-    if (!hasVariants) return [];
-    let filtered = product.variants;
-    if (selectedRam) filtered = filtered.filter(v => normalize(v.ram) === normalize(selectedRam));
-    const seen = new Map();
-    filtered.forEach(v => {
-      if (v.storage) {
-        const key = normalize(v.storage);
-        if (!seen.has(key)) seen.set(key, v.storage.trim());
-      }
-    });
-    return [...seen.values()];
-  }, [product, hasVariants, selectedRam]);
-
   const selectedVariant = useMemo(() => {
-    if (!hasVariants || !product) return null;
-    return product.variants.find(v =>
-      (!selectedRam || normalize(v.ram) === normalize(selectedRam)) &&
-      (!selectedStorage || normalize(v.storage) === normalize(selectedStorage))
-    ) || null;
-  }, [product, hasVariants, selectedRam, selectedStorage]);
+    if (!hasVariants || !product || !selectedVariantKey) return null;
+    return product.variants.find(v => `${normalize(v.ram)}|${normalize(v.storage)}` === selectedVariantKey) || null;
+  }, [product, hasVariants, selectedVariantKey]);
 
   const variantColors = useMemo(() => {
     if (!selectedVariant?.colors) return [];
@@ -165,12 +150,8 @@ export default function ProductDetail() {
   const discount = currentMrp && currentPrice ? Math.round(((currentMrp - currentPrice) / currentMrp) * 100) : 0;
 
   useEffect(() => {
-    if (ramOptions.length > 0 && !selectedRam) setSelectedRam(ramOptions[0]);
-  }, [ramOptions]);
-
-  useEffect(() => {
-    if (storageOptions.length > 0 && !selectedStorage) setSelectedStorage(storageOptions[0]);
-  }, [storageOptions]);
+    if (variantOptions.length > 0 && !selectedVariantKey) setSelectedVariantKey(variantOptions[0].key);
+  }, [variantOptions]);
 
   useEffect(() => {
     if (variantColors.length > 0 && !selectedColorName) {
@@ -178,16 +159,8 @@ export default function ProductDetail() {
     }
   }, [variantColors]);
 
-  const handleRamSelect = (ram) => {
-    const newRam = normalize(ram) === normalize(selectedRam) ? '' : ram;
-    setSelectedRam(newRam);
-    setSelectedStorage('');
-    setSelectedColorName('');
-  };
-
-  const handleStorageSelect = (storage) => {
-    const newStorage = normalize(storage) === normalize(selectedStorage) ? '' : storage;
-    setSelectedStorage(newStorage);
+  const handleVariantSelect = (key) => {
+    setSelectedVariantKey(normalize(key) === normalize(selectedVariantKey) ? '' : key);
     setSelectedColorName('');
   };
 
@@ -235,7 +208,7 @@ export default function ProductDetail() {
   };
 
   const handleWhatsApp = () => {
-    const variantText = selectedVariant ? ` (${selectedRam || ''}${selectedStorage ? '/' + selectedStorage : ''}${selectedColorName ? ' - ' + selectedColorName : ''})` : '';
+    const variantText = selectedVariant ? ` (${selectedVariant.ram || ''}${selectedVariant.storage ? '/' + selectedVariant.storage : ''}${selectedColorName ? ' - ' + selectedColorName : ''})` : '';
     const msg = `Hi, I'm interested in ${product?.name}${variantText} (₹${currentPrice?.toLocaleString()}). Please share more details.`;
     window.open(`https://wa.me/918886888128?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -324,35 +297,17 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* RAM Selector */}
-            {ramOptions.length > 0 && (
+            {/* Variant Selector (RAM + Storage) */}
+            {variantOptions.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">RAM: <span className="text-gold-700">{selectedRam || 'Select'}</span></p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Variant: <span className="text-gold-700">{variantOptions.find(o => o.key === selectedVariantKey)?.label || 'Select'}</span></p>
                 <div className="flex flex-wrap gap-2">
-                  {ramOptions.map(ram => {
-                    const isActive = normalize(selectedRam) === normalize(ram);
+                  {variantOptions.map(opt => {
+                    const isActive = selectedVariantKey === opt.key;
                     return (
-                      <button key={ram} onClick={() => handleRamSelect(ram)}
+                      <button key={opt.key} onClick={() => handleVariantSelect(opt.key)}
                         className={`px-4 py-2 rounded-xl border-2 text-sm transition font-medium ${isActive ? 'border-gold-500 bg-gold-50 text-gold-700' : 'border-gray-200 hover:border-gold-300'}`}>
-                        {ram}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Storage Selector */}
-            {storageOptions.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Storage: <span className="text-gold-700">{selectedStorage || 'Select'}</span></p>
-                <div className="flex flex-wrap gap-2">
-                  {storageOptions.map(storage => {
-                    const isActive = normalize(selectedStorage) === normalize(storage);
-                    return (
-                      <button key={storage} onClick={() => handleStorageSelect(storage)}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm transition font-medium ${isActive ? 'border-gold-500 bg-gold-50 text-gold-700' : 'border-gray-200 hover:border-gold-300'}`}>
-                        {storage}
+                        {opt.label}
                       </button>
                     );
                   })}
@@ -492,8 +447,7 @@ export default function ProductDetail() {
               <table className="w-full text-sm border rounded-xl overflow-hidden">
                 <thead className="bg-gold-50">
                   <tr>
-                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">RAM</th>
-                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Storage</th>
+                    <th className="text-left py-2 px-3 text-gray-700 font-semibold">Variant</th>
                     <th className="text-left py-2 px-3 text-gray-700 font-semibold">Price</th>
                     <th className="text-left py-2 px-3 text-gray-700 font-semibold">MRP</th>
                     <th className="text-left py-2 px-3 text-gray-700 font-semibold">Colors</th>
@@ -505,8 +459,9 @@ export default function ProductDetail() {
                     const totalStock = v.colors?.reduce((s, c) => s + (c.stock || 0), 0) || 0;
                     return (
                       <tr key={i} className="border-t hover:bg-gold-50/50 transition">
-                        <td className="py-2 px-3">{v.ram || '-'}</td>
-                        <td className="py-2 px-3">{v.storage || '-'}</td>
+                        <td className="py-2 px-3 font-medium">
+                          {[shortSpec(v.ram), shortSpec(v.storage)].filter(Boolean).join('+') || '-'}
+                        </td>
                         <td className="py-2 px-3 font-semibold text-gold-700">₹{v.price?.toLocaleString()}</td>
                         <td className="py-2 px-3 text-gray-500 line-through">₹{v.mrp?.toLocaleString()}</td>
                         <td className="py-2 px-3">
