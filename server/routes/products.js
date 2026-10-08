@@ -5,11 +5,13 @@ import { cached, invalidateCache } from '../utils/cache.js';
 
 const router = express.Router();
 
+const escapeRegex = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 async function buildProducts(q) {
   const { search, category, brand, minPrice, maxPrice, ram, storage, screenSize, color, sortBy, featured, newArrival, onOffer } = q;
   let query = { isActive: true };
   if (search) {
-    const regex = new RegExp(search, 'i');
+    const regex = new RegExp(escapeRegex(search), 'i');
     query.$or = [
       { name: regex },
       { brand: regex },
@@ -45,7 +47,7 @@ async function buildProducts(q) {
 
   // Also match against specification values (Map field can't be regex'd in Mongo)
   if (search) {
-    const re = new RegExp(search, 'i');
+    const re = new RegExp(escapeRegex(search), 'i');
     const matchesSpec = (p) => Object.values(p.specifications || {}).some(v => v && re.test(String(v)));
     const filtered = products.filter(p =>
       re.test(p.name) || re.test(p.brand) || re.test(p.category) ||
@@ -54,9 +56,14 @@ async function buildProducts(q) {
     products.splice(0, products.length, ...filtered);
   }
 
-  // Attach lowest variant price for products with variants
+  // Attach lowest variant price for products with variants.
+  // IMEI serials are stripped from every public response — they are only
+  // ever exposed through the staff-only /imei/:code lookup.
   return products.map(p => {
     const obj = p.toObject();
+    if (obj.variants) {
+      obj.variants.forEach(v => (v.colors || []).forEach(c => { delete c.imei; }));
+    }
     if (obj.variants && obj.variants.length > 0) {
       const lowestPrice = Math.min(...obj.variants.map(v => v.price));
       const lowestMrp = Math.min(...obj.variants.map(v => v.mrp));
@@ -116,7 +123,7 @@ router.get('/autocomplete', async (req, res) => {
   try {
     const { field, q } = req.query;
     if (!field || !q) return res.json([]);
-    const regex = new RegExp(q, 'i');
+    const regex = new RegExp(escapeRegex(q), 'i');
     let results;
     if (field === 'name') results = await Product.distinct('name', { name: regex, isActive: true });
     else if (field === 'brand') results = await Product.distinct('brand', { brand: regex, isActive: true });
@@ -132,7 +139,7 @@ router.get('/search/suggestions', async (req, res) => {
   try {
     const { q } = req.query;
     if (!q || q.trim().length < 1) return res.json({ products: [], brands: [], categories: [] });
-    const regex = new RegExp(q, 'i');
+    const regex = new RegExp(escapeRegex(q), 'i');
 
     const products = await Product.find({ isActive: true, $or: [{ name: regex }, { brand: regex }] })
       .select('name brand category price mrp images variants')
@@ -141,6 +148,9 @@ router.get('/search/suggestions', async (req, res) => {
 
     const enriched = products.map(p => {
       const obj = { ...p };
+      if (obj.variants) {
+        obj.variants.forEach(v => (v.colors || []).forEach(c => { delete c.imei; }));
+      }
       if (obj.variants && obj.variants.length > 0) {
         obj.lowestVariantPrice = Math.min(...obj.variants.map(v => v.price));
       }
@@ -169,9 +179,14 @@ router.get('/:id/reviews', async (req, res) => {
 router.post('/:id/reviews', auth, async (req, res) => {
   try {
     const { rating, title, comment } = req.body;
-    if (!rating || rating < 1 || rating > 5 || !comment) {
+    const ratingNum = Number(rating);
+    if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5 || !comment || typeof comment !== 'string') {
       return res.status(400).json({ message: 'Rating (1-5) and comment are required' });
     }
+    if (comment.trim().length < 2 || comment.length > 2000) {
+      return res.status(400).json({ message: 'Comment must be 2-2000 characters' });
+    }
+    const safeTitle = typeof title === 'string' ? title.slice(0, 120) : '';
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
@@ -179,7 +194,7 @@ router.post('/:id/reviews', auth, async (req, res) => {
     const existing = await Review.findOne({ product: product._id, user: req.user.id });
     if (existing) return res.status(400).json({ message: 'You have already reviewed this product' });
 
-    const review = await Review.create({ product: product._id, user: req.user.id, rating, title, comment });
+    const review = await Review.create({ product: product._id, user: req.user.id, rating: ratingNum, title: safeTitle, comment: comment.slice(0, 2000) });
     const populated = await review.populate('user', 'name avatar');
 
     const allReviews = await Review.find({ product: product._id });
@@ -199,6 +214,9 @@ router.delete('/:id/reviews/:reviewId', auth, async (req, res) => {
     const Review = (await import('../models/Review.js')).default;
     const review = await Review.findById(req.params.reviewId);
     if (!review) return res.status(404).json({ message: 'Review not found' });
+    if (String(review.product) !== String(req.params.id)) {
+      return res.status(400).json({ message: 'Review does not belong to this product' });
+    }
     if (req.user.role !== 'admin' && review.user.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -223,7 +241,11 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
+    const obj = product.toObject();
+    if (obj.variants) {
+      obj.variants.forEach(v => (v.colors || []).forEach(c => { delete c.imei; }));
+    }
+    res.json(obj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

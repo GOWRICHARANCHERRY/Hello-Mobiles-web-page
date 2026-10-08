@@ -13,14 +13,20 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `product-${uniqueSuffix}${ext}`);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `product-${uniqueSuffix}${ALLOWED_EXT.includes(ext) ? ext : '.jpg'}`);
   }
 });
 
+const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-  if (allowed.includes(file.mimetype)) cb(null, true);
+  const ext = path.extname(file.originalname).toLowerCase();
+  // Check BOTH mimetype and extension: mimetype comes from client headers and
+  // can be spoofed (e.g. evil.html sent as image/png -> stored XSS). The saved
+  // file is served same-origin, so only real image extensions are allowed.
+  if (allowed.includes(file.mimetype) && ALLOWED_EXT.includes(ext)) cb(null, true);
   else cb(new Error('Only image files allowed (jpg, png, webp, gif)'), false);
 };
 

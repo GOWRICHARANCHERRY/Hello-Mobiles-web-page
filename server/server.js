@@ -114,8 +114,6 @@ app.use(helmet({
   },
 }));
 
-app.use(mongoSanitize());
-
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 600,
@@ -130,6 +128,10 @@ app.use('/api', apiLimiter);
 app.post('/api/razorpay/webhook', express.raw({ type: 'application/json', limit: '2mb' }), razorpayWebhook);
 
 app.use(express.json({ limit: '2mb' }));
+
+// Must run AFTER body parsing — otherwise req.body is still undefined here
+// and POST/PUT payloads would reach Mongo unsanitized (NoSQL injection).
+app.use(mongoSanitize());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -277,6 +279,21 @@ app.use(express.static(clientDist, {
 app.get(/.*/, (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
   serveIndex(req, res);
+});
+
+// Central error handler: never leak stack traces / internals to clients in
+// production (NODE_ENV=production). Multer rejections, JSON parse errors and
+// anything uncaught elsewhere land here as safe generic messages.
+app.use((err, req, res, _next) => {
+  if (err?.type === 'entity.parse.failed' || err instanceof SyntaxError) {
+    return res.status(400).json({ message: 'Invalid request data' });
+  }
+  if (err?.message === 'Only image files allowed (jpg, png, webp, gif)' || err?.message === 'Only image files allowed') {
+    return res.status(400).json({ message: err.message });
+  }
+  console.error(`[${req.method} ${req.path}]`, err?.message || err);
+  const status = err?.status && Number.isInteger(err.status) ? err.status : 500;
+  res.status(status).json({ message: status === 500 ? 'Something went wrong. Please try again.' : (err.message || 'Request failed') });
 });
 
 const PORT = process.env.PORT || 5000;

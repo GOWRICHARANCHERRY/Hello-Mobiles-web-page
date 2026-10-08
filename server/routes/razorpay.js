@@ -69,7 +69,10 @@ router.post('/verify-payment', auth, async (req, res) => {
       .createHmac('sha256', secret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
-    if (expected !== razorpay_signature) {
+    // Constant-time comparison: a plain === leaks match position via timing.
+    const sigBuf = Buffer.from(String(razorpay_signature));
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
       return res.status(400).json({ message: 'Payment verification failed' });
     }
 
@@ -103,13 +106,19 @@ router.post('/verify-payment', auth, async (req, res) => {
   }
 });
 
+function safeEqual(a, b) {
+  const ab = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
+}
+
 function verifyWebhookSignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader || !secret) return false;
   // Razorpay sends either the legacy signature or "t=<ts>,v1=<sig>".
   const legacyMatch = signatureHeader.match(/^[a-f0-9]{64}$/);
   if (legacyMatch) {
     const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-    return expected === signatureHeader;
+    return safeEqual(expected, signatureHeader);
   }
   const fields = {};
   signatureHeader.replace(/,/g, '&').split('&').forEach((pair) => {
@@ -119,7 +128,7 @@ function verifyWebhookSignature(rawBody, signatureHeader, secret) {
   if (!fields.v1) return false;
   const signedPayload = `${fields.t}.${rawBody}`;
   const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
-  return expected === fields.v1;
+  return safeEqual(expected, fields.v1);
 }
 
 // Webhook endpoint registered in server.js with a RAW body parser (before

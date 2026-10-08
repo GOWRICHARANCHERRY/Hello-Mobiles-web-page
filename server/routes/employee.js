@@ -43,7 +43,11 @@ router.get('/inventory', auth, roleAuth('employee'), async (req, res) => {
 router.put('/inventory/:id', auth, roleAuth('employee'), async (req, res) => {
   try {
     const update = {};
-    if (req.body.stock !== undefined) update.stock = req.body.stock;
+    if (req.body.stock !== undefined) {
+      const s = Number(req.body.stock);
+      if (!Number.isFinite(s) || s < 0) return res.status(400).json({ message: 'Invalid stock value' });
+      update.stock = Math.floor(s);
+    }
     if (req.body.variants) update.variants = req.body.variants;
     const product = await Product.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });

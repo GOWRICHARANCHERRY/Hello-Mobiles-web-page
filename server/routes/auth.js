@@ -1,9 +1,10 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
 import { auth } from '../middleware/auth.js';
-import { verifyFirebaseToken } from '../config/firebase.js';
+import { verifyFirebaseToken, isFirebaseConfigured } from '../config/firebase.js';
 import { sendOTP, generateOTP } from '../utils/otp.js';
 
 const router = express.Router();
@@ -23,20 +24,31 @@ const verifyLimiter = limit(10);
 const isValidPhone = (phone) => /^[6-9]\d{9}$/.test(phone);
 
 // Firebase Phone Auth - verify token and login/signup
-router.post('/firebase-auth', async (req, res) => {
+router.post('/firebase-auth', limit(20), async (req, res) => {
   try {
     const { idToken, name, email } = req.body;
 
     // Verify Firebase token
     let firebaseUser = null;
+    let verifyFailed = false;
     try {
       firebaseUser = await verifyFirebaseToken(idToken);
     } catch (err) {
-      // In dev mode, this may fail - handle gracefully
-      console.log('Firebase token verification skipped (dev mode)');
+      verifyFailed = true;
     }
 
-    // For dev mode: accept phone from request body
+    // SECURITY: when Firebase is configured (production), a failed/invalid
+    // token must be rejected outright. Falling back to the client-supplied
+    // phone would let anyone log in as any user (including admin) with a
+    // bogus token. The unverified fallback is dev-only (no Firebase keys).
+    if (verifyFailed && isFirebaseConfigured()) {
+      return res.status(401).json({ message: 'Invalid login token' });
+    }
+    if (!firebaseUser && isFirebaseConfigured()) {
+      return res.status(401).json({ message: 'Invalid login token' });
+    }
+
+    // Dev mode only (Firebase not configured): accept phone from request body
     const phone = firebaseUser?.phone_number || req.body.phone;
 
     if (!phone) {
@@ -88,10 +100,12 @@ router.post('/send-otp', otpLimiter, async (req, res) => {
 
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    // Store only a hash — a DB leak must not expose usable OTPs.
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
 
     let user = await User.findOne({ phone });
     if (user) {
-      user.otp = otp;
+      user.otp = otpHash;
       user.otpExpiry = otpExpiry;
       await user.save();
     } else {
@@ -99,7 +113,7 @@ router.post('/send-otp', otpLimiter, async (req, res) => {
         name: 'Temp',
         phone,
         password: Math.random().toString(36).slice(-8),
-        otp,
+        otp: otpHash,
         otpExpiry,
       });
       await user.save();
@@ -123,7 +137,8 @@ router.post('/verify-otp', verifyLimiter, async (req, res) => {
     if (!user) return res.status(400).json({ message: 'User not found' });
     if (!user.otp || !user.otpExpiry) return res.status(400).json({ message: 'No OTP found' });
     if (new Date() > user.otpExpiry) return res.status(400).json({ message: 'OTP expired' });
-    if (user.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+    const otpHash = crypto.createHash('sha256').update(String(otp)).digest('hex');
+    if (user.otp !== otpHash) return res.status(400).json({ message: 'Invalid OTP' });
 
     user.phoneVerified = true;
     user.otp = undefined;
@@ -137,7 +152,7 @@ router.post('/verify-otp', verifyLimiter, async (req, res) => {
 });
 
 // Complete signup after OTP
-router.post('/complete-signup', async (req, res) => {
+router.post('/complete-signup', limit(20), async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
     const user = await User.findOne({ phone });
@@ -165,12 +180,12 @@ router.post('/complete-signup', async (req, res) => {
       user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Signup failed. Please try again.' });
   }
 });
 
 // Google Login
-router.post('/google', async (req, res) => {
+router.post('/google', loginLimiter, async (req, res) => {
   try {
     const { credential } = req.body;
     const { OAuth2Client } = await import('google-auth-library');
@@ -186,6 +201,9 @@ router.post('/google', async (req, res) => {
 
     let user = await User.findOne({ email });
 
+    if (user?.isActive === false) {
+      return res.status(403).json({ message: 'Account deactivated' });
+    }
     if (!user) {
       const password = Math.random().toString(36).slice(-8);
       user = new User({ name, email, password, role: 'customer', avatar: picture, phoneVerified: true });
@@ -211,8 +229,9 @@ router.post('/login', loginLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
     const user = await User.findOne({ phone });
-    if (!user) return res.status(400).json({ message: 'User not found' });
-    if (user.name === 'Temp') return res.status(400).json({ message: 'Please complete your registration first' });
+    if (!user || user.name === 'Temp' || user.isActive === false) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -233,9 +252,15 @@ router.get('/me', auth, async (req, res) => {
 
 router.put('/profile', auth, async (req, res) => {
   try {
-    const updates = req.body;
-    delete updates.password;
-    delete updates.role;
+    // Whitelist: never allow privilege/security fields from the client
+    // (role, password, phoneVerified, loyaltyPoints, otp, ...).
+    const { name, email, address, language, avatar } = req.body;
+    const updates = {};
+    if (name !== undefined) updates.name = String(name).slice(0, 100);
+    if (email !== undefined) updates.email = email ? String(email).slice(0, 120) : undefined;
+    if (address !== undefined) updates.address = address;
+    if (language !== undefined && ['en', 'hi', 'te'].includes(language)) updates.language = language;
+    if (avatar !== undefined) updates.avatar = String(avatar).slice(0, 500);
     const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-password');
     res.json(user);
   } catch (error) {

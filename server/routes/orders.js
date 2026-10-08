@@ -336,6 +336,17 @@ router.post('/', auth, async (req, res) => {
     let subtotal = 0;
     const orderItems = [];
 
+    if (!Array.isArray(items) || items.length === 0 || items.length > 20) {
+      return res.status(400).json({ message: 'Invalid order items' });
+    }
+    // Exchange discount comes from the client — sanitize it so a tampered
+    // value can never zero out (or inflate) the order total.
+    const exchangeValue = (() => {
+      const v = Number(exchangeDetails?.exchangeValue);
+      if (!Number.isFinite(v) || v < 0) return 0;
+      return Math.min(v, 50000);
+    })();
+
     if (paymentMethod === 'store_pickup') {
       return res.status(400).json({ message: 'Store pickup is no longer available. Please choose delivery.' });
     }
@@ -369,13 +380,18 @@ router.post('/', auth, async (req, res) => {
         const estPrice = (item.variantId && p.variants?.length > 0 && p.variants.id(item.variantId)) ? p.variants.id(item.variantId).price : p.price;
         estimateSubtotal += estPrice * item.quantity;
       }
-      const estimateTotal = estimateSubtotal + (estimateSubtotal > 5000 ? 0 : 99) - (exchangeDetails?.exchangeValue || 0);
+      const estimateTotal = estimateSubtotal + (estimateSubtotal > 5000 ? 0 : 99) - exchangeValue;
       if (cod.outstandingCod + estimateTotal > cod.codLimit) {
         return res.status(400).json({ message: `Your outstanding Cash on Delivery limit is ₹1,00,000. You already have ₹${cod.outstandingCod.toLocaleString('en-IN')} of undelivered COD orders; this order would exceed the limit.` });
       }
     }
 
     for (const item of items) {
+      const qty = Number(item.quantity);
+      if (!Number.isInteger(qty) || qty < 1 || qty > 10) {
+        return res.status(400).json({ message: 'Invalid item quantity' });
+      }
+      item.quantity = qty;
       const product = await Product.findById(item.product);
       if (!product) return res.status(404).json({ message: `Product not found: ${item.product}` });
 
@@ -436,6 +452,7 @@ router.post('/', auth, async (req, res) => {
     let couponDiscount = 0;
     let appliedCoupon = null;
     if (couponCode) {
+      if (typeof couponCode !== 'string') return res.status(400).json({ message: 'Invalid coupon code' });
       const Coupon = (await import('../models/Coupon.js')).default;
       const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
       const now = new Date();
@@ -461,7 +478,7 @@ router.post('/', auth, async (req, res) => {
       appliedCoupon = coupon;
     }
 
-    const total = Math.max(0, subtotal + deliveryCharge - (exchangeDetails?.exchangeValue || 0) - couponDiscount);
+    const total = Math.max(0, subtotal + deliveryCharge - exchangeValue - couponDiscount);
 
     const order = new Order({
       customer: req.user.id,
@@ -470,7 +487,7 @@ router.post('/', auth, async (req, res) => {
       paymentMethod,
       paymentStatus: ['cod', 'razorpay'].includes(paymentMethod) ? 'pending' : 'paid',
       emiDetails,
-      exchangeDetails,
+      exchangeDetails: exchangeDetails ? { exchangeValue } : undefined,
       subtotal,
       deliveryCharge,
       couponCode: appliedCoupon?.code,
@@ -546,7 +563,11 @@ router.put('/:id/status', auth, roleAuth('admin', 'employee'), async (req, res) 
 
 router.put('/:id/payment', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { paymentStatus: req.body.paymentStatus }, { new: true });
+    const { paymentStatus } = req.body;
+    if (!['pending', 'paid', 'failed', 'refunded'].includes(paymentStatus)) {
+      return res.status(400).json({ message: 'Invalid payment status' });
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, { paymentStatus }, { new: true });
     if (!order) return res.status(404).json({ message: 'Order not found' });
     res.json(orderJson(order, req.user.role));
   } catch (error) {
@@ -598,7 +619,7 @@ router.post('/:id/return', auth, async (req, res) => {
     order.returnReason = req.body.reason || 'Customer requested return';
     order.returnStatus = 'requested';
     await order.save();
-    res.json(order);
+    res.json(orderJson(order, req.user.role));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

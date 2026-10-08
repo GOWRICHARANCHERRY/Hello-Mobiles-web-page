@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/validate', auth, async (req, res) => {
   try {
     const { code, subtotal, items } = req.body;
-    if (!code) return res.status(400).json({ message: 'Coupon code is required' });
+    if (!code || typeof code !== 'string') return res.status(400).json({ message: 'Coupon code is required' });
     if (!subtotal || subtotal <= 0) return res.status(400).json({ message: 'Invalid order amount' });
 
     const coupon = await Coupon.findOne({ code: code.toUpperCase().trim() });

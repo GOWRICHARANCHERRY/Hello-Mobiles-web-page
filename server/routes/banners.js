@@ -15,13 +15,17 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `banner-${uniqueSuffix}${path.extname(file.originalname)}`);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `banner-${uniqueSuffix}${ALLOWED_EXT.includes(ext) ? ext : '.jpg'}`);
   }
 });
 
+const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.webp'];
+
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (allowed.includes(file.mimetype)) cb(null, true);
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowed.includes(file.mimetype) && ALLOWED_EXT.includes(ext)) cb(null, true);
   else cb(new Error('Only image files allowed'), false);
 };
 

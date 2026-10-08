@@ -6,6 +6,9 @@ import { auth, roleAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Never expose password hashes, OTP secrets or internal flags in listings.
+const SAFE_USER_FIELDS = '-password -otp -otpExpiry';
+
 router.get('/dashboard', auth, roleAuth('admin'), async (req, res) => {
   try {
     const today = new Date();
@@ -82,7 +85,7 @@ router.get('/dashboard', auth, roleAuth('admin'), async (req, res) => {
 
 router.get('/employees', auth, roleAuth('admin'), async (req, res) => {
   try {
-    const employees = await User.find({ role: { $in: ['employee', 'delivery'] } }).select('-password').sort({ createdAt: -1 });
+    const employees = await User.find({ role: { $in: ['employee', 'delivery'] } }).select(SAFE_USER_FIELDS).sort({ createdAt: -1 });
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -93,6 +96,10 @@ router.post('/employees', auth, roleAuth('admin'), async (req, res) => {
   try {
     const { name, phone, email, password, role = 'employee' } = req.body;
     if (!['employee', 'delivery'].includes(role)) return res.status(400).json({ message: 'Invalid role' });
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) return res.status(400).json({ message: 'Valid 10-digit phone required' });
+    if (!password || typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
     const employee = new User({ name, phone, email, password, role });
     await employee.save();
     res.status(201).json({ id: employee._id, name: employee.name, phone: employee.phone, email: employee.email, role: employee.role });
@@ -103,6 +110,17 @@ router.post('/employees', auth, roleAuth('admin'), async (req, res) => {
 
 router.delete('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
+    if (String(req.params.id) === String(req.user.id)) {
+      return res.status(400).json({ message: 'You cannot delete your own account' });
+    }
+    const target = await User.findById(req.params.id);
+    if (!target) return res.status(404).json({ message: 'Employee not found' });
+    if (target.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ message: 'Cannot delete the last admin account' });
+      }
+    }
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'Employee removed' });
   } catch (error) {
@@ -130,7 +148,7 @@ router.put('/employees/:id', auth, roleAuth('admin'), async (req, res) => {
 
 router.get('/customers', auth, roleAuth('admin', 'employee'), async (req, res) => {
   try {
-    const customers = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });
+    const customers = await User.find({ role: 'customer' }).select(SAFE_USER_FIELDS).sort({ createdAt: -1 });
     res.json(customers);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -34,3 +34,9 @@ export async function verifyFirebaseToken(idToken) {
   const decoded = await firebaseApp.auth().verifyIdToken(idToken);
   return decoded;
 }
+
+// Strict check used by auth routes: in production (Firebase configured) a
+// failed verification must NEVER fall back to trusting client-supplied data.
+export function isFirebaseConfigured() {
+  return !!firebaseApp;
+}
