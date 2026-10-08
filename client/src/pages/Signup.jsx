@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import SEO from '../components/SEO';
-import { auth, sendFirebaseOTP } from '../utils/firebase';
 import { ArrowLeft, Check, Smartphone, Shield, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -14,7 +13,6 @@ export default function Signup() {
   const [otp, setOtp] = useState('');
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
-  const [confirmation, setConfirmation] = useState(null);
   const [otpTimer, setOtpTimer] = useState(0);
 
   const startTimer = () => {
@@ -28,15 +26,12 @@ export default function Signup() {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setLoading(true);
     try {
-      const result = await sendFirebaseOTP(phone);
-      setConfirmation(result);
+      await api.post('/auth/send-whatsapp-otp', { phone });
       toast.success(t('comp.otpSent'));
       setStep(2);
       startTimer();
     } catch (error) {
-      console.error('Firebase OTP error:', error);
-      if (error.code === 'auth/quota-exceeded') toast.error(t('comp.smsQuotaAddBilling'));
-      else toast.error(t('comp.failedWith', { error: error.message || t('comp.tryAgain') }));
+      toast.error(error.response?.data?.message || t('comp.sendOtpFailed', { error: t('comp.tryAgain') }));
     }
     setLoading(false);
   };
@@ -45,11 +40,11 @@ export default function Signup() {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setLoading(true);
     try {
-      await confirmation.confirm(otp);
+      await api.post('/auth/verify-otp', { phone, otp });
       toast.success(t('comp.phoneVerifiedToast'));
       setStep(3);
     } catch (error) {
-      toast.error(t('comp.invalidOtpTryAgain'));
+      toast.error(error.response?.data?.message || t('comp.invalidOtpTryAgain'));
     }
     setLoading(false);
   };
@@ -61,8 +56,7 @@ export default function Signup() {
     if (form.password.length < 6) return toast.error(t('comp.passwordMinLength'));
     setLoading(true);
     try {
-      const idToken = await auth.currentUser.getIdToken();
-      const { data } = await api.post('/auth/firebase-auth', { idToken, phone, name: form.name, email: form.email, password: form.password });
+      const { data } = await api.post('/auth/complete-signup', { phone, name: form.name, email: form.email, password: form.password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast.success(t('comp.accountCreated'));
@@ -114,7 +108,7 @@ export default function Signup() {
                   <Smartphone size={28} className="text-gold-700" />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-800">{t('comp.enterYourPhoneNumber')}</h2>
-                <p className="text-sm text-gray-500 mt-1">{t('comp.verificationViaSms')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('comp.verificationViaWhatsapp')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('comp.phoneNumber')}</label>
@@ -125,13 +119,12 @@ export default function Signup() {
                     className="w-full border-2 border-gold-200 rounded-r-lg px-4 py-3 focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none bg-gold-50/50" />
                 </div>
               </div>
-              <div id="recaptcha-container" className="flex justify-center"></div>
               <button onClick={handleSendOTP} disabled={loading || phone.length !== 10}
                 className="w-full btn-gold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw size={16} className="animate-spin" /> {t('comp.sendingOtp')}</> : t('comp.sendOtp')}
               </button>
               <div className="flex items-center gap-2 justify-center text-xs text-gray-400">
-                <Shield size={14} /> {t('comp.securedByFirebase')}
+                <Shield size={14} /> {t('comp.securedByWhatsapp')}
               </div>
             </div>
           )}
@@ -144,7 +137,6 @@ export default function Signup() {
                 </button>
                 <h2 className="text-lg font-semibold text-gray-800">{t('comp.enterVerificationCode')}</h2>
                 <p className="text-sm text-gray-500 mt-1">{t('comp.otpSentTo', { phone })}</p>
-                <p className="text-xs text-gold-700 mt-1 font-medium">{t('comp.testModeCode')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('comp.otpLabel')}</label>

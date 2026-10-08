@@ -1,7 +1,15 @@
 const GRAPH_VERSION = 'v19.0';
-const TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const TO_NUMBER = process.env.WHATSAPP_TO || '918886888128';
+// Read env LAZILY on every call: ESM imports hoist above dotenv.config() in
+// server.js, so module-scope reads would capture empty values locally.
+// (Render sets real env vars before the process starts, which is why prod
+// worked while local dev silently did not.)
+function cfg() {
+  return {
+    token: process.env.WHATSAPP_TOKEN,
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+    toNumber: process.env.WHATSAPP_TO || '918886888128',
+  };
+}
 
 function formatINR(n) {
   return `₹${Number(n || 0).toLocaleString('en-IN')}`;
@@ -38,6 +46,7 @@ Ordered at: ${new Date(order.createdAt || Date.now()).toLocaleString('en-IN')}`;
 }
 
 export async function sendOrderWhatsApp(order, customer) {
+  const { token: TOKEN, phoneNumberId: PHONE_NUMBER_ID, toNumber: TO_NUMBER } = cfg();
   if (!TOKEN || !PHONE_NUMBER_ID) {
     console.log('[WhatsApp] not configured (WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID missing) — skipping');
     return { sent: false, reason: 'not-configured' };
@@ -89,6 +98,7 @@ Track order: https://hello-mobiles.com/orders/${order._id}`;
 }
 
 export async function sendDeliveryAssignedWhatsApp(customerPhone, order, deliveryPerson, otp) {
+  const { token: TOKEN, phoneNumberId: PHONE_NUMBER_ID, toNumber: TO_NUMBER } = cfg();
   if (!TOKEN || !PHONE_NUMBER_ID) {
     console.log('[WhatsApp] not configured — skipping delivery-assignment alert');
     return { sent: false, reason: 'not-configured' };
@@ -122,6 +132,50 @@ export async function sendDeliveryAssignedWhatsApp(customerPhone, order, deliver
   }
 }
 
+export function buildOtpMessage(otp) {
+  return `🔐 Your Hello Mobiles login OTP is: ${otp}\nValid for 5 minutes. Do not share it with anyone.`;
+}
+
+// Login OTP to an arbitrary customer number (NOT the store's own number).
+// In Cloud API test mode Meta only delivers to verified test recipients —
+// anything else returns Meta's error, which we surface so the UI can explain.
+export async function sendOtpWhatsApp(phone, otp) {
+  const { token: TOKEN, phoneNumberId: PHONE_NUMBER_ID } = cfg();
+  if (!TOKEN || !PHONE_NUMBER_ID) {
+    console.log('[WhatsApp] not configured — skipping OTP send');
+    return { sent: false, reason: 'WhatsApp service is not configured yet' };
+  }
+  const digits = String(phone || '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+  if (!/^[6-9]\d{9}$/.test(digits)) return { sent: false, reason: 'Invalid phone number' };
+  const to = `91${digits}`;
+  try {
+    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${PHONE_NUMBER_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to,
+        type: 'text',
+        text: { body: buildOtpMessage(otp) },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = data?.error?.message || 'api-error';
+      console.error('[WhatsApp] OTP send error:', msg);
+      return { sent: false, reason: msg };
+    }
+    console.log(`[WhatsApp] login OTP sent to ${to}`);
+    return { sent: true };
+  } catch (error) {
+    console.error('[WhatsApp] OTP send error:', error.message);
+    return { sent: false, reason: error.message };
+  }
+}
+
 export function buildAbandonedCartMessage(items, subtotal) {
   const itemLines = items
     .slice(0, 5)
@@ -142,6 +196,7 @@ https://wa.me/918886888128
 }
 
 export async function sendAbandonedCartWhatsApp(phone, items, subtotal) {
+  const { token: TOKEN, phoneNumberId: PHONE_NUMBER_ID, toNumber: TO_NUMBER } = cfg();
   if (!TOKEN || !PHONE_NUMBER_ID) {
     console.log('[WhatsApp] not configured — skipping abandoned-cart reminder');
     return { sent: false, reason: 'not-configured' };

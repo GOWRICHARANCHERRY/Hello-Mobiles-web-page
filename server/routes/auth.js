@@ -6,6 +6,7 @@ import User from '../models/User.js';
 import { auth } from '../middleware/auth.js';
 import { verifyFirebaseToken, isFirebaseConfigured } from '../config/firebase.js';
 import { sendOTP, generateOTP } from '../utils/otp.js';
+import { sendOtpWhatsApp } from '../utils/whatsapp.js';
 
 const router = express.Router();
 
@@ -169,9 +170,13 @@ router.post('/complete-signup', limit(20), async (req, res) => {
       if (existingEmail) return res.status(400).json({ message: 'Email already registered' });
     }
 
-    user.name = name;
+    // OTP-first signup: default anything the client didn't supply so a
+    // verified phone always ends up with a usable account.
+    user.name = (typeof name === 'string' && name.trim() ? name.trim().slice(0, 100) : (user.name !== 'Temp' ? user.name : 'Customer'));
     user.email = email || undefined;
-    user.password = password;
+    user.password = (typeof password === 'string' && password.length >= 6)
+      ? password
+      : Math.random().toString(36).slice(-10);
     await user.save();
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -221,6 +226,85 @@ router.post('/google', loginLimiter, async (req, res) => {
   }
 });
 
+// Send login OTP over WhatsApp (from the store's WhatsApp Business number).
+// NOTE (test mode): Meta only delivers to verified test recipients. Any other
+// number gets a clear 502 until the store migrates its own production number.
+router.post('/send-whatsapp-otp', otpLimiter, async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
+
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
+
+    let user = await User.findOne({ phone });
+    if (user) {
+      user.otp = otpHash;
+      user.otpExpiry = otpExpiry;
+      await user.save();
+    } else {
+      user = new User({
+        name: 'Temp',
+        phone,
+        password: Math.random().toString(36).slice(-8),
+        otp: otpHash,
+        otpExpiry,
+      });
+      await user.save();
+    }
+
+    const result = await sendOtpWhatsApp(phone, otp);
+    if (!result.sent) {
+      return res.status(502).json({ message: `WhatsApp message failed: ${result.reason || 'try again later'}` });
+    }
+    res.json({ message: 'OTP sent on WhatsApp' });
+  } catch (error) {
+    console.error('Send WhatsApp OTP error:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
+});
+
+// Phone + Password Registration (used by the header signup form)
+router.post('/register', limit(10), async (req, res) => {
+  try {
+    const { name, phone, email, password, role } = req.body;
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
+    if (!password || typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    const existing = await User.findOne({ phone });
+    if (existing && existing.name !== 'Temp') {
+      return res.status(400).json({ message: 'Phone number already registered. Please login.' });
+    }
+    if (email) {
+      const existingEmail = await User.findOne({ email, _id: { $ne: existing?._id } });
+      if (existingEmail) return res.status(400).json({ message: 'Email already registered' });
+    }
+    let user = existing;
+    if (user) {
+      user.name = name.trim().slice(0, 100);
+      if (email) user.email = email;
+      user.password = password;
+      user.phoneVerified = true;
+      await user.save();
+    } else {
+      user = new User({ name: name.trim().slice(0, 100), phone, email: email || undefined, password, role: 'customer', phoneVerified: true });
+      await user.save();
+    }
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    res.status(201).json({
+      token,
+      user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    if (error?.code === 11000) return res.status(400).json({ message: 'Phone or email already registered' });
+    res.status(500).json({ message: 'Signup failed. Please try again.' });
+  }
+});
 // Phone + Password Login
 router.post('/login', loginLimiter, async (req, res) => {
   try {

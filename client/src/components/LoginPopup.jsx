@@ -6,7 +6,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { sendFirebaseOTP } from '../utils/firebase';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
@@ -19,7 +18,6 @@ export default function LoginPopup({ onClose }) {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
-  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
   const googleWrapRef = useRef(null);
   const [googleWidth, setGoogleWidth] = useState(0);
@@ -79,14 +77,11 @@ export default function LoginPopup({ onClose }) {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setOtpLoading(true);
     try {
-      const result = await sendFirebaseOTP(phone);
-      setConfirmation(result);
+      await api.post('/auth/send-whatsapp-otp', { phone });
       setOtpSent(true);
       toast.success(t('comp.otpSent'));
     } catch (error) {
-      console.error('Firebase OTP error:', error);
-      if (error.code === 'auth/quota-exceeded') toast.error(t('comp.smsQuotaExceeded'));
-      else toast.error(t('comp.sendOtpFailed', { error: error.message || t('comp.tryAgain') }));
+      toast.error(error.response?.data?.message || t('comp.sendOtpFailed', { error: t('comp.tryAgain') }));
     }
     setOtpLoading(false);
   };
@@ -95,9 +90,8 @@ export default function LoginPopup({ onClose }) {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setOtpLoading(true);
     try {
-      const userCred = await confirmation.confirm(otp);
-      const idToken = await userCred.user.getIdToken();
-      const res = await api.post('/auth/firebase-auth', { idToken, phone });
+      await api.post('/auth/verify-otp', { phone, otp });
+      const res = await api.post('/auth/complete-signup', { phone });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       toast.success(t('comp.loggedIn'));
@@ -170,7 +164,7 @@ export default function LoginPopup({ onClose }) {
 
               <button type="button" onClick={() => switchMode('otp')}
                 className="w-full mt-2 border-2 border-gold-300 text-gold-700 font-semibold py-2.5 rounded-lg text-sm hover:bg-gold-50">
-                {t('comp.loginWithOtp')}
+                {t('comp.loginWithWhatsappOtp')}
               </button>
 
               <div className="mt-3 text-center">
@@ -210,7 +204,7 @@ export default function LoginPopup({ onClose }) {
                     className="w-full btn-gold text-white font-semibold py-2.5 rounded-lg text-sm disabled:opacity-50">
                     {otpLoading ? t('comp.sendingOtp') : t('comp.sendOtp')}
                   </button>
-                  <p className="text-center text-xs text-gray-400">{t('comp.otpWillBeSent', { phone: phone || t('comp.yourNumber') })}</p>
+                  <p className="text-center text-xs text-gray-400">{t('comp.otpWillBeSentWhatsapp', { phone: phone || t('comp.yourNumber') })}</p>
                 </>
               ) : (
                 <>
