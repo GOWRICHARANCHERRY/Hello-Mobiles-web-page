@@ -12,7 +12,7 @@ export default function InstagramReels() {
     let cancelled = false;
     api.get('/instagram/reels')
       .then((r) => {
-        if (!cancelled) setReels(Array.isArray(r.data?.reels) ? r.data.reels : []);
+        if (!cancelled) setReels(Array.isArray(r.data?.reels) ? r.data.reels.slice(0, 3) : []);
       })
       .catch(() => {})
       .finally(() => {
@@ -35,7 +35,7 @@ export default function InstagramReels() {
           <Instagram size={16} /> {t('cust.viewAllReels')} →
         </a>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {reels.map((r) => (
           <a key={r.id} href={r.permalink} target="_blank" rel="noopener noreferrer" aria-label={r.caption || 'Instagram Reel'}
             className="group relative rounded-xl overflow-hidden aspect-[9/16] bg-black block card-hover">

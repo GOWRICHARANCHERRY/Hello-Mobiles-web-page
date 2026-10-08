@@ -58,7 +58,7 @@ export default {
   'cust.reviewsText': 'హలో మొబైల్స్‌లో మీ అనుభవం బాగుందా? మీ Google రివ్యూ ఇతరులకు మమ్మల్ని కనుగొనడానికి మరియు మెరుగైన సేవ అందించడానికి సహాయపడుతుంది.',
   'cust.reviewOnGoogle': 'Googleలో రివ్యూ ఇవ్వండి',
   'cust.followOnInstagram': 'Instagramలో ఫాలో అవ్వండి',
-  'cust.reelsTitle': 'మా ఇన్‌స్టాగ్రామ్ నుండి తాజా రీల్స్',
+  'cust.reelsTitle': 'తాజా రీల్స్',
   'cust.reelsText': 'ప్రొడక్ట్ అన్‌బాక్సింగ్, ఆఫర్లు మరియు స్టోర్ అప్‌డేట్లు — మా తాజా రీల్స్ చూడండి.',
   'cust.viewAllReels': 'అన్ని రీల్స్ చూడండి',
   'cust.storeAllurLocation': '\uD83D\uDCCD అల్లూర్, నెల్లూరు జిల్లా, ఆంధ్రప్రదేశ్',
