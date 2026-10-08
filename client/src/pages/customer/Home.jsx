@@ -6,7 +6,6 @@ import { useLanguage } from '../../context/LanguageContext';
 import SEO from '../../components/SEO';
 import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
-import InstagramReels from '../../components/InstagramReels';
 import GoogleReviews from '../../components/GoogleReviews';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
@@ -348,11 +347,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Google Reviews */}
+      {/* Google Reviews + latest Instagram Reels */}
       <GoogleReviews />
-
-      {/* Instagram Reels */}
-      <InstagramReels />
 
       {/* Login CTA for guests */}
       {!user && (
