@@ -33,6 +33,22 @@ export default function InstagramReels() {
     };
   }, [active]);
 
+  useEffect(() => {
+    if (!active || active.video) return;
+    const loadEmbed = () => {
+      if (window.instgrm?.Embeds) window.instgrm.Embeds.process();
+      else {
+        const s = document.createElement('script');
+        s.src = 'https://www.instagram.com/embed.js';
+        s.async = true;
+        s.onload = () => window.instgrm?.Embeds?.process();
+        document.body.appendChild(s);
+      }
+    };
+    const t = setTimeout(loadEmbed, 50);
+    return () => clearTimeout(t);
+  }, [active]);
+
   if (loaded && reels.length === 0) return null;
 
   return (
@@ -78,9 +94,10 @@ export default function InstagramReels() {
               <video key={active.id} src={active.video} poster={active.thumbnail} controls autoPlay playsInline
                 className="w-full aspect-[9/16] max-h-[75vh] bg-black" />
             ) : (
-              <div className="w-full aspect-[9/16] max-h-[75vh] flex flex-col items-center justify-center gap-3 bg-neutral-900 text-white p-6 text-center">
-                <Play size={36} className="fill-white" />
-                <p className="text-sm text-gray-300">Preview not available — watch it on Instagram.</p>
+              <div className="w-full max-h-[75vh] overflow-y-auto bg-white p-2">
+                <blockquote key={active.id} className="instagram-media" data-instgrm-permalink={active.permalink}
+                  data-instgrm-version="14" style={{ margin: 0 }}>
+                </blockquote>
               </div>
             )}
             <div className="p-3 bg-neutral-900 flex items-center justify-between gap-2">
