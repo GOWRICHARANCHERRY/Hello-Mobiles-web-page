@@ -97,6 +97,7 @@ export default function InstagramReels() {
               <div className="w-full max-h-[75vh] overflow-y-auto bg-white p-2">
                 <blockquote key={active.id} className="instagram-media" data-instgrm-permalink={active.permalink}
                   data-instgrm-version="14" style={{ margin: 0 }}>
+                  <a href={active.permalink} target="_blank" rel="noopener noreferrer">View this reel on Instagram</a>
                 </blockquote>
               </div>
             )}
