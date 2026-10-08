@@ -183,6 +183,7 @@ router.get('/reels', async (req, res) => {
         id: m.id,
         caption: (m.caption || '').slice(0, 120),
         thumbnail: m.thumbnail_url || m.media_url,
+        video: m.media_url || null,
         permalink: m.permalink,
         username: m.username,
         timestamp: m.timestamp,
