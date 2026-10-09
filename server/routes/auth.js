@@ -286,7 +286,7 @@ router.post('/send-sms-otp', otpLimiter, async (req, res) => {
   try {
     const { phone } = req.body;
     if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
-    if (!process.env.TWOFACTOR_API_KEY) {
+    if (!process.env.FAST2SMS_API_KEY && !process.env.TWOFACTOR_API_KEY) {
       return res.status(503).json({ message: 'SMS service is not configured yet' });
     }
 

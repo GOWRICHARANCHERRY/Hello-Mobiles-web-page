@@ -1,6 +1,33 @@
 const SENDER_ID = process.env.TWOFACTOR_SENDER_ID || 'HELLOM';
 
+async function sendViaFast2Sms(phone, otp) {
+  const apiKey = process.env.FAST2SMS_API_KEY;
+  if (!apiKey) return false;
+  try {
+    const message = `${otp} is your Hello Mobiles login OTP. Valid for 5 minutes. Do not share it.`;
+    const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${apiKey}&route=q&message=${encodeURIComponent(message)}&language=english&flash=0&numbers=${phone}`;
+    const resp = await fetch(url);
+    const data = await resp.json().catch(() => ({}));
+    if (data?.return === true) {
+      console.log(`Fast2SMS OTP sent to ${phone}`);
+      return true;
+    }
+    console.error('Fast2SMS rejected:', JSON.stringify(data).slice(0, 200));
+    return false;
+  } catch (error) {
+    console.error('Fast2SMS error:', error.message);
+    return false;
+  }
+}
+
 export async function sendOTP(phone, otp) {
+  // Cheapest-first order: Fast2SMS (~₹0.10, free signup credits) before
+  // 2factor (~₹0.20). First configured provider that succeeds wins.
+  if (await sendViaFast2Sms(phone, otp)) return true;
+  return sendVia2Factor(phone, otp);
+}
+
+async function sendVia2Factor(phone, otp) {
   // 2Factor.in OTP SMS (~₹0.20/delivered OTP). Reads env lazily (ESM import
   // hoisting runs before dotenv) and verifies the API response — a failed
   // send must return false so callers don't claim success.
