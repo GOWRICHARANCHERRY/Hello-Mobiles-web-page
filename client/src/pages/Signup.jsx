@@ -14,6 +14,7 @@ export default function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+  const [smsAvailable, setSmsAvailable] = useState(true);
 
   const startTimer = () => {
     setOtpTimer(60);
@@ -26,6 +27,8 @@ export default function Signup() {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setLoading(true);
     try {
+      const { data } = await api.get('/auth/otp-options');
+      setSmsAvailable(!!data?.sms);
       await api.post('/auth/send-whatsapp-otp', { phone });
       toast.success(t('comp.otpSent'));
       setStep(2);
@@ -138,10 +141,12 @@ export default function Signup() {
                 className="w-full btn-gold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw size={16} className="animate-spin" /> {t('comp.sendingOtp')}</> : t('comp.sendOtp')}
               </button>
-              <button onClick={handleSendSmsOTP} disabled={loading || phone.length !== 10}
-                className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
-                {t('comp.useSmsInstead')}
-              </button>
+              {smsAvailable && (
+                <button onClick={handleSendSmsOTP} disabled={loading || phone.length !== 10}
+                  className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
+                  {t('comp.useSmsInstead')}
+                </button>
+              )}
               <div className="flex items-center gap-2 justify-center text-xs text-gray-400">
                 <Shield size={14} /> {t('comp.securedByWhatsapp')}
               </div>

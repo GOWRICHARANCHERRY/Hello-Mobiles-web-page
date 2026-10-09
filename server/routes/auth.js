@@ -318,6 +318,128 @@ router.post('/send-sms-otp', otpLimiter, async (req, res) => {
     res.status(500).json({ message: 'Failed to send OTP' });
   }
 });
+// Phone.Email free SMS quota tracker: 1000/month for the first 6 months.
+// Everything after that (or past quota) falls through to paid SMS.
+const PE_MONTHLY_QUOTA = 1000;
+const PE_FREE_MONTHS = 6;
+
+async function getPhoneEmailStatus() {
+  const clientId = process.env.PHONEEMAIL_CLIENT_ID || '';
+  if (!clientId) return { enabled: false, remaining: 0, clientId: '' };
+  try {
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const Setting = (await import('../models/Setting.js')).default;
+    const [monthDoc, startDoc] = await Promise.all([
+      Setting.findOne({ key: 'PE_MONTH' }),
+      Setting.findOne({ key: 'PE_START' }),
+    ]);
+    if (!startDoc?.value) return { enabled: true, remaining: PE_MONTHLY_QUOTA, clientId, fresh: true };
+    const startMonth = startDoc.value;
+    const monthsUsed = (Number(monthKey.slice(0, 4)) - Number(startMonth.slice(0, 4))) * 12
+      + (Number(monthKey.slice(5, 7)) - Number(startMonth.slice(5, 7)));
+    if (monthsUsed >= PE_FREE_MONTHS) return { enabled: false, remaining: 0, clientId: '' };
+    const usedThisMonth = monthDoc?.key === undefined || monthDoc?.value !== monthKey
+      ? 0
+      : Number((await Setting.findOne({ key: 'PE_COUNT' }))?.value || 0);
+    return { enabled: usedThisMonth < PE_MONTHLY_QUOTA, remaining: Math.max(0, PE_MONTHLY_QUOTA - usedThisMonth), clientId };
+  } catch {
+    return { enabled: !!clientId, remaining: PE_MONTHLY_QUOTA, clientId };
+  }
+}
+
+async function bumpPhoneEmailUsage() {
+  try {
+    const Setting = (await import('../models/Setting.js')).default;
+    const monthKey = new Date().toISOString().slice(0, 7);
+    await Setting.findOneAndUpdate({ key: 'PE_START' }, { $setOnInsert: { key: 'PE_START', value: monthKey } }, { upsert: true });
+    const monthDoc = await Setting.findOne({ key: 'PE_MONTH' });
+    if (!monthDoc || monthDoc.value !== monthKey) {
+      await Setting.findOneAndUpdate({ key: 'PE_MONTH' }, { key: 'PE_MONTH', value: monthKey }, { upsert: true });
+      await Setting.findOneAndUpdate({ key: 'PE_COUNT' }, { key: 'PE_COUNT', value: '1' }, { upsert: true });
+    } else {
+      await Setting.findOneAndUpdate({ key: 'PE_COUNT' }, [{ $set: { value: { $toString: { $add: [{ $toLong: '$value' }, 1] } } } }], { upsert: true });
+    }
+  } catch { /* usage tracking must never break login */ }
+}
+
+// Public: which OTP channels are currently available (drives UI options).
+router.get('/otp-options', async (req, res) => {
+  try {
+    const pe = await getPhoneEmailStatus();
+    res.json({
+      phoneEmail: pe.enabled,
+      phoneEmailClientId: pe.clientId,
+      phoneEmailRemaining: pe.remaining,
+      sms: !!(process.env.FAST2SMS_API_KEY || process.env.TWOFACTOR_API_KEY),
+      whatsapp: !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID),
+    });
+  } catch {
+    res.json({ phoneEmail: false, phoneEmailClientId: '', phoneEmailRemaining: 0, sms: false, whatsapp: false });
+  }
+});
+
+// Verify a Phone.Email sign-in: client hands over the user_json_url from the
+// widget callback; the SERVER fetches it (never trust the browser's word for
+// the phone number) and issues our JWT on match.
+router.post('/phone-email-verify', limit(20), async (req, res) => {
+  try {
+    const { user_json_url } = req.body;
+    let url;
+    try {
+      url = new URL(String(user_json_url || ''));
+    } catch {
+      return res.status(400).json({ message: 'Invalid verification data' });
+    }
+    // SSRF guard: only Phone.Email's own JSON host is ever fetched.
+    if (url.protocol !== 'https:' || url.hostname !== 'user.phone.email') {
+      return res.status(400).json({ message: 'Invalid verification data' });
+    }
+    const pe = await getPhoneEmailStatus();
+    if (!pe.enabled) return res.status(400).json({ message: 'Free SMS quota exhausted. Please use another login option.' });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    let data;
+    try {
+      const resp = await fetch(url.toString(), { signal: controller.signal });
+      clearTimeout(timer);
+      data = await resp.json();
+    } catch {
+      clearTimeout(timer);
+      return res.status(502).json({ message: 'Verification service unreachable. Try again.' });
+    }
+    const cc = String(data?.user_country_code || '').replace(/\D/g, '');
+    const national = String(data?.user_phone_number || '').replace(/\D/g, '');
+    const phone = cc === '91' ? national : (national.length === 10 ? national : '');
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Phone number verification failed' });
+
+    let user = await User.findOne({ phone });
+    if (user?.isActive === false) return res.status(403).json({ message: 'Account deactivated' });
+    if (!user) {
+      const first = String(data?.user_first_name || '').slice(0, 50);
+      const last = String(data?.user_last_name || '').slice(0, 50);
+      user = new User({
+        name: [first, last].filter(Boolean).join(' ') || 'Customer',
+        phone,
+        password: Math.random().toString(36).slice(-12),
+        role: 'customer',
+        phoneVerified: true,
+      });
+      await user.save();
+    } else if (!user.phoneVerified) {
+      user.phoneVerified = true;
+      await user.save();
+    }
+    await bumpPhoneEmailUsage();
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    res.json({
+      token,
+      user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error('Phone.Email verify error:', error.message);
+    res.status(500).json({ message: 'Verification failed. Please try again.' });
+  }
+});
 // Phone + Password Registration (used by the header signup form)
 router.post('/register', limit(10), async (req, res) => {
   try {

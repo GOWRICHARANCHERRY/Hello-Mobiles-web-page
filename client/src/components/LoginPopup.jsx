@@ -19,6 +19,7 @@ export default function LoginPopup({ onClose }) {
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [smsAvailable, setSmsAvailable] = useState(true);
   const googleWrapRef = useRef(null);
   const [googleWidth, setGoogleWidth] = useState(0);
 
@@ -123,7 +124,12 @@ export default function LoginPopup({ onClose }) {
     setOtpLoading(false);
   };
 
-  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); };
+  const switchMode = (m) => {
+    setMode(m); setOtpSent(false); setOtp('');
+    if (m === 'otp') {
+      api.get('/auth/otp-options').then(r => setSmsAvailable(!!r.data?.sms)).catch(() => {});
+    }
+  };
 
   return (
     <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
@@ -222,10 +228,12 @@ export default function LoginPopup({ onClose }) {
                     {otpLoading ? t('comp.sendingOtp') : t('comp.sendOtp')}
                   </button>
                   <p className="text-center text-xs text-gray-400">{t('comp.otpWillBeSentWhatsapp', { phone: phone || t('comp.yourNumber') })}</p>
-                  <button type="button" onClick={handleSendSmsOtp} disabled={otpLoading}
-                    className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
-                    {t('comp.useSmsInstead')}
-                  </button>
+                  {smsAvailable && (
+                    <button type="button" onClick={handleSendSmsOtp} disabled={otpLoading}
+                      className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
+                      {t('comp.useSmsInstead')}
+                    </button>
+                  )}
                 </>
               ) : (
                 <>
