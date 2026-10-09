@@ -18,10 +18,14 @@ This number now sends automatic order updates. For instant help:
 — Team Hello Mobiles`;
 
 // Meta verifies the webhook with a GET challenge during setup.
+// NOTE: query params are read from originalUrl — NOT req.query — because the
+// global mongo-sanitize middleware strips keys containing dots, and Meta's
+// params are all dotted (hub.mode, hub.verify_token, hub.challenge).
 router.get('/webhook', (req, res) => {
-  const mode = req.query['hub.mode'];
-  const token = req.query['hub.verify_token'];
-  const challenge = req.query['hub.challenge'];
+  const params = new URL(req.originalUrl, 'http://localhost').searchParams;
+  const mode = params.get('hub.mode');
+  const token = params.get('hub.verify_token');
+  const challenge = params.get('hub.challenge');
   const expected = process.env.META_WA_WEBHOOK_TOKEN;
   if (mode === 'subscribe' && expected && token === expected) {
     console.log('[WhatsApp] webhook verified');
