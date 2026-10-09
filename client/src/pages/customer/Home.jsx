@@ -8,6 +8,7 @@ import HeroCarousel from '../../components/HeroCarousel';
 import TextBannerCarousel from '../../components/TextBannerCarousel';
 import InstagramReels from '../../components/InstagramReels';
 import GoogleReviews from '../../components/GoogleReviews';
+import AppInstallBanner from '../../components/AppInstallBanner';
 import { Zap, Shield, Truck, Percent, ChevronRight, Star, Gift, CreditCard, RotateCcw, LogIn } from 'lucide-react';
 
 const categories = [
@@ -328,6 +329,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Get the App */}
+      <AppInstallBanner />
 
       {/* Reviews CTA */}
       <div className="bg-gradient-to-br from-gold-50 to-amber-50 rounded-2xl p-6 sm:p-8 text-center gold-border">
