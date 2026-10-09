@@ -88,6 +88,7 @@ export default {
   'comp.otpWillBeSent': 'OTP will be sent to +91 {phone}',
   'comp.loginWithWhatsappOtp': 'Login with WhatsApp OTP',
   'comp.otpWillBeSentWhatsapp': 'OTP will be sent on WhatsApp to +91 {phone}',
+  'comp.useSmsInstead': 'No WhatsApp? Get the code by SMS instead',
   'comp.yourNumber': 'your number',
   'comp.enterOtpSentTo': 'Enter the 6-digit OTP sent to',
   'comp.otpPlaceholder': '6-digit OTP',

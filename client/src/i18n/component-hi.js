@@ -88,6 +88,7 @@ export default {
   'comp.otpWillBeSent': 'OTP +91 {phone} पर भेजा जाएगा',
   'comp.loginWithWhatsappOtp': 'WhatsApp OTP से लॉगिन करें',
   'comp.otpWillBeSentWhatsapp': 'OTP WhatsApp पर +91 {phone} पर भेजा जाएगा',
+  'comp.useSmsInstead': 'WhatsApp नहीं है? SMS से कोड पाएं',
   'comp.yourNumber': 'आपका नंबर',
   'comp.enterOtpSentTo': 'इस पर भेजा गया 6-अंकीय OTP दर्ज करें',
   'comp.otpPlaceholder': '6-अंकीय OTP',

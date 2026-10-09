@@ -88,6 +88,7 @@ export default {
   'comp.otpWillBeSent': 'OTP +91 {phone} కు పంపబడుతుంది',
   'comp.loginWithWhatsappOtp': 'WhatsApp OTPతో లాగిన్ చేయండి',
   'comp.otpWillBeSentWhatsapp': 'OTP WhatsAppలో +91 {phone} కు పంపబడుతుంది',
+  'comp.useSmsInstead': 'WhatsApp లేదా? SMS ద్వారా కోడ్ పొందండి',
   'comp.yourNumber': 'మీ నంబర్',
   'comp.enterOtpSentTo': 'పంపిన 6-అంకెల OTP నమోదు చేయండి',
   'comp.otpPlaceholder': '6-అంకెల OTP',

@@ -68,12 +68,17 @@ router.post('/firebase-auth', limit(20), async (req, res) => {
       });
     }
 
-    // New user - create account
-    const password = Math.random().toString(36).slice(-8);
+    // New user - create account (honor client-supplied signup details when valid)
+    const password = (typeof req.body.password === 'string' && req.body.password.length >= 6)
+      ? req.body.password
+      : Math.random().toString(36).slice(-8);
+    const displayName = (typeof req.body.name === 'string' && req.body.name.trim())
+      ? req.body.name.trim().slice(0, 100)
+      : (name || 'Customer');
     user = new User({
-      name: name || 'Customer',
+      name: displayName,
       phone,
-      email: email || undefined,
+      email: req.body.email || email || undefined,
       password,
       role: 'customer',
       phoneVerified: true,

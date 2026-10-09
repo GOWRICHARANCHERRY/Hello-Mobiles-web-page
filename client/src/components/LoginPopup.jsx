@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { sendFirebaseOTP } from '../utils/firebase';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
@@ -18,6 +19,8 @@ export default function LoginPopup({ onClose }) {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
+  const [otpChannel, setOtpChannel] = useState('whatsapp');
+  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
   const googleWrapRef = useRef(null);
   const [googleWidth, setGoogleWidth] = useState(0);
@@ -76,6 +79,7 @@ export default function LoginPopup({ onClose }) {
   const handleSendOtp = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setOtpLoading(true);
+    setOtpChannel('whatsapp');
     try {
       await api.post('/auth/send-whatsapp-otp', { phone });
       setOtpSent(true);
@@ -86,27 +90,54 @@ export default function LoginPopup({ onClose }) {
     setOtpLoading(false);
   };
 
+  const handleSendSmsOtp = async () => {
+    if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
+    setOtpLoading(true);
+    setOtpChannel('sms');
+    try {
+      const result = await sendFirebaseOTP(phone);
+      setConfirmation(result);
+      setOtpSent(true);
+      toast.success(t('comp.otpSent'));
+    } catch (error) {
+      if (error.code === 'auth/quota-exceeded') toast.error(t('comp.smsQuotaExceeded'));
+      else toast.error(t('comp.sendOtpFailed', { error: error.message || t('comp.tryAgain') }));
+    }
+    setOtpLoading(false);
+  };
+
+  const finishLogin = (res) => {
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+    toast.success(t('comp.loggedIn'));
+    if (res.data.user?.role === 'admin') { onClose(); navigate('/admin'); }
+    else if (res.data.user?.role === 'employee') { onClose(); navigate('/employee'); }
+    else if (res.data.user?.role === 'delivery') { onClose(); navigate('/delivery'); }
+    else onClose();
+    window.location.reload();
+  };
+
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setOtpLoading(true);
     try {
-      await api.post('/auth/verify-otp', { phone, otp });
-      const res = await api.post('/auth/complete-signup', { phone });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      toast.success(t('comp.loggedIn'));
-      if (res.data.user?.role === 'admin') { onClose(); navigate('/admin'); }
-      else if (res.data.user?.role === 'employee') { onClose(); navigate('/employee'); }
-      else if (res.data.user?.role === 'delivery') { onClose(); navigate('/delivery'); }
-      else onClose();
-      window.location.reload();
+      if (otpChannel === 'sms') {
+        const userCred = await confirmation.confirm(otp);
+        const idToken = await userCred.user.getIdToken();
+        const res = await api.post('/auth/firebase-auth', { idToken, phone });
+        finishLogin(res);
+      } else {
+        await api.post('/auth/verify-otp', { phone, otp });
+        const res = await api.post('/auth/complete-signup', { phone });
+        finishLogin(res);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || t('comp.invalidOtpTryAgain'));
     }
     setOtpLoading(false);
   };
 
-  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); };
+  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); setOtpChannel('whatsapp'); setConfirmation(null); };
 
   return (
     <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">
@@ -205,6 +236,10 @@ export default function LoginPopup({ onClose }) {
                     {otpLoading ? t('comp.sendingOtp') : t('comp.sendOtp')}
                   </button>
                   <p className="text-center text-xs text-gray-400">{t('comp.otpWillBeSentWhatsapp', { phone: phone || t('comp.yourNumber') })}</p>
+                  <button type="button" onClick={handleSendSmsOtp} disabled={otpLoading}
+                    className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
+                    {t('comp.useSmsInstead')}
+                  </button>
                 </>
               ) : (
                 <>

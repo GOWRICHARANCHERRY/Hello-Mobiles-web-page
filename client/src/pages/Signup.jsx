@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import SEO from '../components/SEO';
+import { auth, sendFirebaseOTP } from '../utils/firebase';
 import { ArrowLeft, Check, Smartphone, Shield, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -14,6 +15,8 @@ export default function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+  const [otpChannel, setOtpChannel] = useState('whatsapp');
+  const [confirmation, setConfirmation] = useState(null);
 
   const startTimer = () => {
     setOtpTimer(60);
@@ -25,6 +28,7 @@ export default function Signup() {
   const handleSendOTP = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setLoading(true);
+    setOtpChannel('whatsapp');
     try {
       await api.post('/auth/send-whatsapp-otp', { phone });
       toast.success(t('comp.otpSent'));
@@ -36,11 +40,32 @@ export default function Signup() {
     setLoading(false);
   };
 
+  const handleSendSmsOTP = async () => {
+    if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
+    setLoading(true);
+    setOtpChannel('sms');
+    try {
+      const result = await sendFirebaseOTP(phone);
+      setConfirmation(result);
+      toast.success(t('comp.otpSent'));
+      setStep(2);
+      startTimer();
+    } catch (error) {
+      if (error.code === 'auth/quota-exceeded') toast.error(t('comp.smsQuotaExceeded'));
+      else toast.error(t('comp.sendOtpFailed', { error: error.message || t('comp.tryAgain') }));
+    }
+    setLoading(false);
+  };
+
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setLoading(true);
     try {
-      await api.post('/auth/verify-otp', { phone, otp });
+      if (otpChannel === 'sms') {
+        await confirmation.confirm(otp);
+      } else {
+        await api.post('/auth/verify-otp', { phone, otp });
+      }
       toast.success(t('comp.phoneVerifiedToast'));
       setStep(3);
     } catch (error) {
@@ -56,7 +81,13 @@ export default function Signup() {
     if (form.password.length < 6) return toast.error(t('comp.passwordMinLength'));
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/complete-signup', { phone, name: form.name, email: form.email, password: form.password });
+      let data;
+      if (otpChannel === 'sms') {
+        const idToken = await auth.currentUser.getIdToken();
+        ({ data } = await api.post('/auth/firebase-auth', { idToken, phone, name: form.name, email: form.email, password: form.password }));
+      } else {
+        ({ data } = await api.post('/auth/complete-signup', { phone, name: form.name, email: form.email, password: form.password }));
+      }
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast.success(t('comp.accountCreated'));
@@ -122,6 +153,10 @@ export default function Signup() {
               <button onClick={handleSendOTP} disabled={loading || phone.length !== 10}
                 className="w-full btn-gold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw size={16} className="animate-spin" /> {t('comp.sendingOtp')}</> : t('comp.sendOtp')}
+              </button>
+              <button onClick={handleSendSmsOTP} disabled={loading || phone.length !== 10}
+                className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
+                {t('comp.useSmsInstead')}
               </button>
               <div className="flex items-center gap-2 justify-center text-xs text-gray-400">
                 <Shield size={14} /> {t('comp.securedByWhatsapp')}
