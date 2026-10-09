@@ -152,10 +152,16 @@ export async function sendDeliveryAssignedWhatsApp(customerPhone, order, deliver
         template: {
           name: 'hello_mobiles_otp',
           language: { code: 'en_US' },
-          components: [{
-            type: 'button', sub_type: 'url', index: '0',
-            parameters: [{ type: 'text', text: String(otp) }],
-          }],
+          components: [
+            {
+              type: 'body',
+              parameters: [{ type: 'text', text: String(otp) }],
+            },
+            {
+              type: 'button', sub_type: 'url', index: '0',
+              parameters: [{ type: 'text', text: String(otp) }],
+            },
+          ],
         },
       });
       const infoRes = await postMessage(TOKEN, PHONE_NUMBER_ID, {
@@ -217,28 +223,34 @@ export async function sendOtpWhatsApp(phone, otp) {
   const digits = String(phone || '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
   if (!/^[6-9]\d{9}$/.test(digits)) return { sent: false, reason: 'Invalid phone number' };
   const to = `91${digits}`;
+  // OTPs always prefer the approved Authentication template on the
+  // production sender (works for ANY customer number). Falls back to plain
+  // text only if templates are unavailable (test recipients / open windows).
+  const otpSender = process.env.WHATSAPP_OTP_PHONE_NUMBER_ID || PHONE_NUMBER_ID;
   try {
-    if (useTemplates()) {
-      const { ok, data } = await postMessage(TOKEN, PHONE_NUMBER_ID, {
-        to,
-        type: 'template',
-        template: {
-          name: 'hello_mobiles_otp',
-          language: { code: 'en_US' },
-          components: [{
+    const tpl = await postMessage(TOKEN, otpSender, {
+      to,
+      type: 'template',
+      template: {
+        name: 'hello_mobiles_otp',
+        language: { code: 'en_US' },
+        components: [
+          {
+            type: 'body',
+            parameters: [{ type: 'text', text: String(otp) }],
+          },
+          {
             type: 'button', sub_type: 'url', index: '0',
             parameters: [{ type: 'text', text: String(otp) }],
-          }],
-        },
-      });
-      if (ok) {
-        console.log(`[WhatsApp] login OTP (template) sent to ${to}`);
-        return { sent: true };
-      }
-      const msg = data?.error?.message || 'api-error';
-      console.error('[WhatsApp] OTP template error:', msg);
-      return { sent: false, reason: msg };
+          },
+        ],
+      },
+    });
+    if (tpl.ok) {
+      console.log(`[WhatsApp] login OTP (template) sent to ${to}`);
+      return { sent: true };
     }
+    console.error('[WhatsApp] OTP template error:', tpl.data?.error?.message || tpl.data);
     const { ok, data } = await postMessage(TOKEN, PHONE_NUMBER_ID, {
       to,
       type: 'text',
