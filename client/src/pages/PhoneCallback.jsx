@@ -10,6 +10,9 @@ export default function PhoneCallback() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // When opened as the phone.email popup, the opener window completes the
+    // login itself — stay quiet to avoid double verification (double quota).
+    if (window.opener) return;
     const accessToken = searchParams.get('access_token');
     if (!accessToken) {
       setError(t('comp.verificationFailed'));

@@ -158,7 +158,35 @@ export default function Signup() {
               {peAvailable && (
                 <button onClick={() => {
                   const redirect = `${window.location.origin}/auth/phone-callback`;
-                  window.location.href = `https://www.phone.email/auth/log-in?client_id=${encodeURIComponent(peClientId)}&redirect_url=${encodeURIComponent(redirect)}`;
+                  const authUrl = `https://www.phone.email/auth/log-in?client_id=${encodeURIComponent(peClientId)}&redirect_url=${encodeURIComponent(redirect)}`;
+                  const popup = window.open(authUrl, 'peLoginWindow',
+                    `toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=600,top=${(window.screen.height - 600) / 2},left=${(window.screen.width - 500) / 2}`);
+                  if (!popup) return toast.error(t('comp.tryAgain'));
+                  setLoading(true);
+                  const timer = setInterval(async () => {
+                    try {
+                      if (popup.closed) { clearInterval(timer); setLoading(false); return; }
+                      const href = popup.location.href;
+                      if (href.includes('/auth/phone-callback') && href.includes('access_token=')) {
+                        clearInterval(timer);
+                        const token = new URL(href).searchParams.get('access_token');
+                        popup.close();
+                        try {
+                          const { data } = await api.post('/auth/phone-email-token', { access_token: token });
+                          localStorage.setItem('token', data.token);
+                          localStorage.setItem('user', JSON.stringify(data.user));
+                          setPhone(data.user.phone || phone);
+                          toast.success(t('comp.phoneVerifiedToast'));
+                          setStep(3);
+                        } catch (error) {
+                          toast.error(error.response?.data?.message || t('comp.invalidOtpTryAgain'));
+                        }
+                        setLoading(false);
+                      }
+                    } catch {
+                      // Cross-origin until the popup lands back on our domain.
+                    }
+                  }, 800);
                 }}
                   disabled={loading || phone.length !== 10}
                   className="w-full text-xs font-semibold text-gold-700 hover:underline disabled:opacity-50">

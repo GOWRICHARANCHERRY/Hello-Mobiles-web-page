@@ -165,7 +165,8 @@ router.post('/complete-signup', limit(20), async (req, res) => {
 
     if (!user) return res.status(400).json({ message: 'Please verify your phone first' });
     if (!user.phoneVerified) return res.status(400).json({ message: 'Phone not verified yet' });
-    if (user.name !== 'Temp') {
+    const wantsProfile = (typeof name === 'string' && name.trim()) || email || (typeof password === 'string' && password.length >= 6);
+    if (user.name !== 'Temp' && !wantsProfile) {
       const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
       return res.json({ token, user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role } });
     }
