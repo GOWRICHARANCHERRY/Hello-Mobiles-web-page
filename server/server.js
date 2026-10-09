@@ -20,6 +20,7 @@ import leadRoutes from './routes/leads.js';
 import instagramRoutes from './routes/instagram.js';
 import deliveryZoneRoutes from './routes/deliveryZones.js';
 import razorpayRoutes, { razorpayWebhook } from './routes/razorpay.js';
+import whatsappWebhookRoutes from './routes/whatsappWebhook.js';
 import Product from './models/Product.js';
 import Banner from './models/Banner.js';
 import { cached } from './utils/cache.js';
@@ -147,6 +148,7 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/delivery-zones', deliveryZoneRoutes);
 app.use('/api/razorpay', razorpayRoutes);
+app.use('/api/whatsapp', whatsappWebhookRoutes);
 
 let sitemapCache = null;
 let sitemapCacheTime = 0;
