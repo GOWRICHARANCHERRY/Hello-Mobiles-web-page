@@ -256,7 +256,17 @@ router.post('/send-whatsapp-otp', otpLimiter, async (req, res) => {
 
     const result = await sendOtpWhatsApp(phone, otp);
     if (!result.sent) {
-      return res.status(502).json({ message: `WhatsApp message failed: ${result.reason || 'try again later'}` });
+      // Translate Meta's technical errors into something customers understand.
+      const reason = result.reason || '';
+      let message = 'WhatsApp message failed, please try again later.';
+      if (/not a valid whatsapp user|not in allowed list|131030/i.test(reason)) {
+        message = 'This number is not on WhatsApp. Please check the number and try again.';
+      } else if (/re-engagement|131047|template/i.test(reason)) {
+        message = 'WhatsApp login is rolling out gradually. Please use password login or contact the store for help.';
+      } else if (/not configured/i.test(reason)) {
+        message = 'WhatsApp login is not enabled yet. Please use password login.';
+      }
+      return res.status(502).json({ message });
     }
     res.json({ message: 'OTP sent on WhatsApp' });
   } catch (error) {
