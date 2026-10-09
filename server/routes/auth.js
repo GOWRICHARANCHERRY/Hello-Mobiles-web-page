@@ -362,6 +362,60 @@ async function bumpPhoneEmailUsage() {
   } catch { /* usage tracking must never break login */ }
 }
 
+// Phone.Email redirect flow: the client sends the user to phone.email's
+// hosted login; Meta-style, phone.email redirects back with ?access_token=.
+// The SERVER exchanges it for the verified phone (never trust client claims).
+router.post('/phone-email-token', limit(20), async (req, res) => {
+  try {
+    const clientId = process.env.PHONEEMAIL_CLIENT_ID || '';
+    if (!clientId) return res.status(503).json({ message: 'Phone verification is not configured yet' });
+    const accessToken = String(req.body?.access_token || '');
+    if (!accessToken || accessToken.length > 500) return res.status(400).json({ message: 'Invalid verification data' });
+    const pe = await getPhoneEmailStatus();
+    if (!pe.enabled) return res.status(400).json({ message: 'Free SMS quota exhausted. Please use another login option.' });
+    let data;
+    try {
+      const resp = await fetch('https://eapi.phone.email/getuser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: accessToken, client_id: clientId }),
+      });
+      data = await resp.json();
+    } catch {
+      return res.status(502).json({ message: 'Verification service unreachable. Try again.' });
+    }
+    if (data?.status !== 200) return res.status(401).json({ message: 'Phone verification failed' });
+    const cc = String(data?.country_code || '').replace(/\D/g, '');
+    const national = String(data?.phone_no || '').replace(/\D/g, '');
+    const phone = cc === '91' ? national : (national.length === 10 ? national : '');
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Phone number verification failed' });
+
+    let user = await User.findOne({ phone });
+    if (user?.isActive === false) return res.status(403).json({ message: 'Account deactivated' });
+    if (!user) {
+      user = new User({
+        name: 'Customer',
+        phone,
+        password: Math.random().toString(36).slice(-12),
+        role: 'customer',
+        phoneVerified: true,
+      });
+      await user.save();
+    } else if (!user.phoneVerified) {
+      user.phoneVerified = true;
+      await user.save();
+    }
+    await bumpPhoneEmailUsage();
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    res.json({
+      token,
+      user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error('Phone.Email token verify error:', error.message);
+    res.status(500).json({ message: 'Verification failed. Please try again.' });
+  }
+});
 // Public: which OTP channels are currently available (drives UI options).
 router.get('/otp-options', async (req, res) => {
   try {

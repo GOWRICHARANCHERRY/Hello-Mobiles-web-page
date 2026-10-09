@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
@@ -15,6 +15,18 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
   const [smsAvailable, setSmsAvailable] = useState(true);
+  const [peAvailable, setPeAvailable] = useState(false);
+  const [peClientId, setPeClientId] = useState('');
+
+  useEffect(() => {
+    api.get('/auth/otp-options')
+      .then(r => {
+        setSmsAvailable(!!r.data?.sms);
+        setPeAvailable(!!r.data?.phoneEmail);
+        setPeClientId(r.data?.phoneEmailClientId || '');
+      })
+      .catch(() => {});
+  }, []);
 
   const startTimer = () => {
     setOtpTimer(60);
@@ -29,6 +41,8 @@ export default function Signup() {
     try {
       const { data } = await api.get('/auth/otp-options');
       setSmsAvailable(!!data?.sms);
+      setPeAvailable(!!data?.phoneEmail);
+      setPeClientId(data?.phoneEmailClientId || '');
       await api.post('/auth/send-whatsapp-otp', { phone });
       toast.success(t('comp.otpSent'));
       setStep(2);
@@ -141,6 +155,16 @@ export default function Signup() {
                 className="w-full btn-gold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw size={16} className="animate-spin" /> {t('comp.sendingOtp')}</> : t('comp.sendOtp')}
               </button>
+              {peAvailable && (
+                <button onClick={() => {
+                  const redirect = `${window.location.origin}/auth/phone-callback`;
+                  window.location.href = `https://www.phone.email/auth/log-in?client_id=${encodeURIComponent(peClientId)}&redirect_url=${encodeURIComponent(redirect)}`;
+                }}
+                  disabled={loading || phone.length !== 10}
+                  className="w-full text-xs font-semibold text-gold-700 hover:underline disabled:opacity-50">
+                  {t('comp.verifyFreeSms')}
+                </button>
+              )}
               {smsAvailable && (
                 <button onClick={handleSendSmsOTP} disabled={loading || phone.length !== 10}
                   className="w-full text-xs text-gray-500 hover:text-gold-700 underline">

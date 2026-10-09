@@ -20,6 +20,8 @@ export default function LoginPopup({ onClose }) {
   const [otpLoading, setOtpLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [smsAvailable, setSmsAvailable] = useState(true);
+  const [peAvailable, setPeAvailable] = useState(false);
+  const [peClientId, setPeClientId] = useState('');
   const googleWrapRef = useRef(null);
   const [googleWidth, setGoogleWidth] = useState(0);
 
@@ -127,8 +129,20 @@ export default function LoginPopup({ onClose }) {
   const switchMode = (m) => {
     setMode(m); setOtpSent(false); setOtp('');
     if (m === 'otp') {
-      api.get('/auth/otp-options').then(r => setSmsAvailable(!!r.data?.sms)).catch(() => {});
+      api.get('/auth/otp-options')
+        .then(r => {
+          setSmsAvailable(!!r.data?.sms);
+          setPeAvailable(!!r.data?.phoneEmail);
+          setPeClientId(r.data?.phoneEmailClientId || '');
+        })
+        .catch(() => {});
     }
+  };
+
+  const startPhoneEmail = () => {
+    if (!peClientId) return toast.error(t('comp.tryAgain'));
+    const redirect = `${window.location.origin}/auth/phone-callback`;
+    window.location.href = `https://www.phone.email/auth/log-in?client_id=${encodeURIComponent(peClientId)}&redirect_url=${encodeURIComponent(redirect)}`;
   };
 
   return (
@@ -232,6 +246,12 @@ export default function LoginPopup({ onClose }) {
                     <button type="button" onClick={handleSendSmsOtp} disabled={otpLoading}
                       className="w-full text-xs text-gray-500 hover:text-gold-700 underline">
                       {t('comp.useSmsInstead')}
+                    </button>
+                  )}
+                  {peAvailable && (
+                    <button type="button" onClick={startPhoneEmail}
+                      className="w-full text-xs font-semibold text-gold-700 hover:underline">
+                      {t('comp.verifyFreeSms')}
                     </button>
                   )}
                 </>

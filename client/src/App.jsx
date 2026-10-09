@@ -10,6 +10,7 @@ import { LanguageProvider } from './context/LanguageContext';
 
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const PhoneCallback = lazy(() => import('./pages/PhoneCallback'));
 const CustomerLayout = lazy(() => import('./pages/customer/CustomerLayout'));
 const Home = lazy(() => import('./pages/customer/Home'));
 const ProductList = lazy(() => import('./pages/customer/ProductList'));
@@ -85,6 +86,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to={getHomeRoute()} /> : <SuspenseRoute><Login /></SuspenseRoute>} />
       <Route path="/signup" element={user ? <Navigate to={getHomeRoute()} /> : <SuspenseRoute><Signup /></SuspenseRoute>} />
+      <Route path="/auth/phone-callback" element={<SuspenseRoute><PhoneCallback /></SuspenseRoute>} />
 
       <Route path="/" element={<OptionalAuthRoute><SuspenseRoute><CustomerLayout /></SuspenseRoute></OptionalAuthRoute>}>
         <Route index element={<SuspenseRoute><Home /></SuspenseRoute>} />

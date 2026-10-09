@@ -94,6 +94,8 @@ export default {
   'comp.otpPlaceholder': '6-అంకెల OTP',
   'comp.verifyLogin': 'ధృవీకరించి లాగిన్ చేయండి',
   'comp.verifying': 'ధృవీకరిస్తోంది...',
+  'comp.verificationFailed': 'ధృవీకరణ విఫలమైంది. మళ్లీ ప్రయత్నించండి.',
+  'comp.verifyFreeSms': 'ఉచిత SMSతో ధృవీకరించండి',
   'comp.changeNumberResend': 'నంబర్ మార్చండి / మళ్లీ పంపండి',
   'comp.backTo': 'వెనుకకు',
   'comp.continueWithoutLogin': 'లాగిన్ లేకుండా కొనసాగించండి →',

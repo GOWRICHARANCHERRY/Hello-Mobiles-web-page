@@ -94,6 +94,8 @@ export default {
   'comp.otpPlaceholder': '6-digit OTP',
   'comp.verifyLogin': 'Verify & Login',
   'comp.verifying': 'Verifying...',
+  'comp.verificationFailed': 'Verification failed. Please try again.',
+  'comp.verifyFreeSms': 'Verify free with SMS',
   'comp.changeNumberResend': 'Change number / Resend',
   'comp.backTo': 'Back to',
   'comp.continueWithoutLogin': 'Continue without login →',

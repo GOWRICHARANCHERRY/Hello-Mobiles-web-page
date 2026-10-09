@@ -94,6 +94,8 @@ export default {
   'comp.otpPlaceholder': '6-अंकीय OTP',
   'comp.verifyLogin': 'सत्यापित करें और लॉगिन करें',
   'comp.verifying': 'सत्यापित हो रहा है...',
+  'comp.verificationFailed': 'सत्यापन विफल। पुनः प्रयास करें।',
+  'comp.verifyFreeSms': 'मुफ्त SMS से सत्यापित करें',
   'comp.changeNumberResend': 'नंबर बदलें / पुनः भेजें',
   'comp.backTo': 'वापस',
   'comp.continueWithoutLogin': 'लॉगिन किए बिना जारी रखें →',
