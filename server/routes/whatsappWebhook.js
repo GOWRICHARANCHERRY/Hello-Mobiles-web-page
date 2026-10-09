@@ -58,7 +58,13 @@ router.post('/webhook', async (req, res) => {
     const entry = req.body?.entry?.[0];
     const change = entry?.changes?.[0];
     const value = change?.value;
-    if (!value?.messages) return; // status updates, not inbound
+    if (!value) return;
+    // Log delivery lifecycle events (sent/delivered/read/failed) so we can
+    // trace whether Meta actually hands messages to handsets.
+    for (const st of value.statuses || []) {
+      console.log(`[WhatsApp] status ${st.status} to ${st.recipient_id} (${st.id || ''})${st.errors ? ' err=' + JSON.stringify(st.errors).slice(0, 200) : ''}`);
+    }
+    if (!value?.messages) return; // pure status update, nothing to reply to
     for (const msg of value.messages) {
       const from = msg.from;
       if (!from || msg.type === 'reaction') continue;
