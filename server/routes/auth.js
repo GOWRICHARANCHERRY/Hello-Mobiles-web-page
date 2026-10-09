@@ -280,6 +280,44 @@ router.post('/send-whatsapp-otp', otpLimiter, async (req, res) => {
   }
 });
 
+// Send login OTP over SMS via 2factor.in (cheap fallback when the customer
+// has no WhatsApp). Costs ~₹0.20/OTP — far cheaper than Firebase SMS (~₹6).
+router.post('/send-sms-otp', otpLimiter, async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!isValidPhone(phone)) return res.status(400).json({ message: 'Invalid phone number' });
+    if (!process.env.TWOFACTOR_API_KEY) {
+      return res.status(503).json({ message: 'SMS service is not configured yet' });
+    }
+
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
+
+    let user = await User.findOne({ phone });
+    if (user) {
+      user.otp = otpHash;
+      user.otpExpiry = otpExpiry;
+      await user.save();
+    } else {
+      user = new User({
+        name: 'Temp',
+        phone,
+        password: Math.random().toString(36).slice(-8),
+        otp: otpHash,
+        otpExpiry,
+      });
+      await user.save();
+    }
+
+    const ok = await sendOTP(phone, otp);
+    if (!ok) return res.status(502).json({ message: 'Failed to send SMS. Please try again.' });
+    res.json({ message: 'OTP sent via SMS' });
+  } catch (error) {
+    console.error('Send SMS OTP error:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
+});
 // Phone + Password Registration (used by the header signup form)
 router.post('/register', limit(10), async (req, res) => {
   try {

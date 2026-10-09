@@ -6,7 +6,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { sendFirebaseOTP } from '../utils/firebase';
 
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
@@ -19,8 +18,6 @@ export default function LoginPopup({ onClose }) {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
-  const [otpChannel, setOtpChannel] = useState('whatsapp');
-  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
   const googleWrapRef = useRef(null);
   const [googleWidth, setGoogleWidth] = useState(0);
@@ -79,7 +76,6 @@ export default function LoginPopup({ onClose }) {
   const handleSendOtp = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setOtpLoading(true);
-    setOtpChannel('whatsapp');
     try {
       await api.post('/auth/send-whatsapp-otp', { phone });
       setOtpSent(true);
@@ -93,15 +89,12 @@ export default function LoginPopup({ onClose }) {
   const handleSendSmsOtp = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setOtpLoading(true);
-    setOtpChannel('sms');
     try {
-      const result = await sendFirebaseOTP(phone);
-      setConfirmation(result);
+      await api.post('/auth/send-sms-otp', { phone });
       setOtpSent(true);
       toast.success(t('comp.otpSent'));
     } catch (error) {
-      if (error.code === 'auth/quota-exceeded') toast.error(t('comp.smsQuotaExceeded'));
-      else toast.error(t('comp.sendOtpFailed', { error: error.message || t('comp.tryAgain') }));
+      toast.error(error.response?.data?.message || t('comp.sendOtpFailed', { error: t('comp.tryAgain') }));
     }
     setOtpLoading(false);
   };
@@ -121,23 +114,16 @@ export default function LoginPopup({ onClose }) {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setOtpLoading(true);
     try {
-      if (otpChannel === 'sms') {
-        const userCred = await confirmation.confirm(otp);
-        const idToken = await userCred.user.getIdToken();
-        const res = await api.post('/auth/firebase-auth', { idToken, phone });
-        finishLogin(res);
-      } else {
-        await api.post('/auth/verify-otp', { phone, otp });
-        const res = await api.post('/auth/complete-signup', { phone });
-        finishLogin(res);
-      }
+      await api.post('/auth/verify-otp', { phone, otp });
+      const res = await api.post('/auth/complete-signup', { phone });
+      finishLogin(res);
     } catch (error) {
       toast.error(error.response?.data?.message || t('comp.invalidOtpTryAgain'));
     }
     setOtpLoading(false);
   };
 
-  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); setOtpChannel('whatsapp'); setConfirmation(null); };
+  const switchMode = (m) => { setMode(m); setOtpSent(false); setOtp(''); };
 
   return (
     <GoogleOAuthProvider clientId="851466331590-mg31lbo8k58gp9l7hhu793bu1r2dj0jg.apps.googleusercontent.com">

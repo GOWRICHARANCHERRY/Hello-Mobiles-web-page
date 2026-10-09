@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import SEO from '../components/SEO';
-import { auth, sendFirebaseOTP } from '../utils/firebase';
 import { ArrowLeft, Check, Smartphone, Shield, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -15,8 +14,6 @@ export default function Signup() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [otpChannel, setOtpChannel] = useState('whatsapp');
-  const [confirmation, setConfirmation] = useState(null);
 
   const startTimer = () => {
     setOtpTimer(60);
@@ -28,7 +25,6 @@ export default function Signup() {
   const handleSendOTP = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setLoading(true);
-    setOtpChannel('whatsapp');
     try {
       await api.post('/auth/send-whatsapp-otp', { phone });
       toast.success(t('comp.otpSent'));
@@ -43,10 +39,8 @@ export default function Signup() {
   const handleSendSmsOTP = async () => {
     if (phone.length !== 10) return toast.error(t('comp.invalidPhone'));
     setLoading(true);
-    setOtpChannel('sms');
     try {
-      const result = await sendFirebaseOTP(phone);
-      setConfirmation(result);
+      await api.post('/auth/send-sms-otp', { phone });
       toast.success(t('comp.otpSent'));
       setStep(2);
       startTimer();
@@ -61,11 +55,7 @@ export default function Signup() {
     if (otp.length !== 6) return toast.error(t('comp.invalidOtp'));
     setLoading(true);
     try {
-      if (otpChannel === 'sms') {
-        await confirmation.confirm(otp);
-      } else {
-        await api.post('/auth/verify-otp', { phone, otp });
-      }
+      await api.post('/auth/verify-otp', { phone, otp });
       toast.success(t('comp.phoneVerifiedToast'));
       setStep(3);
     } catch (error) {
@@ -81,13 +71,7 @@ export default function Signup() {
     if (form.password.length < 6) return toast.error(t('comp.passwordMinLength'));
     setLoading(true);
     try {
-      let data;
-      if (otpChannel === 'sms') {
-        const idToken = await auth.currentUser.getIdToken();
-        ({ data } = await api.post('/auth/firebase-auth', { idToken, phone, name: form.name, email: form.email, password: form.password }));
-      } else {
-        ({ data } = await api.post('/auth/complete-signup', { phone, name: form.name, email: form.email, password: form.password }));
-      }
+      const { data } = await api.post('/auth/complete-signup', { phone, name: form.name, email: form.email, password: form.password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast.success(t('comp.accountCreated'));
